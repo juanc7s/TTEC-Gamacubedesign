@@ -1,0 +1,21 @@
+FIRST STEP IS TO ALWAYS PUT ARDUINO IDE IN DARK MODE (OR ANY IDE FOR THAT MATTER)
+
+########## Required links ########## (Put in Preferences -> "Additional boards manager URLs")
+
+https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/releases/download/0.0.9/package_heltec_esp32_index.json
+https://mcudude.github.io/MiniCore/package_MCUdude_MiniCore_index.json
+
+########## Required Boards ########## (boards manager)
+
+https://github.com/MCUdude/MiniCore -- AtMega8 and AtMega328 with 8MHz Internal Oscillator, allow 3.3V operation
+https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series -- Esp32 LoRa
+
+########## Libraries generally used ########## (library manager)
+
+ArduinoJson
+LoRa
+SD
+TinyGPSPlus
+EspSoftwareSerial
+Heltec_ESP32_Dev-Boards
+LoRa_E32_Series_Library
