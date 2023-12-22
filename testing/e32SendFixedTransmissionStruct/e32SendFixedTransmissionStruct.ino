@@ -28,6 +28,9 @@
 #define M0 7
 #define M1 6
 
+#define CHANNEL_TX 0x02
+#define CHANNEL_RX 0x02
+
 // ---------- Arduino pins --------------
 LoRa_E32 e32ttl(RX, TX, AUX, M0, M1);
 // LoRa_E32 e32ttl(9, 10); // Config without connect AUX and M0 M1
@@ -56,9 +59,9 @@ void setup()
 	Configuration configuration = *(Configuration*) c.data;
 	configuration.ADDL = 0x01;
 	configuration.ADDH = 0x00;
-	configuration.CHAN = 0x02;
+	configuration.CHAN = CHANNEL_RX;
 	configuration.OPTION.fixedTransmission = FT_FIXED_TRANSMISSION;
-  configuration.OPTION.transmissionPower = POWER_10;
+  configuration.OPTION.transmissionPower = POWER_20;
   configuration.SPED.uartBaudRate = UART_BPS_19200;
   configuration.SPED.airDataRate = AIR_DATA_RATE_011_48;
   configuration.SPED.uartParity = MODE_01_8O1;
@@ -87,7 +90,7 @@ void loop()
 
 	*(float*)(message.temperature) = 19.2;
 
-	ResponseStatus rs = e32ttl.sendFixedMessage(0,3,4,&message, sizeof(Message));
+	ResponseStatus rs = e32ttl.sendFixedMessage(0,3,CHANNEL_TX,&message, sizeof(Message));
 	Serial.println(rs.getResponseDescription());
 }
 
