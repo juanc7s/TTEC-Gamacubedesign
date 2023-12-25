@@ -13,10 +13,12 @@ void BitCubeSatProtocol::begin(long int frequency){
     Serial.println("Starting LoRa failed!");
     while (1);
   }
+  LoRa.crc();
+  LoRa.setSPIFrequency(8e6);
 
   // this->receiving_command.reserve(sizeof(Command));
   // this->received_command.reserve(sizeof(Command));
-  // this->sending_telemetry.reserve(sizeof(Telemetry));
+  this->sending_telemetry.reserve(255); // Maximum LoRa package size
   // telemetry.message_1;
   // telemetry.message_2;
 }
@@ -51,8 +53,32 @@ void BitCubeSatProtocol::getCommand(){
   command.cmd_3 = command_doc["3"];
 }
 
+long int t1;
+void tic(){
+  t1 = millis();
+}
+
+void toc(){
+  Serial.print("toc: ");Serial.println(millis() - t1);
+}
+
 void BitCubeSatProtocol::sendTelemetry(){
-  StaticJsonDocument<JSON_OBJECT_SIZE(sizeof(Telemetry))> telemetry_doc;
+    tic();
+  for(int i = 0; i < 2; i++){
+    sending_telemetry = "";
+    prepareTelemetryToLoRa();
+    // prepareTelemetryToLoRa();
+    while(!LoRa.beginPacket()); // Wait until LoRa is ready to transmit
+    LoRa.print(sending_telemetry);
+    LoRa.endPacket(true); // true: Asyncronous transmission, must check if LoRa is ready before begin packet again
+  }
+    toc();
+}
+
+void BitCubeSatProtocol::prepareTelemetryToLoRa(){
+  long int t1 = millis();
+  telemetry.index++;
+  telemetry.time = millis();
   telemetry_doc["1"] = telemetry.type;
   telemetry_doc["2"] = telemetry.message_1;
   telemetry_doc["3"] = telemetry.main_temperature;
@@ -61,16 +87,18 @@ void BitCubeSatProtocol::sendTelemetry(){
   telemetry_doc["6"] = telemetry.batt_current;
   telemetry_doc["7"] = telemetry.batt_charge;
   telemetry_doc["8"] = telemetry.batt_temperature;
-  sending_telemetry = "";
+  telemetry_doc["9"] = telemetry.index;
+  telemetry_doc["10"] = telemetry.time;
   serializeJson(telemetry_doc, sending_telemetry);
-  LoRa.beginPacket();
-  LoRa.print(sending_telemetry);
-  LoRa.endPacket();
-  Serial.println(telemetry_doc.memoryUsage());
-  Serial.println(sizeof(Telemetry));
-  Serial.println(JSON_OBJECT_SIZE(sizeof(Telemetry)));
-  Serial.println(JSON_OBJECT_SIZE(8) + JSON_ARRAY_SIZE(sizeof(Telemetry)));
-  Serial.println(sending_telemetry);
+  sending_telemetry += "\n";
+  // Serial.println(telemetry_doc.memoryUsage());
+  // Serial.println(sizeof(Telemetry));
+  // Serial.println(JSON_OBJECT_SIZE(sizeof(Telemetry)));
+  // Serial.println(JSON_OBJECT_SIZE(9) + 56);
+  // Serial.println("");
+  // Serial.println("");
+  // Serial.println(sending_telemetry.length());// Serial.print(" ");
+  // Serial.println(telemetry.index);
 }
 
 bool BitCubeSatProtocol::isCommandReceived(){

@@ -6,11 +6,15 @@
 
 BitCubeSatProtocol protocol;
 
+long unsigned telemetry_timer = 500;
+long unsigned next_telemetry_timer;
+
 void setup() {
-  Serial.begin(19200);
+  Serial.begin(57600);
   while (!Serial);
 
   protocol.begin(433E6);
+  next_telemetry_timer = millis() + telemetry_timer;
 }
 
 void loop() {
@@ -19,6 +23,14 @@ void loop() {
 }
 
 void TTC_main_loop(){
+  if(millis() < next_telemetry_timer){
+    // Serial.println("Not yet");
+    return;
+  }
+  next_telemetry_timer += telemetry_timer;
+  if(millis() > next_telemetry_timer){
+    Serial.println("Telemetry lost!");
+  }
   protocol.main_loop();
   if(protocol.isCommandReceived()){
     protocol.getCommand();
@@ -29,7 +41,6 @@ void TTC_main_loop(){
     Serial.println(protocol.counter++);
   }
   protocol.sendTelemetry();
-  delay(2000);
 }
 
 

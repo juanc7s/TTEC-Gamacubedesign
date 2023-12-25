@@ -19,3 +19,10 @@ TinyGPSPlus
 EspSoftwareSerial
 Heltec_ESP32_Dev-Boards
 LoRa_E32_Series_Library
+
+########## Interesting links ##########
+https://github.com/thesolarnomad/lora-serialization
+https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md
+https://github.com/KrisKasprzak/EBYTE
+https://github.com/xreef/LoRa_E32_Series_Library
+https://github.com/airspy/airspyone_host#how-to-build-the-host-software-on-linux

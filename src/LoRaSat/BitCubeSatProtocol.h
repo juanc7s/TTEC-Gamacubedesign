@@ -15,7 +15,7 @@ class BitCubeSatProtocol{
     bool isCommandReceived();
 
     struct Telemetry {
-        char type[5] = "tele";
+        char type[15] = "Telemetry Data";
         const char message_1[13] = "Hello There!";
         float main_temperature = 150.5;
         const char message_2[16] = "General Kenobi!";
@@ -23,6 +23,8 @@ class BitCubeSatProtocol{
         float batt_current = 1000.1;
         float batt_charge = -20.3;
         float batt_temperature = -50.0;
+        int index = 0;
+        long unsigned int time = 0;
     } telemetry;
 
     struct Command {
@@ -48,8 +50,10 @@ class BitCubeSatProtocol{
     // } config;
   
   private:
+    StaticJsonDocument<200> telemetry_doc;
     long unsigned int frequency;
     bool message_received;
+    void prepareTelemetryToLoRa();
     String receiving_command;
     String received_command;
     String sending_telemetry;

@@ -14,17 +14,14 @@ from gnuradio import gr
 
 
 class blk(gr.sync_block):  # other base classes are basic_block, decim_block, interp_block
-    """Embedded Python Block example - a simple multiply const"""
+    """Embedded Python Block"""
 
     def __init__(self, log_file='log.txt', clear_current=False):  # only default arguments here
         """arguments to this function show up as parameters in GRC"""
         gr.sync_block.__init__(
             self,
             name='Data Logger',   # will show up in GRC
-            in_sig=[
-                # np.uint8,
-                # dict,
-            ],
+            in_sig=[],
             out_sig=[]
         )
         # if an attribute with the same name as a parameter is found,
@@ -38,47 +35,45 @@ class blk(gr.sync_block):  # other base classes are basic_block, decim_block, in
         if clear_current:
             with open(self.log_file, 'w') as f:
                 pass
-
-        # self.receiving_message = ""#np.ndarray(0, dtype=np.uint8)
-        # self.stack_size = 0
-        # self.received_message = ""
-        # self.message_received = False
+        self.expected_telemetry_index = 0
     
     def message_handler(self, msg):
-        entry = str(msg)
+        entries = str(msg)
         with open(self.log_file, 'a') as f:
-            if not self.first_write:
-                f.write('\n')
-            else:
-                self.first_write = False
-            f.write(entry)
+            for entry in entries.splitlines():
+                if not self.first_write:
+                    f.write('\n')
+                else:
+                    self.first_write = False
+                f.write(entry)
+
+                try:
+                    tin = json.loads(entry)
+                    telemetry = {
+                        "type": tin["1"],
+                        "message_1": tin["2"],
+                        "main_temperature": tin["3"],
+                        "message_2": tin["4"],
+                        "batt_voltage": tin["5"],
+                        "batt_current": tin["6"],
+                        "batt_charge": tin["7"],
+                        "batt_temperature": tin["8"],
+                        "message_index": tin["9"],
+                        "time": tin["10"],
+                    }
+                    print("")
+                    for k,v in zip(telemetry.keys(), telemetry.values()):
+                        print(k + ": " + str(v))
+                    print("")
+                    if self.expected_telemetry_index != telemetry["message_index"]:
+                        f.write("\nTransmission " + str(self.expected_telemetry_index) + " lost!")
+                        print("Transmission " + str(self.expected_telemetry_index) + " lost!")
+                        self.expected_telemetry_index = telemetry["message_index"]+1
+                    else:
+                        self.expected_telemetry_index += 1
+                except json.JSONDecodeError as e:
+                    print(e)
+
 
     def work(self, input_items, output_items):
-        """example: multiply with constant"""
-        # msg = ""
-        # for c in input_items[0].tobytes():
-        #     msg += chr(c)
-        # print(msg)
-        # print(len(input_items[0]))
-        # input_items[0] = np.array([])
-        # self.receiving_message.append(input_items[0])
-        # for c,n in zip(input_items[0].tobytes(),range(len(input_items[0]))):
-        #     if c == '\n':
-        #         self.received_message = self.receiving_message
-        #         self.stack_size -= n
-        #         self.message_received = True
-        #         self.receiving_message = ""
-        #     else:
-        #         self.receiving_message += chr(c)
-        #         self.stack_size += 1
-        #         print(c)
-        # if self.message_received:
-            # message = input_items[0]
-            # crc_check = input_items[1]
-            # kv = json.loads(self.received_message[6:])
-            # for k,v in zip(kv.keys(), kv.values()):
-            #     print(k + ":" + v)
-            # self.message_received = False
-        
-        # return len(output_items[0])
         return 0
