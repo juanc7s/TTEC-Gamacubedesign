@@ -4,43 +4,41 @@
 
 #include "BitCubeSatProtocol.h"
 
-struct Telemetry {
-    char type[5];
-    char message_1[8];
-    float temperature_1;
-    float temperature_2;
-    char message_2[8];
-    float battery_voltage;
-    float battery_charge;
-} telemetry;
-
-int counter = 0;
-BitCubeSatProtocol protocol(915E6);
-
-String command;
+BitCubeSatProtocol protocol;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(19200);
   while (!Serial);
 
-  protocol.begin();
+  protocol.begin(433E6);
 }
 
 void loop() {
   // try to parse packet
-  protocol.main_loop();
-  if(protocol.is_message_received()){
-    command = protocol.read_command();
-    parse_command(command);
-    Serial.print("Command received: ");
-    Serial.println(command);
-    protocol.send_data(data);
-    counter++;
-    Serial.print("Sending data: ");
-    Serial.println(data);
-  }
+  TTC_main_loop();
 }
 
-void parse_command(String command){
-  
+void TTC_main_loop(){
+  protocol.main_loop();
+  if(protocol.isCommandReceived()){
+    protocol.getCommand();
+    parseCommand();
+
+    
+    Serial.print("Sending data packet: ");
+    Serial.println(protocol.counter++);
+  }
+  protocol.sendTelemetry();
+  delay(2000);
+}
+
+
+void parseCommand(){
+  Serial.print("Command received.");
+  Serial.print("\tCommand 1: ");
+  Serial.println(protocol.command.cmd_1);
+  Serial.print("\tCommand 2: ");
+  Serial.println(protocol.command.cmd_2);
+  Serial.print("\tCommand 3: ");
+  Serial.println(protocol.command.cmd_3);
 }

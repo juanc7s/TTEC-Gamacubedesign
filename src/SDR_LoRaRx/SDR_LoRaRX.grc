@@ -1,0 +1,192 @@
+options:
+  parameters:
+    author: vitinho
+    catch_exceptions: 'True'
+    category: '[GRC Hier Blocks]'
+    cmake_opt: ''
+    comment: ''
+    copyright: ''
+    description: ''
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: no_gui
+    hier_block_src_path: '.:'
+    id: testLORARE
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: Not titled yet
+    window_size: (1000,1000)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: freq
+  id: variable
+  parameters:
+    comment: ''
+    value: 433e6
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [288, 12.0]
+    rotation: 0
+    state: enabled
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: ''
+    value: '250000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [184, 12]
+    rotation: 0
+    state: enabled
+- name: epy_block_0
+  id: epy_block
+  parameters:
+    _source_code: "\"\"\"\nEmbedded Python Blocks:\n\nEach time this file is saved,\
+      \ GRC will instantiate the first class it finds\nto get ports and parameters\
+      \ of your block. The arguments to __init__  will\nbe the parameters. All of\
+      \ them are required to have default values!\n\"\"\"\n\nimport numpy as np\n\
+      import json\nimport pmt\n\nfrom gnuradio import gr\n\n\nclass blk(gr.sync_block):\
+      \  # other base classes are basic_block, decim_block, interp_block\n    \"\"\
+      \"Embedded Python Block example - a simple multiply const\"\"\"\n\n    def __init__(self,\
+      \ log_file='log.txt', clear_current=False):  # only default arguments here\n\
+      \        \"\"\"arguments to this function show up as parameters in GRC\"\"\"\
+      \n        gr.sync_block.__init__(\n            self,\n            name='Data\
+      \ Logger',   # will show up in GRC\n            in_sig=[\n                #\
+      \ np.uint8,\n                # dict,\n            ],\n            out_sig=[]\n\
+      \        )\n        # if an attribute with the same name as a parameter is found,\n\
+      \        # a callback is registered (properties work, too).\n\n        self.message_port_register_in(pmt.intern(\"\
+      in\"))\n        self.set_msg_handler(pmt.intern(\"in\"), self.message_handler)\n\
+      \        # self.message_port_register_out(pmt.intern(\"port name\"))\n     \
+      \   self.log_file = log_file\n        self.first_write = True\n        if clear_current:\n\
+      \            with open(self.log_file, 'w') as f:\n                pass\n\n \
+      \       # self.receiving_message = \"\"#np.ndarray(0, dtype=np.uint8)\n    \
+      \    # self.stack_size = 0\n        # self.received_message = \"\"\n       \
+      \ # self.message_received = False\n    \n    def message_handler(self, msg):\n\
+      \        entry = str(msg)\n        with open(self.log_file, 'a') as f:\n   \
+      \         if not self.first_write:\n                f.write('\\n')\n       \
+      \     else:\n                self.first_write = False\n            f.write(entry)\n\
+      \n    def work(self, input_items, output_items):\n        \"\"\"example: multiply\
+      \ with constant\"\"\"\n        # msg = \"\"\n        # for c in input_items[0].tobytes():\n\
+      \        #     msg += chr(c)\n        # print(msg)\n        # print(len(input_items[0]))\n\
+      \        # input_items[0] = np.array([])\n        # self.receiving_message.append(input_items[0])\n\
+      \        # for c,n in zip(input_items[0].tobytes(),range(len(input_items[0]))):\n\
+      \        #     if c == '\\n':\n        #         self.received_message = self.receiving_message\n\
+      \        #         self.stack_size -= n\n        #         self.message_received\
+      \ = True\n        #         self.receiving_message = \"\"\n        #     else:\n\
+      \        #         self.receiving_message += chr(c)\n        #         self.stack_size\
+      \ += 1\n        #         print(c)\n        # if self.message_received:\n  \
+      \          # message = input_items[0]\n            # crc_check = input_items[1]\n\
+      \            # kv = json.loads(self.received_message[6:])\n            # for\
+      \ k,v in zip(kv.keys(), kv.values()):\n            #     print(k + \":\" + v)\n\
+      \            # self.message_received = False\n        \n        # return len(output_items[0])\n\
+      \        return 0\n"
+    affinity: ''
+    alias: ''
+    clear_current: 'False'
+    comment: ''
+    log_file: '"log.txt"'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    _io_cache: ('Data Logger', 'blk', [('log_file', "'log.txt'"), ('clear_current',
+      'False')], [('in', 'message', 1)], [], 'Embedded Python Block example - a simple
+      multiply const', ['log_file'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [816, 192.0]
+    rotation: 0
+    state: enabled
+- name: lora_rx_0
+  id: lora_rx
+  parameters:
+    affinity: ''
+    alias: ''
+    bw: '125000'
+    comment: ''
+    cr: '1'
+    has_crc: 'True'
+    impl_head: 'False'
+    ldro: '2'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    pay_len: '255'
+    print_rx: '[False,False]'
+    samp_rate: samp_rate
+    sf: '7'
+    soft_decoding: 'True'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [504, 156.0]
+    rotation: 0
+    state: enabled
+- name: lora_sdr_crc_verif_0
+  id: lora_sdr_crc_verif
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    output_crc_check: 'False'
+    print_rx_msg: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [808, 296.0]
+    rotation: 0
+    state: disabled
+- name: soapy_rtlsdr_source_0
+  id: soapy_rtlsdr_source
+  parameters:
+    affinity: ''
+    agc: 'False'
+    alias: ''
+    bias: 'False'
+    center_freq: freq
+    comment: ''
+    dev_args: ''
+    freq_correction: '0'
+    gain: '20'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_rate: samp_rate
+    type: fc32
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [200, 196.0]
+    rotation: 0
+    state: enabled
+
+connections:
+- [lora_rx_0, '0', lora_sdr_crc_verif_0, '0']
+- [lora_rx_0, out, epy_block_0, in]
+- [soapy_rtlsdr_source_0, '0', lora_rx_0, '0']
+
+metadata:
+  file_format: 1
+  grc_version: v3.11.0.0git-489-g76831245

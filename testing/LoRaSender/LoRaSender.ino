@@ -4,7 +4,7 @@
 int counter = 0;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(19200);
   while (!Serial);
 
   Serial.println("LoRa Sender");
@@ -17,15 +17,18 @@ void setup() {
 
 void loop() {
   Serial.print("Sending packet: ");
-  Serial.println(counter);
+  Serial.print(counter);
+  Serial.print(" ");
 
   // send packet
   LoRa.beginPacket();
-  LoRa.print("hello ");
-  LoRa.print(counter);
+  uint8_t msgLength = LoRa.print("Hello There!\nGeneral Kenobi! - ");
+  msgLength += LoRa.print(counter);
   LoRa.endPacket();
+
+  Serial.println(msgLength);
 
   counter++;
 
-  delay(100);
+  delay(500);
 }

@@ -22,14 +22,20 @@
 #define E32_M1 6
 #define E32_AUX 5
 
-#define RX 9
-#define TX 10
+#define RX 2
+#define TX 3
 #define AUX 5
 #define M0 7
 #define M1 6
 
-#define CHANNEL_TX 0x02
-#define CHANNEL_RX 0x02
+// #define CHANNEL_TX 0x02
+#define CHANNEL_RX 0x04
+#define RX_ADDH 0x00
+#define RX_ADDL 0x01
+#define TX_ADDH 0xff
+#define TX_ADDL 0xff
+
+int CHANNEL_TX = 0x02;//17;
 
 // ---------- Arduino pins --------------
 LoRa_E32 e32ttl(RX, TX, AUX, M0, M1);
@@ -45,7 +51,7 @@ void printModuleInformation(struct ModuleInformation moduleInformation);
 //The setup function is called once at startup of the sketch
 void setup()
 {
-	Serial.begin(9600);
+	Serial.begin(19200);
 	while (!Serial) {
 	    ; // wait for serial port to connect. Needed for native USB
     }
@@ -57,11 +63,11 @@ void setup()
 	ResponseStructContainer c;
 	c = e32ttl.getConfiguration();
 	Configuration configuration = *(Configuration*) c.data;
-	configuration.ADDL = 0x01;
-	configuration.ADDH = 0x00;
+	configuration.ADDL = RX_ADDL;
+	configuration.ADDH = RX_ADDH;
 	configuration.CHAN = CHANNEL_RX;
 	configuration.OPTION.fixedTransmission = FT_FIXED_TRANSMISSION;
-  configuration.OPTION.transmissionPower = POWER_20;
+  configuration.OPTION.transmissionPower = POWER_10;
   configuration.SPED.uartBaudRate = UART_BPS_19200;
   configuration.SPED.airDataRate = AIR_DATA_RATE_011_48;
   configuration.SPED.uartParity = MODE_01_8O1;
@@ -74,24 +80,32 @@ struct Message {
     char type[5];
     char message[8];
     int temperature;
+    byte chan;
 } message;
 
 int i = 0;
 // The loop function is called in an endless loop
 void loop()
 {
-	delay(200);
+	delay(250);
 	i++;
 	struct Message {
 	    char type[5] = "TEMP";
 	    char message[8] = "Kitchen";
 	    byte temperature[4];
+      byte chan = CHANNEL_TX;
 	} message;
 
 	*(float*)(message.temperature) = 19.2;
 
-	ResponseStatus rs = e32ttl.sendFixedMessage(0,3,CHANNEL_TX,&message, sizeof(Message));
+	ResponseStatus rs = e32ttl.sendFixedMessage(TX_ADDH,TX_ADDL,CHANNEL_TX,&message, sizeof(Message));
 	Serial.println(rs.getResponseDescription());
+  // Serial.print(" ");
+  // Serial.println(CHANNEL_TX);
+  // CHANNEL_TX++;
+  // if(CHANNEL_TX==0x20){
+  //   CHANNEL_TX = 0;
+  // }
 }
 
 void printParameters(struct Configuration configuration) {

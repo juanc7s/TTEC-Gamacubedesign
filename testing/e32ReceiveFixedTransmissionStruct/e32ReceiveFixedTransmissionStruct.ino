@@ -6,8 +6,8 @@
  * E32-TTL-100----- Arduino UNO or esp8266
  * M0         ----- 3.3v (To config) GND (To send) 7 (To dinamically manage)
  * M1         ----- 3.3v (To config) GND (To send) 6 (To dinamically manage)
- * TX         ----- RX PIN 2 (PullUP)
- * RX         ----- TX PIN 3 (PullUP & Voltage divider)
+ * TX         ----- MTX_E32RX PIN 2 (PullUP)
+ * MTX_E32RX         ----- TX PIN 3 (PullUP & Voltage divider)
  * AUX        ----- Not connected (5 if you connect)
  * VCC        ----- 3.3v/5v
  * GND        ----- GND
@@ -21,32 +21,39 @@
 //LoRa_E32 e32ttl(D2, D3); // Config without connect AUX and M0 M1
 
 //#include <SoftwareSerial.h>
-//SoftwareSerial mySerial(D2, D3); // Arduino RX <-- e32 TX, Arduino TX --> e32 RX
+//SoftwareSerial mySerial(D2, D3); // Arduino MTX_E32RX <-- e32 TX, Arduino TX --> e32 MTX_E32RX
 //LoRa_E32 e32ttl(&mySerial, D5, D7, D6);
 // -------------------------------------
 
-#define RX 9
-#define TX 10
+#define MTX_E32RX 2
+#define TX 3
 #define AUX 5
 #define M0 7
 #define M1 6
 
+#define CHANNEL_TX 0x02
+#define CHANNEL_RX 0x02
+#define RX_ADDH 0xff
+#define RX_ADDL 0xff
+#define TX_ADDH 0xff
+#define TX_ADDL 0xff
+
 // ---------- Arduino pins --------------
-LoRa_E32 e32ttl(RX, TX, AUX, M0, M1);
-// LoRa_E32 e32ttl(9, 10, 4); // Config without connect AUX and M0 M1
+LoRa_E32 e32ttl(MTX_E32RX, TX, AUX, M0, M1);
+// LoRa_E32 e32ttl(MTX_E32RX, TX, 4); // Config without connect AUX and M0 M1
 
 //#include <SoftwareSerial.h>
-//SoftwareSerial mySerial(2, 3); // Arduino RX <-- e32 TX, Arduino TX --> e32 RX
+//SoftwareSerial mySerial(2, 3); // Arduino MTX_E32RX <-- e32 TX, Arduino TX --> e32 MTX_E32RX
 //LoRa_E32 e32ttl(&mySerial, 5, 7, 6);
 // -------------------------------------
 
 // ---------------- STM32 --------------------
-// HardwareSerial Serial2(USART2);   // PA3  (RX)  PA2  (TX)
-// LoRa_E32 e32ttl(&Serial2, PA0, PB0, PB10); //  RX AUX M0 M1
+// HardwareSerial Serial2(USART2);   // PA3  (MTX_E32RX)  PA2  (TX)
+// LoRa_E32 e32ttl(&Serial2, PA0, PB0, PB10); //  MTX_E32RX AUX M0 M1
 // -------------------------------------------------
 
 // ---------- Raspberry PI Pico pins --------------
-// LoRa_E32 e32ttl100(&Serial2, 2, 10, 11); //  RX AUX M0 M1
+// LoRa_E32 e32ttl100(&Serial2, 2, 10, 11); //  MTX_E32RX AUX M0 M1
 // -------------------------------------
 
 void printParameters(struct Configuration configuration);
@@ -54,14 +61,14 @@ void printModuleInformation(struct ModuleInformation moduleInformation);
 //The setup function is called once at startup of the sketch
 void setup()
 {
-	Serial.begin(9600);
+	Serial.begin(19200);
 	while (!Serial) {
 	    ; // wait for serial port to connect. Needed for native USB
     }
 	delay(100);
 
 	e32ttl.begin();
-  // pinMode(9, INPUT_PULLUP);
+  // pinMode(MTX_E32RX, INPUT_PULLUP);
 
 //	e32ttl.resetModule();
 	// After set configuration comment set M0 and M1 to low
@@ -69,11 +76,11 @@ void setup()
 	ResponseStructContainer c;
 	c = e32ttl.getConfiguration();
 	Configuration configuration = *(Configuration*) c.data;
-	configuration.ADDL = 0x03;
-	configuration.ADDH = 0x00;
-	configuration.CHAN = 0x04;
+	configuration.ADDH = RX_ADDH;
+	configuration.ADDL = RX_ADDL;
+	configuration.CHAN = CHANNEL_RX;
 	configuration.OPTION.fixedTransmission = FT_FIXED_TRANSMISSION;
-  configuration.SPED.uartBaudRate = UART_BPS_9600;
+  configuration.SPED.uartBaudRate = UART_BPS_19200;
   configuration.SPED.airDataRate = AIR_DATA_RATE_011_48;
   configuration.SPED.uartParity = MODE_01_8O1;
 	e32ttl.setConfiguration(configuration, WRITE_CFG_PWR_DWN_SAVE);
@@ -89,6 +96,7 @@ struct Message {
     char type[5];
     char message[8];
     byte temperature[4];
+    byte chan;
 };
 
 // The loop function is called in an endless loop
@@ -102,6 +110,7 @@ void loop()
 
 		Serial.println(*(float*)(message.temperature));
 		Serial.println(message.message);
+    Serial.println(message.chan);
 //		free(rsc.data);
 		rsc.close();
 	}
