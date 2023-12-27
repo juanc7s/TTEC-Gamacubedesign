@@ -19,7 +19,6 @@ from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import soapy
 import gnuradio.lora_sdr as lora_sdr
-import testLORARE_epy_block_0 as epy_block_0  # embedded python block
 
 
 
@@ -33,7 +32,7 @@ class testLORARE(gr.top_block):
         # Variables
         ##################################################
         self.samp_rate = samp_rate = 250000
-        self.freq = freq = 433e6
+        self.freq = freq = 434e6
 
         ##################################################
         # Blocks
@@ -74,14 +73,12 @@ class testLORARE(gr.top_block):
         self._soapy_rtlsdr_source_0_gain_value = 20
         self.set_soapy_rtlsdr_source_0_gain_mode(0, bool(False))
         self.set_soapy_rtlsdr_source_0_gain(0, 'TUNER', 20)
-        self.lora_rx_0 = lora_sdr.lora_sdr_lora_rx( bw=125000, cr=1, has_crc=True, impl_head=False, pay_len=255, samp_rate=samp_rate, sf=7, soft_decoding=True, ldro_mode=2, print_rx=[True,True])
-        self.epy_block_0 = epy_block_0.blk(log_file="log.txt", clear_current=True)
+        self.lora_rx_0 = lora_sdr.lora_sdr_lora_rx( bw=125000, cr=0, has_crc=False, impl_head=False, pay_len=255, samp_rate=samp_rate, sf=7, soft_decoding=True, ldro_mode=2, print_rx=[True,True])
 
 
         ##################################################
         # Connections
         ##################################################
-        self.msg_connect((self.lora_rx_0, 'out'), (self.epy_block_0, 'in'))
         self.connect((self.soapy_rtlsdr_source_0, 0), (self.lora_rx_0, 0))
 
 

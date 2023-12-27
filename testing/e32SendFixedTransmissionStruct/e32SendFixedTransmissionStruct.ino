@@ -16,15 +16,15 @@
 #include "Arduino.h"
 #include "LoRa_E32.h"
 
-#define E32_RX 2
-#define E32_TX 3
-#define E32_M0 7
-#define E32_M1 6
-#define E32_AUX 5
+// #define E32_RX 9
+// #define E32_TX 10
+// #define E32_M0 7
+// #define E32_M1 6
+// #define E32_AUX 2
 
-#define RX 2
-#define TX 3
-#define AUX 5
+#define RX 9
+#define TX 10
+#define AUX 2
 #define M0 7
 #define M1 6
 
@@ -35,7 +35,7 @@
 #define TX_ADDH 0xff
 #define TX_ADDL 0xff
 
-int CHANNEL_TX = 0x02;//17;
+int CHANNEL_TX = 0x02;
 
 // ---------- Arduino pins --------------
 LoRa_E32 e32ttl(RX, TX, AUX, M0, M1);
@@ -67,9 +67,10 @@ void setup()
 	configuration.ADDH = RX_ADDH;
 	configuration.CHAN = CHANNEL_RX;
 	configuration.OPTION.fixedTransmission = FT_FIXED_TRANSMISSION;
-  configuration.OPTION.transmissionPower = POWER_10;
+  configuration.OPTION.transmissionPower = POWER_20;
   configuration.SPED.uartBaudRate = UART_BPS_19200;
-  configuration.SPED.airDataRate = AIR_DATA_RATE_011_48;
+  // configuration.SPED.airDataRate = AIR_DATA_RATE_001_12;
+  configuration.SPED.airDataRate = AIR_DATA_RATE_000_03;
   configuration.SPED.uartParity = MODE_01_8O1;
 	e32ttl.setConfiguration(configuration, WRITE_CFG_PWR_DWN_SAVE);
 	printParameters(configuration);
@@ -84,21 +85,39 @@ struct Message {
 } message;
 
 int i = 0;
+String receiving_message = "";
+String received_message = "";
+bool message_received = false;
+
 // The loop function is called in an endless loop
 void loop()
 {
-	delay(250);
+	delay(2500);
+  // delay(900);
+
+  if(message_received){
+    CHANNEL_TX = received_message.toInt();
+    Serial.print("Channel set to ");
+    Serial.println(CHANNEL_TX, HEX);
+    message_received = false;
+  }
+
 	i++;
-	struct Message {
-	    char type[5] = "TEMP";
-	    char message[8] = "Kitchen";
-	    byte temperature[4];
-      byte chan = CHANNEL_TX;
-	} message;
+	// struct Message {
+	//     char type[5] = "TEMP";
+	//     char message[8] = "Kitchen";
+	//     byte temperature[4];
+  //     byte chan = CHANNEL_TX;
+	// } message;
 
-	*(float*)(message.temperature) = 19.2;
+	// *(float*)(message.temperature) = 19.2;
+  uint8_t message[] = {0x20};
 
-	ResponseStatus rs = e32ttl.sendFixedMessage(TX_ADDH,TX_ADDL,CHANNEL_TX,&message, sizeof(Message));
+	// ResponseStatus rs = e32ttl.sendFixedMessage(TX_ADDH,TX_ADDL,CHANNEL_TX,&message, sizeof(Message));
+	ResponseStatus rs = e32ttl.sendFixedMessage(TX_ADDH,TX_ADDL,CHANNEL_TX,&message, sizeof(message));
+  // delay(100);
+  Serial.print(sizeof(message));
+  Serial.print(" ");
 	Serial.println(rs.getResponseDescription());
   // Serial.print(" ");
   // Serial.println(CHANNEL_TX);
@@ -139,4 +158,18 @@ void printModuleInformation(struct ModuleInformation moduleInformation) {
 	Serial.print(F("Features : "));  Serial.println(moduleInformation.features, HEX);
 	Serial.println("----------------------------------------");
 
+}
+
+void serialEvent(){
+  char c;
+  while(Serial.available() && !message_received){
+    c = Serial.read();
+    if(c == '\n'){
+      message_received = true;
+      received_message = receiving_message;
+      receiving_message = "";
+    } else{
+      receiving_message += c;
+    }
+  }
 }
