@@ -1,0 +1,3 @@
+[submodule "libraries/EbyteLib"]
+	path = libraries/EbyteLib
+	url = https://github.com/VitinLima/EbyteLib.git
