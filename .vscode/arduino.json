@@ -1,0 +1,5 @@
+{
+    "configuration": "bootloader=uart0,eeprom=keep,baudrate=default,variant=modelP,BOD=2v7,LTO=Os_flto,clock=16MHz_external",
+    "board": "MiniCore:avr:328",
+    "sketch": "src\\EByteSystem\\Satellite\\Satellite.ino"
+}
