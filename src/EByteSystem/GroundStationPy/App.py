@@ -4,14 +4,14 @@ from tkinter import ttk
 
 import serial.tools.list_ports
 
-import Comm
+import Control
 
 class App(tk.Tk):
   def __init__(self):
     tk.Tk.__init__(self)
     self.title('GamaCubedesign Groud Station')
 
-    self.comm = Comm.Comm()
+    self.control = Control.ControlFrame(self)
     
     self.init_variables()
     self.init_layout()
@@ -38,9 +38,9 @@ class App(tk.Tk):
     ttk.Entry(master=baudrate_frame,textvariable=self.baudrate).pack(side='top', fill='both')
     open_frame = ttk.Frame(master=top_frame)
     open_frame.pack(side='left',fill='both')
-    ttk.Button(master=open_frame,textvariable=self.open_close_variable,command=self.open_close_channel).pack(side='top',fill='both')
+    ttk.Button(master=open_frame,textvariable=self.open_close_variable,command=self.open_close_channel).pack(side='left',fill='both')
 
-    self.control_frame = tk.Frame(master=self)
+    # self.control_frame = tk.Frame(master=self)
   
   def detect_ports(self):
     self.ports_dict = dict()
@@ -53,14 +53,20 @@ class App(tk.Tk):
   
   def open_close_channel(self):
     if self.open_close_variable.get()=="Open channel":
-      self.comm.begin(self.control_frame, self.ports_dict[self.port_combobox.get()], self.baudrate.get())
-      self.open_close_variable.set("Close channel")
-      self.control_frame.pack(side='bottom',fill='both')
+      if self.control.begin(self.ports_dict[self.port_combobox.get()], self.baudrate.get()):
+        self.open_close_variable.set("Close channel")
+        # self.control.pack(side='bottom',fill='both')
+        self.update_id = self.after(ms=500,func=self.update)
     elif self.open_close_variable.get()=="Close channel":
-      self.comm.close()
+      self.control.close()
       self.open_close_variable.set("Open channel")
-      self.control_frame.pack_forget()
+      # self.control_frame.pack_forget()
+      self.after_cancel(self.update_id)
       # self.control_frame.pack()
+  
+  def update(self):
+    self.control.update()
+    self.update_id = self.after(ms=500,func=self.update)
 
 
 if __name__ == "__main__":

@@ -15,7 +15,7 @@ void setup(){
   Serial.println("Testing Gama Ground Station communication system with EByte32 rf module");
 
   initE32();
-  Serial.println("Device initiated successfully");
+  Serial.println("CONTROL:Device initiated successfully");
 
   setHEAD(SAVE_ON_POWER_DOWN);
   setADDH(rxAddh);
