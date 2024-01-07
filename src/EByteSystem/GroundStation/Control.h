@@ -8,12 +8,15 @@ extern uint8_t rxAddh;
 extern uint8_t rxAddl;
 extern uint8_t rxChan;
 
-extern String received_serial;
-extern String receiving_serial;
-extern bool serial_received;
+// extern String received_serial;
+// extern String receiving_serial;
+// extern bool serial_received;
 
 extern bool state_sending;
 extern unsigned int telemetry_index;
+extern unsigned int message_data_index;
+
+extern void (*parsing_function)(uint8_t c);
 
 enum CONTROL_COMMAND{
   READ_HEAD,
@@ -49,6 +52,20 @@ enum CONTROL_COMMAND{
 
 void checkControl();
 void decodeSerial();
-void parseSerial();
+void parseSerial(uint8_t c);
+
+void control_toggleTx(uint8_t);
+void control_setTxChannel(uint8_t);
+void control_setTxAddh(uint8_t);
+void control_setTxAddl(uint8_t);
+void control_setAddh(uint8_t c);
+void control_setAddl(uint8_t c);
+void control_setChannel(uint8_t c);
+void control_setParity(uint8_t c);
+void control_setUARTBaudRate(uint8_t c);
+void control_setAirDataRate(uint8_t c);
+void control_setTxPower(uint8_t c);
+void control_setTxMode(uint8_t c);
+void control_setOperationMode(uint8_t c);
 
 #endif

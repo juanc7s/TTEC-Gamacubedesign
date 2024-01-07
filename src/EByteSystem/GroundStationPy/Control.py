@@ -255,41 +255,44 @@ class ControlFrame(ttk.LabelFrame):
         self.receiving_buffer += b.to_bytes()
   
   def parse_message(self):
-      print(self.receiving_buffer)
-      msg = str(self.receiving_buffer,encoding='utf8').rstrip()
-      print(msg)
-      if len(msg)>2:
-        v = msg.split(':')
-        if v[0] == "CONTROL":
-          cmd = v[1]
-          args = v[2:]
-          if cmd=="Device initiated successfully":
-            self.on_device_ready()
-          elif cmd == "HEAD":
-            self.head_variable.set(hex(int(args[0], 16))[2:].upper())
-          elif cmd == "ADDH":
-            self.addh_variable.set(hex(int(args[0], 16))[2:].upper())
-          elif cmd == "ADDL":
-            self.addl_variable.set(hex(int(args[0], 16))[2:].upper())
-          elif cmd == "CHAN":
-            self.chan_variable.set(hex(int(args[0], 16))[2:].upper())
-          elif cmd == "PARITY":
-            self.parity_variable.set(args[0])
-          elif cmd == "UART_BAUD_RATE":
-            self.uart_baud_rate_variable.set(args[0])
-          elif cmd == "AIR_DATA_RATE":
-            self.air_data_rate_variable.set(args[0])
-          elif cmd == "TXPW":
-            self.tx_power_variable.set(args[0])
-          elif cmd == "TXMO":
-            self.tx_mode_variable.set(args[0])
-          elif cmd == "OPMO":
-            self.operation_mode_variable.set(args[0])
-        else:
-          pass
-            # v = msg.split(sep=': ')
-            # parameter = v[0]
-            # value = v[1]
+      # print(self.receiving_buffer)
+      try:
+        msg = str(self.receiving_buffer,encoding='utf8').rstrip()
+        print(msg)
+        if len(msg)>2:
+          v = msg.split(':')
+          if v[0] == "CONTROL":
+            cmd = v[1]
+            args = v[2:]
+            if cmd=="Device initiated successfully":
+              self.on_device_ready()
+            elif cmd == "HEAD":
+              self.head_variable.set(hex(int(args[0], 16))[2:].upper())
+            elif cmd == "ADDH":
+              self.addh_variable.set(hex(int(args[0], 16))[2:].upper())
+            elif cmd == "ADDL":
+              self.addl_variable.set(hex(int(args[0], 16))[2:].upper())
+            elif cmd == "CHAN":
+              self.chan_variable.set(hex(int(args[0], 16))[2:].upper())
+            elif cmd == "PARITY":
+              self.parity_variable.set(args[0])
+            elif cmd == "UART_BAUD_RATE":
+              self.uart_baud_rate_variable.set(args[0])
+            elif cmd == "AIR_DATA_RATE":
+              self.air_data_rate_variable.set(args[0])
+            elif cmd == "TXPW":
+              self.tx_power_variable.set(args[0])
+            elif cmd == "TXMO":
+              self.tx_mode_variable.set(args[0])
+            elif cmd == "OPMO":
+              self.operation_mode_variable.set(args[0])
+          else:
+            pass
+              # v = msg.split(sep=': ')
+              # parameter = v[0]
+              # value = v[1]
+      except Exception as e:
+        print(e)
   
   def update(self):
     self.read()

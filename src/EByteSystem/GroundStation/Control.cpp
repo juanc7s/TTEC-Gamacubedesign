@@ -11,26 +11,26 @@
 
 bool serialFlag = false;
 
+unsigned int message_data_index = 0;
+
+void (*parsing_function)(uint8_t c) = parseSerial;
+
 void checkControl(){
   char c;
-  while(Serial.available() && !serial_received){
+  while(Serial.available()){
     c = Serial.read();
     // Serial.println((uint8_t)c);
     if(serialFlag){
-      received_serial += c;
+      parsing_function(c);
     } else if(c==13){
       serialFlag = true;
     } else if(c=='\n'){
-      serial_received = true;
+      parsing_function = parseSerial;
+    } else if (c==255){
+      parsing_function = parseSerial;
     } else{
-      received_serial += c;
+      parsing_function(c);
     }
-  }
-
-  if(serial_received){
-    // decodeSerial();
-    parseSerial();
-    received_serial = "";
   }
 }
 
@@ -38,20 +38,19 @@ void checkControl(){
 
 // }
 
-void parseSerial(){
-  serial_received = false;
-  switch(received_serial[0]){
+void parseSerial(uint8_t c){
+  switch(c){
     case TOGGLE_COMMUNICATION:
-      state_sending = ((uint8_t)received_serial[1]) != 0;
+      parsing_function = control_toggleTx;
       break;
     case SET_TX_CHAN:
-      txChan = received_serial[1];
+      parsing_function = control_setTxChannel;
       break;
     case SET_TX_ADDH:
-      txAddh = received_serial[1];
+      parsing_function = control_setTxAddh;
       break;
     case SET_TX_ADDL:
-      txAddl = received_serial[1];
+      parsing_function = control_setTxAddl;
       break;
     case READ_ADDH:
       Serial.print("CONTROL:ADDH:");
@@ -140,114 +139,30 @@ void parseSerial(){
     case READ_ALL:
       printConfiguration();
     case SET_ADDH:
-      setADDH((uint8_t)received_serial[1]);
-      setConfiguration();
+      parsing_function = control_setAddh;
       break;
     case SET_ADDL:
-      setADDL((uint8_t)received_serial[1]);
-      setConfiguration();
+      parsing_function = control_setAddl;
       break;
     case SET_CHAN:
-      setChannel((uint8_t)received_serial[1]);
-      setConfiguration();
+      parsing_function = control_setChannel;
       break;
     case SET_PARITY:
-      switch(received_serial[1]){
-        case 'N':
-          setParity(UART_PARITY_BIT_8N1);
-          break;
-        case 'O':
-          setParity(UART_PARITY_BIT_8O1);
-          break;
-        case 'E':
-          setParity(UART_PARITY_BIT_8E1);
-          break;
-      }
-      setConfiguration();
+      parsing_function = control_setParity;
       break;
     case SET_UART_BAUD_RATE:
-      // switch(((unsigned int)received_serial[1])<<8 + (unsigned int)received_serial[2]){
-      //   case 12:
-      //     setBaudRate(TTL_UART_BAUD_RATE_1200);
-      //     break;
-      //   case 24:
-      //     setBaudRate(TTL_UART_BAUD_RATE_2400);
-      //     break;
-      //   case 48:
-      //     setBaudRate(TTL_UART_BAUD_RATE_4800);
-      //     break;
-      //   case 96:
-      //     setBaudRate(TTL_UART_BAUD_RATE_9600);
-      //     break;
-      //   case 192:
-      //     setBaudRate(TTL_UART_BAUD_RATE_19200);
-      //     break;
-      //   case 384:
-      //     setBaudRate(TTL_UART_BAUD_RATE_38400);
-      //     break;
-      //   case 576:
-      //     setBaudRate(TTL_UART_BAUD_RATE_57600);
-      //     break;
-      //   case 1152:
-      //     setBaudRate(TTL_UART_BAUD_RATE_115200);
-      //     break;
-      // }
-      setBaudRate((TTL_UART_BAUD_RATE)received_serial[1]);
-      setConfiguration();
+      parsing_function = control_setUARTBaudRate;
       break;
     case SET_AIR_DATA_RATE:
-      // switch((uint8_t)received_serial[1]){
-      //   case 3:
-      //     setAirDataRate(AIR_DATA_RATE_300);
-      //     break;
-      //   case 12:
-      //     setAirDataRate(AIR_DATA_RATE_1200);
-      //     break;
-      //   case 24:
-      //     setAirDataRate(AIR_DATA_RATE_2400);
-      //     break;
-      //   case 48:
-      //     setAirDataRate(AIR_DATA_RATE_4800);
-      //     break;
-      //   case 96:
-      //     setAirDataRate(AIR_DATA_RATE_9600);
-      //     break;
-      //   case 192:
-      //     setAirDataRate(AIR_DATA_RATE_19200);
-      //     break;
-      // }
-      setAirDataRate((AIR_DATA_RATE)received_serial[1]);
-      setConfiguration();
+      parsing_function = control_setAirDataRate;
       break;
     case SET_TRANSMISSION_POWER:
-      switch((uint8_t)received_serial[1]){
-        case 10:
-          setTransmissionPower(TRANSMISSION_POWER_10dBm);
-          break;
-        case 14:
-          setTransmissionPower(TRANSMISSION_POWER_14dBm);
-          break;
-        case 17:
-          setTransmissionPower(TRANSMISSION_POWER_17dBm);
-          break;
-        case 20:
-          setTransmissionPower(TRANSMISSION_POWER_20dBm);
-          break;
-      }
-      setConfiguration();
+      parsing_function = control_setTxPower;
       break;
     case SET_TRANSMISSION_MODE:
-      switch((uint8_t)received_serial[1]){
-        case 0:
-          setTransmissionMode(TRANSPARENT_TRANSMISSION_MODE);
-          break;
-        case 1:
-          setTransmissionMode(FIXED_TRANSMISSION_MODE);
-          break;
-      }
-      setConfiguration();
+      parsing_function = control_setTxMode;
     case SET_OPERATION_MODE:
-      setOperationMode((OperationMode)received_serial[1]);
+      parsing_function = control_setOperationMode;
     case FLUSH:
       telemetry_index = 0;
       break;
@@ -255,4 +170,153 @@ void parseSerial(){
       break;
   }
   // delay(400);
+}
+
+void control_toggleTx(uint8_t c){
+  state_sending = c != 0;
+  parsing_function = parseSerial;
+}
+
+void control_setTxChannel(uint8_t c){
+  txChan = c;
+  parsing_function = parseSerial;
+}
+
+void control_setTxAddh(uint8_t c){
+  txAddh = c;
+  parsing_function = parseSerial;
+}
+
+void control_setTxAddl(uint8_t c){
+  txAddl = c;
+  parsing_function = parseSerial;
+}
+
+void control_setAddh(uint8_t c){
+  setADDH((uint8_t)c);
+  setConfiguration();
+  parsing_function = parseSerial;
+}
+
+void control_setAddl(uint8_t c){
+  setADDL((uint8_t)c);
+  setConfiguration();  
+  parsing_function = parseSerial;
+}
+
+void control_setChannel(uint8_t c){
+  setChannel((uint8_t)c);
+  setConfiguration();
+  parsing_function = parseSerial;
+}
+
+void control_setParity(uint8_t c){
+  switch(c){
+    case 'N':
+      setParity(UART_PARITY_BIT_8N1);
+      break;
+    case 'O':
+      setParity(UART_PARITY_BIT_8O1);
+      break;
+    case 'E':
+      setParity(UART_PARITY_BIT_8E1);
+      break;
+  }
+  setConfiguration();
+  parsing_function = parseSerial;
+}
+
+void control_setUARTBaudRate(uint8_t c){
+  // switch(((unsigned int)c)<<8 + (unsigned int)received_serial[2]){
+  //   case 12:
+  //     setBaudRate(TTL_UART_BAUD_RATE_1200);
+  //     break;
+  //   case 24:
+  //     setBaudRate(TTL_UART_BAUD_RATE_2400);
+  //     break;
+  //   case 48:
+  //     setBaudRate(TTL_UART_BAUD_RATE_4800);
+  //     break;
+  //   case 96:
+  //     setBaudRate(TTL_UART_BAUD_RATE_9600);
+  //     break;
+  //   case 192:
+  //     setBaudRate(TTL_UART_BAUD_RATE_19200);
+  //     break;
+  //   case 384:
+  //     setBaudRate(TTL_UART_BAUD_RATE_38400);
+  //     break;
+  //   case 576:
+  //     setBaudRate(TTL_UART_BAUD_RATE_57600);
+  //     break;
+  //   case 1152:
+  //     setBaudRate(TTL_UART_BAUD_RATE_115200);
+  //     break;
+  // }
+  setBaudRate((TTL_UART_BAUD_RATE)c);
+  setConfiguration();
+  parsing_function = parseSerial;
+}
+
+void control_setAirDataRate(uint8_t c){
+  // switch((uint8_t)c){
+  //   case 3:
+  //     setAirDataRate(AIR_DATA_RATE_300);
+  //     break;
+  //   case 12:
+  //     setAirDataRate(AIR_DATA_RATE_1200);
+  //     break;
+  //   case 24:
+  //     setAirDataRate(AIR_DATA_RATE_2400);
+  //     break;
+  //   case 48:
+  //     setAirDataRate(AIR_DATA_RATE_4800);
+  //     break;
+  //   case 96:
+  //     setAirDataRate(AIR_DATA_RATE_9600);
+  //     break;
+  //   case 192:
+  //     setAirDataRate(AIR_DATA_RATE_19200);
+  //     break;
+  // }
+  setAirDataRate((AIR_DATA_RATE)c);
+  setConfiguration();
+  parsing_function = parseSerial;
+}
+
+void control_setTxPower(uint8_t c){
+  switch((uint8_t)c){
+    case 10:
+      setTransmissionPower(TRANSMISSION_POWER_10dBm);
+      break;
+    case 14:
+      setTransmissionPower(TRANSMISSION_POWER_14dBm);
+      break;
+    case 17:
+      setTransmissionPower(TRANSMISSION_POWER_17dBm);
+      break;
+    case 20:
+      setTransmissionPower(TRANSMISSION_POWER_20dBm);
+      break;
+  }
+  setConfiguration();
+  parsing_function = parseSerial;
+}
+
+void control_setTxMode(uint8_t c){
+  switch((uint8_t)c){
+    case 0:
+      setTransmissionMode(TRANSPARENT_TRANSMISSION_MODE);
+      break;
+    case 1:
+      setTransmissionMode(FIXED_TRANSMISSION_MODE);
+      break;
+  }
+  setConfiguration();
+  parsing_function = parseSerial;
+}
+
+void control_setOperationMode(uint8_t c){
+  setOperationMode((OperationMode)c);
+  parsing_function = parseSerial;
 }
