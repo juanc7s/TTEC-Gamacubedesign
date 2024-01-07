@@ -32,15 +32,16 @@ Message message = {
 Telemetry telemetry;
 
 void sendCommand(){
+  telemetry_index = 0;
   Serial.print("Sending a message of length ");
   Serial.println(sizeof(message));
   asynchronousWriteFixedTransmission(txAddh, txAddl, txChan, (uint8_t*)&message, sizeof(message));
-  if(!getTransmissionResult(5000)){
+  if(!getTransmissionResult(500)){
     Serial.println("Transmission failed.\nSkipping to next iteration.");
   } else{
     // delay(3000);
     Serial.println("Waiting for response");
-    listenForResponse(10000);
+    listenForResponse(1000);
   }
 }
 

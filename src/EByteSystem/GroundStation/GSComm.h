@@ -11,7 +11,7 @@ extern uint8_t rxChan;
 extern unsigned int telemetry_index;
 extern bool telemetry_received;
 
-#define N 255 // Size of the added array (+1 for an end of line char)  
+#define N 58 // Size of the added array (+1 for an end of line char)  
 struct Message{
   unsigned int length;
   char type[10];

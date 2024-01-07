@@ -22,8 +22,8 @@ void setup(){
   setADDL(rxAddl);
   setChannel(rxChan);
   setParity(UART_PARITY_BIT_8N1);
-  setBaudRate(TTL_UART_baud_rate_9600);
-  setAirDataRate(Air_Data_Rate_2400);
+  setBaudRate(TTL_UART_BAUD_RATE_57600);
+  setAirDataRate(AIR_DATA_RATE_19200);
   setTransmissionMode(FIXED_TRANSMISSION_MODE);
   setIODriveMode(IO_DRIVE_MODE_PUSH_PULL);
   setWirelessWakeUpTime(WIRELESS_WAKE_UP_TIME_250ms);
@@ -31,15 +31,16 @@ void setup(){
   setTransmissionPower(TRANSMISSION_POWER_20dBm);
   setConfiguration();
   
-  printConfiguration();
+  // printConfiguration();
   setNormalMode();
+  delay(3000);
 }
 
 String receiving_serial = "";
 String received_serial = "";
 bool serial_received = false;
 
-bool state_sending = false;
+bool state_sending = true;
 
 unsigned long transmission_timer = 1500;
 unsigned long next_transmission = 0;

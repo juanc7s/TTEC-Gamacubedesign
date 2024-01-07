@@ -21,8 +21,8 @@ void setup(){
   setADDL(rxAddl);
   setChannel(rxChan);
   setParity(UART_PARITY_BIT_8N1);
-  setBaudRate(TTL_UART_baud_rate_9600);
-  setAirDataRate(Air_Data_Rate_2400);
+  setBaudRate(TTL_UART_BAUD_RATE_57600);
+  setAirDataRate(AIR_DATA_RATE_19200);
   setTransmissionMode(FIXED_TRANSMISSION_MODE);
   setIODriveMode(IO_DRIVE_MODE_PUSH_PULL);
   setWirelessWakeUpTime(WIRELESS_WAKE_UP_TIME_250ms);
