@@ -33,14 +33,13 @@ void setup(){
   
   // printConfiguration();
   setNormalMode();
-  delay(3000);
 }
 
 String receiving_serial = "";
 String received_serial = "";
 bool serial_received = false;
 
-bool state_sending = true;
+bool state_sending = false;
 
 unsigned long transmission_timer = 1500;
 unsigned long next_transmission = 0;

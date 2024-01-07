@@ -16,6 +16,7 @@ extern bool state_sending;
 extern unsigned int telemetry_index;
 
 enum CONTROL_COMMAND{
+  READ_HEAD,
   READ_ADDH,
   READ_ADDL,
   READ_CHAN,
@@ -26,6 +27,7 @@ enum CONTROL_COMMAND{
   READ_TRANSMISSION_MODE,
   READ_OPERATION_MODE,
   READ_ALL,
+  SET_HEAD,
   SET_ADDH,
   SET_ADDL,
   SET_CHAN,

@@ -6,27 +6,29 @@ import serial
 from enum import Enum
 
 control_commands = [
+  "READ_HEAD",
   "READ_ADDH",
   "READ_ADDL",
   "READ_CHAN",
   "READ_AIR_DATA_RATE",
   "READ_UART_BAUD_RATE",
   "READ_PARITY",
-  "READ_TRANSMISSION_POWER",
-  "READ_TRANSMISSION_MODE",
+  "READ_TX_POWER",
+  "READ_TX_MODE",
   "READ_OPERATION_MODE",
   "READ_ALL",
+  "SET_HEAD",
   "SET_ADDH",
   "SET_ADDL",
   "SET_CHAN",
   "SET_AIR_DATA_RATE",
   "SET_UART_BAUD_RATE",
   "SET_PARITY",
-  "SET_TRANSMISSION_POWER",
-  "SET_TRANSMISSION_MODE",
+  "SET_TX_POWER",
+  "SET_TX_MODE",
   "SET_OPERATION_MODE",
   "SET_ALL",
-  "TOGGLE_COMMUNICATION",
+  "TOGGLE_TX",
   "COMMUNICATE",
   "SET_TX_ADDH",
   "SET_TX_ADDL",
@@ -34,55 +36,55 @@ control_commands = [
   "FLUSH",
   "SET_MESSAGE_DATA"]
 
-uart_baud_rate_list = [
-  '1200 bps',
-  '2400 bps',
-  '4800 bps',
-  '9600 bps',
-  '19200 bps',
-  '38400 bps',
-  '57600 bps',
-  '115200 bps'
-]
+uart_baud_rate_dict = {
+  '1200 bps':0,
+  '2400 bps':1,
+  '4800 bps':2,
+  '9600 bps':3,
+  '19200 bps':4,
+  '38400 bps':5,
+  '57600 bps':6,
+  '115200 bps':7
+}
 
-air_data_rate_list = [
-  '300 bps',
-  '1200 bps',
-  '2400 bps',
-  '4800 bps',
-  '9600 bps',
-  '19200 bps'
-]
+air_data_rate_dict = {
+  '300 bps':0,
+  '1200 bps':1,
+  '2400 bps':2,
+  '4800 bps':3,
+  '9600 bps':4,
+  '19200 bps':5
+}
 
-parity_list = [
-  '8N1',
-  '8O1',
-  '8E1'
-]
+parity_dict = {
+  '8N1':ord('N'),
+  '8O1':ord('O'),
+  '8E1':ord('E')
+}
 
-transmission_power_list = [
-  '10 dBm',
-  '14 dBm',
-  '17 dBm',
-  '20 dBm'
-]
+transmission_power_dict = {
+  '10 dBm':10,
+  '14 dBm':14,
+  '17 dBm':17,
+  '20 dBm':20
+}
 
-transmission_mode_list = [
-  'TRANSPARENT TRANSMISSION',
-  'FIXED TRANSMISSION'
-]
+transmission_mode_dict = {
+  'TRANSPARENT TRANSMISSION':0,
+  'FIXED TRANSMISSION':1
+}
 
-operation_mode_list = [
-  'NORMAL',
-  'WAKE UP',
-  'POWER SAVING',
-  'SLEEP'
-]
+operation_mode_dict = {
+  'NORMAL':0,
+  'WAKE UP':1,
+  'POWER SAVING':2,
+  'SLEEP':3
+}
 
-head_list = [
-  'SAVE ON POWER DOWN',
-  'DONT SAVE ON POWER DOWN'
-]
+head_dict = {
+  'SAVE ON POWER DOWN':0xC0,
+  'DONT SAVE ON POWER DOWN':0xC2
+}
 
 # class Comm:
 class ControlFrame(ttk.LabelFrame):
@@ -103,6 +105,9 @@ class ControlFrame(ttk.LabelFrame):
     }
 
     self.ser = None
+    self.transmission_flag = False
+    self.receiving_buffer = bytes()
+    self.receiving_flag = False
 
     self.init_variables()
     self.init_layout()
@@ -118,6 +123,7 @@ class ControlFrame(ttk.LabelFrame):
     self.tx_mode_variable = tk.StringVar()
     self.operation_mode_variable = tk.StringVar()
     self.parity_variable = tk.StringVar()
+    self.toggle_transmission_variable = tk.StringVar(value='OFF')
 
   def init_layout(self):
     left_frame = ttk.Frame(master=self)
@@ -126,85 +132,89 @@ class ControlFrame(ttk.LabelFrame):
     top_frame = ttk.LabelFrame(master=left_frame,text="ADDH")
     top_frame.pack(side='top',fill='both')
     ttk.Entry(master=top_frame,textvariable=self.addh_variable,width=4,justify='center').pack(side='left',fill='both')
-    top_bottom_frame = ttk.Frame(master=top_frame)
-    top_bottom_frame.pack(side='bottom',fill='both')
-    ttk.Button(master=top_bottom_frame,text="read",command=self.read_addh).pack(side='left',fill='both')
-    ttk.Button(master=top_bottom_frame,text="set",command=self.set_addh).pack(side='left',fill='both')
+    # top_bottom_frame = ttk.Frame(master=top_frame)
+    # top_bottom_frame.pack(side='bottom',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_addh).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_addh).pack(side='left',fill='both')
 
-    top_frame = ttk.LabelFrame(master=self,text="ADDL")
+    top_frame = ttk.LabelFrame(master=left_frame,text="ADDL")
     top_frame.pack(side='top',fill='both')
     ttk.Entry(master=top_frame,textvariable=self.addl_variable,width=4,justify='center').pack(side='left',fill='both')
-    top_bottom_frame = ttk.Frame(master=top_frame)
-    top_bottom_frame.pack(side='bottom',fill='both')
-    ttk.Button(master=top_bottom_frame,text="read",command=self.read_addl).pack(side='left',fill='both')
-    ttk.Button(master=top_bottom_frame,text="set",command=self.set_addl).pack(side='left',fill='both')
+    # top_bottom_frame = ttk.Frame(master=top_frame)
+    # top_bottom_frame.pack(side='bottom',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_addl).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_addl).pack(side='left',fill='both')
 
-    top_frame = ttk.LabelFrame(master=self,text="Channel")
+    top_frame = ttk.LabelFrame(master=left_frame,text="Channel")
     top_frame.pack(side='top',fill='both')
     ttk.Entry(master=top_frame,textvariable=self.chan_variable,width=4,justify='center').pack(side='left',fill='both')
-    top_bottom_frame = ttk.Frame(master=top_frame)
-    top_bottom_frame.pack(side='bottom',fill='both')
-    ttk.Button(master=top_bottom_frame,text="read",command=self.read_channel).pack(side='left',fill='both')
-    ttk.Button(master=top_bottom_frame,text="set",command=self.set_channel).pack(side='left',fill='both')
+    # top_bottom_frame = ttk.Frame(master=top_frame)
+    # top_bottom_frame.pack(side='bottom',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_channel).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_channel).pack(side='left',fill='both')
 
     top_frame = ttk.LabelFrame(master=left_frame, text='Parity')
     top_frame.pack(side='top',fill='both')
-    ttk.Combobox(master=top_frame, values=parity_list, textvariable=self.parity_variable).pack(side='left',fill='both')
-    top_bottom_frame = ttk.Frame(master=top_frame)
-    top_bottom_frame.pack(side='bottom',fill='both')
-    ttk.Button(master=top_bottom_frame,text="read",command=self.read_parity).pack(side='left',fill='both')
-    ttk.Button(master=top_bottom_frame,text="set",command=self.set_parity).pack(side='left',fill='both')
+    ttk.Combobox(master=top_frame, values=list(parity_dict.keys()), textvariable=self.parity_variable).pack(side='left',fill='both')
+    # top_bottom_frame = ttk.Frame(master=top_frame)
+    # top_bottom_frame.pack(side='bottom',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_parity).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_parity).pack(side='left',fill='both')
 
     top_frame = ttk.LabelFrame(master=left_frame, text='Operation mode')
     top_frame.pack(side='top',fill='both')
-    ttk.Combobox(master=top_frame, values=operation_mode_list, textvariable=self.operation_mode_variable).pack(side='left',fill='both')
-    top_bottom_frame = ttk.Frame(master=top_frame)
-    top_bottom_frame.pack(side='bottom',fill='both')
-    ttk.Button(master=top_bottom_frame,text="read",command=self.read_operation_mode).pack(side='left',fill='both')
-    ttk.Button(master=top_bottom_frame,text="set",command=self.set_operation_mode).pack(side='left',fill='both')
+    ttk.Combobox(master=top_frame, values=list(operation_mode_dict.keys()), textvariable=self.operation_mode_variable).pack(side='left',fill='both')
+    # top_bottom_frame = ttk.Frame(master=top_frame)
+    # top_bottom_frame.pack(side='bottom',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_operation_mode).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_operation_mode).pack(side='left',fill='both')
 
     left_frame = ttk.Frame(master=self)
     left_frame.pack(side='left', fill='both')
 
     top_frame = ttk.LabelFrame(master=left_frame, text='UART baud rate')
     top_frame.pack(side='top',fill='both')
-    ttk.Combobox(master=top_frame, values=uart_baud_rate_list, textvariable=self.uart_baud_rate_variable).pack(side='left',fill='both')
-    top_bottom_frame = ttk.Frame(master=top_frame)
-    top_bottom_frame.pack(side='bottom',fill='both')
-    ttk.Button(master=top_bottom_frame,text="read",command=self.read_uart_baud_rate).pack(side='left',fill='both')
-    ttk.Button(master=top_bottom_frame,text="set",command=self.set_uart_baud_rate).pack(side='left',fill='both')
+    ttk.Combobox(master=top_frame, values=list(uart_baud_rate_dict.keys()), textvariable=self.uart_baud_rate_variable).pack(side='left',fill='both')
+    # top_bottom_frame = ttk.Frame(master=top_frame)
+    # top_bottom_frame.pack(side='bottom',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_uart_baud_rate).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_uart_baud_rate).pack(side='left',fill='both')
 
     top_frame = ttk.LabelFrame(master=left_frame, text='Air data rate')
     top_frame.pack(side='top',fill='both')
-    ttk.Combobox(master=top_frame, values=air_data_rate_list, textvariable=self.air_data_rate_variable).pack(side='left',fill='both')
-    top_bottom_frame = ttk.Frame(master=top_frame)
-    top_bottom_frame.pack(side='bottom',fill='both')
-    ttk.Button(master=top_bottom_frame,text="read",command=self.read_air_data_rate).pack(side='left',fill='both')
-    ttk.Button(master=top_bottom_frame,text="set",command=self.set_air_data_rate).pack(side='left',fill='both')
+    ttk.Combobox(master=top_frame, values=list(air_data_rate_dict.keys()), textvariable=self.air_data_rate_variable).pack(side='left',fill='both')
+    # top_bottom_frame = ttk.Frame(master=top_frame)
+    # top_bottom_frame.pack(side='bottom',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_air_data_rate).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_air_data_rate).pack(side='left',fill='both')
 
     top_frame = ttk.LabelFrame(master=left_frame, text='Transmission power')
     top_frame.pack(side='top',fill='both')
-    ttk.Combobox(master=top_frame, values=transmission_power_list, textvariable=self.tx_power_variable).pack(side='left',fill='both')
-    top_bottom_frame = ttk.Frame(master=top_frame)
-    top_bottom_frame.pack(side='bottom',fill='both')
-    ttk.Button(master=top_bottom_frame,text="read",command=self.read_tx_power).pack(side='left',fill='both')
-    ttk.Button(master=top_bottom_frame,text="set",command=self.set_tx_power).pack(side='left',fill='both')
+    ttk.Combobox(master=top_frame, values=list(transmission_power_dict.keys()), textvariable=self.tx_power_variable).pack(side='left',fill='both')
+    # top_bottom_frame = ttk.Frame(master=top_frame)
+    # top_bottom_frame.pack(side='bottom',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_tx_power).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_tx_power).pack(side='left',fill='both')
 
     top_frame = ttk.LabelFrame(master=left_frame, text='Transmission mode')
     top_frame.pack(side='top',fill='both')
-    ttk.Combobox(master=top_frame, values=transmission_mode_list, textvariable=self.tx_mode_variable).pack(side='left',fill='both')
-    top_bottom_frame = ttk.Frame(master=top_frame)
-    top_bottom_frame.pack(side='bottom',fill='both')
-    ttk.Button(master=top_bottom_frame,text="read",command=self.read_tx_mode).pack(side='left',fill='both')
-    ttk.Button(master=top_bottom_frame,text="set",command=self.set_tx_mode).pack(side='left',fill='both')
+    ttk.Combobox(master=top_frame, values=list(transmission_mode_dict.keys()), textvariable=self.tx_mode_variable).pack(side='left',fill='both')
+    # top_bottom_frame = ttk.Frame(master=top_frame)
+    # top_bottom_frame.pack(side='bottom',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_tx_mode).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_tx_mode).pack(side='left',fill='both')
 
     # top_frame = ttk.LabelFrame(master=left_frame, text='')
     # top_frame.pack(side='top',fill='both')
-    # ttk.Combobox(master=top_frame, values=_list, textvariable=self._variable).pack(side='left',fill='both')
+    # ttk.Combobox(master=top_frame, values=_dict.keys(), textvariable=self._variable).pack(side='left',fill='both')
     # top_bottom_frame = ttk.Frame(master=top_frame)
     # top_bottom_frame.pack(side='bottom',fill='both')
     # ttk.Button(master=top_bottom_frame,text="read",command=self.read_).pack(side='left',fill='both')
     # ttk.Button(master=top_bottom_frame,text="set",command=self.set_).pack(side='left',fill='both')
+
+    top_frame = ttk.LabelFrame(master=left_frame, text='Toggle transmission')
+    top_frame.pack(side='top',fill='both')
+    tk.Button(master=top_frame, textvariable=self.toggle_transmission_variable, relief='raised', command=self.toggle_transmission).pack(side='left',fill='both')
     
   def begin(self, port, baudrate):
     if self.ser is not None:
@@ -232,9 +242,22 @@ class ControlFrame(ttk.LabelFrame):
   
   def read(self):
     while self.ser.in_waiting > 0:
-      msg = self.ser.readline()
+      b = self.ser.read()[0]
+      if self.receiving_flag:
+        if b==10:
+          self.parse_message()
+          self.receiving_buffer = bytes()
+        else:
+          self.receiving_buffer += b.to_bytes()
+      elif b==13:
+        self.receiving_flag = True
+      else:
+        self.receiving_buffer += b.to_bytes()
+  
+  def parse_message(self):
+      print(self.receiving_buffer)
+      msg = str(self.receiving_buffer,encoding='utf8').rstrip()
       print(msg)
-      msg = str(msg,encoding='utf8').rstrip()
       if len(msg)>2:
         v = msg.split(':')
         if v[0] == "CONTROL":
@@ -282,14 +305,21 @@ class ControlFrame(ttk.LabelFrame):
     return out
 
   def on_device_ready(self):
+    self.read_head()
     self.read_addh()
     self.read_addl()
     self.read_channel()
+    self.read_parity()
+    self.read_uart_baud_rate()
+    self.read_air_data_rate()
+    self.read_tx_mode()
+    self.read_tx_power()
+    self.read_operation_mode()
   
   def set_head(self):
-    pass
+    self.write([control_commands.index("SET_HEAD"), int(self.head_variable.get(), 16)])
   def read_head(self):
-    pass
+    self.write([control_commands.index("READ_HEAD")])
   
   def set_addh(self):
     self.write([control_commands.index("SET_ADDH"), int(self.addh_variable.get(), 16)])
@@ -307,35 +337,44 @@ class ControlFrame(ttk.LabelFrame):
     self.write([control_commands.index("READ_CHAN")])
   
   def set_parity(self):
-    pass
+    self.write([control_commands.index("SET_PARITY"), parity_dict[self.parity_variable.get()]])
   def read_parity(self):
-    pass
+    self.write([control_commands.index("READ_PARITY")])
   
   def set_uart_baud_rate(self):
-    self.write([control_commands.index("SET_UART_BAUD_RATE", int(self.uart_baud_rate_variable.get()[:-4]))])
+    self.write([control_commands.index("SET_UART_BAUD_RATE"), uart_baud_rate_dict[self.uart_baud_rate_variable.get()]])
   def read_uart_baud_rate(self):
     self.write([control_commands.index("READ_UART_BAUD_RATE")])
   
   def set_air_data_rate(self):
-    self.write([control_commands.index("SET_AIR_DATA_BAUD_RATE", int(self.air_data_rate_variable.get()[:-4]))])
+    self.write([control_commands.index("SET_AIR_DATA_RATE"), air_data_rate_dict[self.air_data_rate_variable.get()]])
   def read_air_data_rate(self):
     self.write([control_commands.index("READ_AIR_DATA_RATE")])
   
   def set_tx_power(self):
-    pass
+    self.write([control_commands.index("SET_TX_POWER"), transmission_power_dict[self.tx_power_variable.get()]])
   def read_tx_power(self):
-    pass
+    self.write([control_commands.index("READ_TX_POWER")])
   
   def set_tx_mode(self):
-    pass
+    self.write([control_commands.index("SET_TX_MODE"), transmission_mode_dict[self.tx_mode_variable.get()]])
   def read_tx_mode(self):
-    pass
+    self.write([control_commands.index("READ_TX_MODE")])
   
   def set_operation_mode(self):
-    pass
+    self.write([control_commands.index("SET_OPERATION_MODE"), operation_mode_dict[self.operation_mode_variable.get()]])
   def read_operation_mode(self):
-    pass
-  
+    self.write([control_commands.index("READ_OPERATION_MODE")])
+
+  def toggle_transmission(self):
+    if self.toggle_transmission_variable.get() == 'ON':
+      self.transmission_flag = False
+      self.toggle_transmission_variable.set('OFF')
+    elif self.toggle_transmission_variable.get() == 'OFF':
+      self.transmission_flag = True
+      self.toggle_transmission_variable.set('ON')
+    self.write([control_commands.index("TOGGLE_TX"), self.transmission_flag])
+
   # def entry_changed(in):
 
 

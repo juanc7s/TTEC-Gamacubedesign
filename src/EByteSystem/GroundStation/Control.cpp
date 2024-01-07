@@ -15,7 +15,7 @@ void checkControl(){
   char c;
   while(Serial.available() && !serial_received){
     c = Serial.read();
-    Serial.println((uint8_t)c);
+    // Serial.println((uint8_t)c);
     if(serialFlag){
       received_serial += c;
     } else if(c==13){
@@ -55,15 +55,15 @@ void parseSerial(){
       break;
     case READ_ADDH:
       Serial.print("CONTROL:ADDH:");
-      Serial.print(getADDH(), HEX);
+      Serial.println(getADDH(), HEX);
       break;
     case READ_ADDL:
       Serial.print("CONTROL:ADDL:");
-      Serial.print(getADDL(), HEX);
+      Serial.println(getADDL(), HEX);
       break;
     case READ_CHAN:
       Serial.print("CONTROL:CHAN:");
-      Serial.print(getChannel(), HEX);
+      Serial.println(getChannel(), HEX);
       break;
     case READ_PARITY:
       Serial.print("CONTROL:PARITY:");
@@ -84,55 +84,13 @@ void parseSerial(){
       break;
     case READ_UART_BAUD_RATE:
       Serial.print("CONTROL:UART_BAUD_RATE:");
-      switch(getBaudRate()){
-        case TTL_UART_BAUD_RATE_1200:
-          Serial.println("1200 bps");
-          break;
-        case TTL_UART_BAUD_RATE_2400:
-          Serial.println("2400 bps");
-          break;
-        case TTL_UART_BAUD_RATE_4800:
-          Serial.println("4800 bps");
-          break;
-        case TTL_UART_BAUD_RATE_9600:
-          Serial.println("9600 bps");
-          break;
-        case TTL_UART_BAUD_RATE_19200:
-          Serial.println("19200 bps");
-          break;
-        case TTL_UART_BAUD_RATE_38400:
-          Serial.println("38400 bps");
-          break;
-        case TTL_UART_BAUD_RATE_57600:
-          Serial.println("57600 bps");
-          break;
-        case TTL_UART_BAUD_RATE_115200:
-          Serial.println("115200 bps");
-          break;
-      }
+      Serial.print(getBaudRate());
+      Serial.println(" bps");
       break;
     case READ_AIR_DATA_RATE:
       Serial.print("CONTROL:AIR_DATA_RATE:");
-      switch(getAirDataRate()){
-        case AIR_DATA_RATE_300:
-          Serial.println("300 bps");
-          break;
-        case AIR_DATA_RATE_1200:
-          Serial.println("1200 bps");
-          break;
-        case AIR_DATA_RATE_2400:
-          Serial.println("2400 bps");
-          break;
-        case AIR_DATA_RATE_4800:
-          Serial.println("4800 bps");
-          break;
-        case AIR_DATA_RATE_9600:
-          Serial.println("9600 bps");
-          break;
-        case AIR_DATA_RATE_19200:
-          Serial.println("19200 bps");
-          break;
-      }
+      Serial.print(getAirDataRate());
+      Serial.println(" bps");
       break;
     case READ_TRANSMISSION_POWER:
       Serial.print("CONTROL:TXPW:");
@@ -208,55 +166,57 @@ void parseSerial(){
       setConfiguration();
       break;
     case SET_UART_BAUD_RATE:
-      switch(((unsigned int)received_serial[1])<<8 + (unsigned int)received_serial[2]){
-        case 12:
-          setBaudRate(TTL_UART_BAUD_RATE_1200);
-          break;
-        case 24:
-          setBaudRate(TTL_UART_BAUD_RATE_2400);
-          break;
-        case 48:
-          setBaudRate(TTL_UART_BAUD_RATE_4800);
-          break;
-        case 96:
-          setBaudRate(TTL_UART_BAUD_RATE_9600);
-          break;
-        case 192:
-          setBaudRate(TTL_UART_BAUD_RATE_19200);
-          break;
-        case 384:
-          setBaudRate(TTL_UART_BAUD_RATE_38400);
-          break;
-        case 576:
-          setBaudRate(TTL_UART_BAUD_RATE_57600);
-          break;
-        case 1152:
-          setBaudRate(TTL_UART_BAUD_RATE_115200);
-          break;
-      }
+      // switch(((unsigned int)received_serial[1])<<8 + (unsigned int)received_serial[2]){
+      //   case 12:
+      //     setBaudRate(TTL_UART_BAUD_RATE_1200);
+      //     break;
+      //   case 24:
+      //     setBaudRate(TTL_UART_BAUD_RATE_2400);
+      //     break;
+      //   case 48:
+      //     setBaudRate(TTL_UART_BAUD_RATE_4800);
+      //     break;
+      //   case 96:
+      //     setBaudRate(TTL_UART_BAUD_RATE_9600);
+      //     break;
+      //   case 192:
+      //     setBaudRate(TTL_UART_BAUD_RATE_19200);
+      //     break;
+      //   case 384:
+      //     setBaudRate(TTL_UART_BAUD_RATE_38400);
+      //     break;
+      //   case 576:
+      //     setBaudRate(TTL_UART_BAUD_RATE_57600);
+      //     break;
+      //   case 1152:
+      //     setBaudRate(TTL_UART_BAUD_RATE_115200);
+      //     break;
+      // }
+      setBaudRate((TTL_UART_BAUD_RATE)received_serial[1]);
       setConfiguration();
       break;
     case SET_AIR_DATA_RATE:
-      switch((uint8_t)received_serial[1]){
-        case 3:
-          setAirDataRate(AIR_DATA_RATE_300);
-          break;
-        case 12:
-          setAirDataRate(AIR_DATA_RATE_1200);
-          break;
-        case 24:
-          setAirDataRate(AIR_DATA_RATE_2400);
-          break;
-        case 48:
-          setAirDataRate(AIR_DATA_RATE_4800);
-          break;
-        case 96:
-          setAirDataRate(AIR_DATA_RATE_9600);
-          break;
-        case 192:
-          setAirDataRate(AIR_DATA_RATE_19200);
-          break;
-      }
+      // switch((uint8_t)received_serial[1]){
+      //   case 3:
+      //     setAirDataRate(AIR_DATA_RATE_300);
+      //     break;
+      //   case 12:
+      //     setAirDataRate(AIR_DATA_RATE_1200);
+      //     break;
+      //   case 24:
+      //     setAirDataRate(AIR_DATA_RATE_2400);
+      //     break;
+      //   case 48:
+      //     setAirDataRate(AIR_DATA_RATE_4800);
+      //     break;
+      //   case 96:
+      //     setAirDataRate(AIR_DATA_RATE_9600);
+      //     break;
+      //   case 192:
+      //     setAirDataRate(AIR_DATA_RATE_19200);
+      //     break;
+      // }
+      setAirDataRate((AIR_DATA_RATE)received_serial[1]);
       setConfiguration();
       break;
     case SET_TRANSMISSION_POWER:
@@ -286,6 +246,8 @@ void parseSerial(){
           break;
       }
       setConfiguration();
+    case SET_OPERATION_MODE:
+      setOperationMode((OperationMode)received_serial[1]);
     case FLUSH:
       telemetry_index = 0;
       break;
