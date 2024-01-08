@@ -17,6 +17,7 @@ control_commands = [
   "READ_TX_MODE",
   "READ_OPERATION_MODE",
   "READ_ALL",
+
   "SET_HEAD",
   "SET_ADDH",
   "SET_ADDL",
@@ -28,11 +29,14 @@ control_commands = [
   "SET_TX_MODE",
   "SET_OPERATION_MODE",
   "SET_ALL",
+
   "TOGGLE_TX",
   "SEND_TX",
+
   "SET_TX_ADDH",
   "SET_TX_ADDL",
   "SET_TX_CHAN",
+  
   "FLUSH",
   "SET_MESSAGE_DATA"]
 
