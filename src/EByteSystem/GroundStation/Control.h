@@ -1,6 +1,8 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#include <EbyteLib.h>
+
 extern uint8_t txAddh;
 extern uint8_t txAddl;
 extern uint8_t txChan;
@@ -50,7 +52,7 @@ enum CONTROL_COMMAND{
   SET_TX_ADDH,
   SET_TX_ADDL,
   SET_TX_CHAN,
-  
+
   FLUSH,
   SET_MESSAGE_DATA
 };

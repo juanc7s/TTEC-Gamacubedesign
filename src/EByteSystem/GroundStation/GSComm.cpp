@@ -1,13 +1,5 @@
 #include "Arduino.h"
-#include "gsComm.h"
-
-#include <EbyteLib.h>
-#include <Transmission.h>
-#include <Utils.h>
-#include <configurations.h>
-#include <debugging.h>
-#include <definitions.h>
-#include <modes.h>
+#include "GSComm.h"
 
 uint8_t txChan = 23;
 uint8_t txAddh = 0xa1;
@@ -19,26 +11,22 @@ uint8_t rxAddl = 0xf7;
 unsigned int telemetry_index = 0;
 bool telemetry_received = false;
   
-Message message = {
-  .length = sizeof(Message),
-  .type = "Command  ",
-  .message_1 = "Hello There!",
-  .actuator_1 = false,
-  .actuator_2 = true,
-  .actuator_3 = true,
-  .actuator_4 = false
+Greeting greeting = {
+  .type = 0,
+  .message = 0
 }; // sending a struct with multiple fields
-
+Protocol protocol;
 Telemetry telemetry;
+Resend resend;
 
 void sendCommand(){
   telemetry_index = 0;
   Serial.print("Sending a message of length ");
-  Serial.println(sizeof(message));
+  // Serial.println(sizeof(message));
   if(getTransmissionMode()==FIXED_TRANSMISSION_MODE){
-    asynchronousWriteFixedTransmission(txAddh, txAddl, txChan, (uint8_t*)&message, sizeof(message));
+    // asynchronousWriteFixedTransmission(txAddh, txAddl, txChan, (uint8_t*)&message, sizeof(message));
   } else{
-    asynchronousWrite((uint8_t*)&message, sizeof(message));
+    // asynchronousWrite((uint8_t*)&message, sizeof(message));
   }
   if(!getTransmissionResult(500)){
     Serial.println("Transmission failed.\nSkipping to next iteration.");
@@ -50,6 +38,7 @@ void sendCommand(){
 }
 
 void listenForResponse(unsigned long int timeout){
+
   unsigned long int to = millis() + timeout;
   while(millis() < to){
     updateRFComm();
@@ -77,12 +66,13 @@ void updateRFComm(){
       telemetry_index = 0;
       telemetry_received = true;
       Serial.print("Telemetry received!\n\n");
-      Serial.print("Telemetry type: ");Serial.println(telemetry.type);
-      Serial.print("Telemetry 1: ");Serial.println(telemetry.telemetry_message);
-      Serial.print("Instrument 1: ");Serial.println(telemetry.instrument_1);
-      Serial.print("Instrument 2: ");Serial.println(telemetry.instrument_2);
-      Serial.print("Instrument 3: ");Serial.println(telemetry.instrument_3);
-      Serial.print("Instrument 4: ");Serial.println(telemetry.instrument_4);
+      Serial.print("Packet index: ");Serial.println(telemetry.index);
+      Serial.print("Packet Data: ");Serial.write(telemetry.data, telemetry.length-2);
+      Serial.println("");
+      // Serial.print("Instrument 1: ");Serial.println(telemetry.instrument_1);
+      // Serial.print("Instrument 2: ");Serial.println(telemetry.instrument_2);
+      // Serial.print("Instrument 3: ");Serial.println(telemetry.instrument_3);
+      // Serial.print("Instrument 4: ");Serial.println(telemetry.instrument_4);
     }
   }
 }

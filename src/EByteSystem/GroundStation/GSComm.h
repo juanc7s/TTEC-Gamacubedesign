@@ -1,6 +1,8 @@
 #ifndef GS_COMM_H
 #define GS_COMM_H
 
+#include <EbyteLib.h>
+
 extern uint8_t txAddh;
 extern uint8_t txAddl;
 extern uint8_t txChan;
@@ -11,29 +13,28 @@ extern uint8_t rxChan;
 extern unsigned int telemetry_index;
 extern bool telemetry_received;
 
-#define N 58 // Size of the added array (+1 for an end of line char)  
-struct Message{
-  unsigned int length;
-  char type[10];
-  char message_1[13];
-  bool actuator_1;
-  bool actuator_2;
-  bool actuator_3;
-  bool actuator_4;
+struct Greeting{
+  uint8_t type;
+  uint8_t message;
 }; // sending a struct with multiple fields
 
-struct Telemetry{
-  unsigned int length;
-  char type[10];
-  char telemetry_message[16];
-  bool instrument_1;
-  bool instrument_2;
-  bool instrument_3;
-  bool instrument_4;
-  uint8_t data[N+1];
+struct Protocol{
+  uint8_t type;
+  uint8_t data;
 };
 
-extern Message message;
+struct Resend{
+  uint8_t length;
+  uint8_t packets[32];
+};
+
+struct Telemetry{
+  uint8_t length;
+  uint8_t index;
+  uint8_t data[56];
+};
+
+// extern Message message;
 extern Telemetry telemetry;
 
 void sendCommand();

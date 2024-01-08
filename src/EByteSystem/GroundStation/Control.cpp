@@ -1,14 +1,6 @@
 #include "Arduino.h"
 #include "Control.h"
 
-#include <EbyteLib.h>
-#include <Transmission.h>
-#include <Utils.h>
-#include <configurations.h>
-#include <debugging.h>
-#include <definitions.h>
-#include <modes.h>
-
 bool serialFlag = false;
 
 unsigned int message_data_index = 0;
@@ -137,7 +129,8 @@ void parseSerial(uint8_t c){
       }
       break;
     case READ_ALL:
-      printConfiguration();
+      // printConfiguration();
+      break;
     case SET_ADDH:
       parsing_function = control_setAddh;
       break;
@@ -161,8 +154,10 @@ void parseSerial(uint8_t c){
       break;
     case SET_TRANSMISSION_MODE:
       parsing_function = control_setTxMode;
+      break;
     case SET_OPERATION_MODE:
       parsing_function = control_setOperationMode;
+      break;
     case FLUSH:
       telemetry_index = 0;
       break;
@@ -170,6 +165,7 @@ void parseSerial(uint8_t c){
       break;
     case SEND_TX:
       send_tx++;
+      break;
   }
   // delay(400);
 }

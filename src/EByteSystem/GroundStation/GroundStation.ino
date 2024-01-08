@@ -1,10 +1,4 @@
 #include <EbyteLib.h>
-#include <Transmission.h>
-#include <Utils.h>
-#include <configurations.h>
-#include <debugging.h>
-#include <definitions.h>
-#include <modes.h>
 
 #include "Control.h"
 #include "GSComm.h"
@@ -35,9 +29,9 @@ void setup(){
   setNormalMode();
 }
 
-String receiving_serial = "";
-String received_serial = "";
-bool serial_received = false;
+// String receiving_serial = "";
+// String received_serial = "";
+// bool serial_received = false;
 
 bool state_sending = false;
 uint8_t send_tx = 0;
