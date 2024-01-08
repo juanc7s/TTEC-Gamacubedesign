@@ -40,6 +40,7 @@ String received_serial = "";
 bool serial_received = false;
 
 bool state_sending = false;
+uint8_t send_tx = 0;
 
 unsigned long transmission_timer = 1500;
 unsigned long next_transmission = 0;
@@ -51,6 +52,13 @@ void loop(){
   if(millis() >= next_transmission){
     next_transmission += transmission_timer;
     if(state_sending){
+      unsigned long int t0 = millis();
+      sendCommand();
+      Serial.print("Communication took ");
+      Serial.print(millis() - t0);
+      Serial.println("ms");
+    } else if(send_tx > 0){
+      send_tx--;
       unsigned long int t0 = millis();
       sendCommand();
       Serial.print("Communication took ");

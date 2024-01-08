@@ -35,7 +35,11 @@ void sendCommand(){
   telemetry_index = 0;
   Serial.print("Sending a message of length ");
   Serial.println(sizeof(message));
-  asynchronousWriteFixedTransmission(txAddh, txAddl, txChan, (uint8_t*)&message, sizeof(message));
+  if(getTransmissionMode()==FIXED_TRANSMISSION_MODE){
+    asynchronousWriteFixedTransmission(txAddh, txAddl, txChan, (uint8_t*)&message, sizeof(message));
+  } else{
+    asynchronousWrite((uint8_t*)&message, sizeof(message));
+  }
   if(!getTransmissionResult(500)){
     Serial.println("Transmission failed.\nSkipping to next iteration.");
   } else{

@@ -40,7 +40,7 @@ void checkControl(){
 
 void parseSerial(uint8_t c){
   switch(c){
-    case TOGGLE_COMMUNICATION:
+    case TOGGLE_TX:
       parsing_function = control_toggleTx;
       break;
     case SET_TX_CHAN:
@@ -168,6 +168,8 @@ void parseSerial(uint8_t c){
       break;
     case SET_MESSAGE_DATA:
       break;
+    case SEND_TX:
+      send_tx++;
   }
   // delay(400);
 }

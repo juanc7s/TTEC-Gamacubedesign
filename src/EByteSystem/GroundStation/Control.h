@@ -13,6 +13,7 @@ extern uint8_t rxChan;
 // extern bool serial_received;
 
 extern bool state_sending;
+extern uint8_t send_tx;
 extern unsigned int telemetry_index;
 extern unsigned int message_data_index;
 
@@ -41,8 +42,8 @@ enum CONTROL_COMMAND{
   SET_TRANSMISSION_MODE,
   SET_OPERATION_MODE,
   SET_ALL,
-  TOGGLE_COMMUNICATION,
-  COMMUNICATE,
+  TOGGLE_TX,
+  SEND_TX,
   SET_TX_ADDH,
   SET_TX_ADDL,
   SET_TX_CHAN,
