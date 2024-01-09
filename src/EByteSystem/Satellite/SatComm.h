@@ -8,36 +8,67 @@ extern uint8_t txAddh;
 extern uint8_t txAddl;
 extern uint8_t txChan;
 
-extern unsigned int comm_pointer;
+enum PROTOCOL{
+  PROTOCOL_GREETING,
+  PROTOCOL_START_TELEMETRY_TRANSMISSION,
+  PROTOCOL_RESEND_STATUS,
+  SATELLITE_PACKETS_AVAILABLE
+};
 
-#define N 58 // Size of the added array (+1 for an end of line char)  
-struct Message{
+struct TxCommand{
   unsigned int length;
-  char type[10];
-  char message[13];
   bool actuator_1;
   bool actuator_2;
   bool actuator_3;
   bool actuator_4;
 }; // sending a struct with multiple fields
 
-struct Telemetry{
-  unsigned int length;
-  char type[10];
-  char telemetry_message[16];
-  bool instrument_1;
-  bool instrument_2;
-  bool instrument_3;
-  bool instrument_4;
-  uint8_t data[N+1];
+#define N 10 // Size of the added array
+struct TelemetryData{
+  uint8_t length;
+  uint8_t data[N];
 };
 
-extern Message message;
-extern Telemetry telemetry;
+struct TxResend{
+  bool isDone;
+  uint8_t packets[32];
+};
+
+struct TelemetryPacket{
+  uint8_t index;
+  uint8_t data[55];
+};
+
+union RxData{
+  uint8_t numberOfPackets;
+  TelemetryPacket telemetryPacket;
+};
+
+struct RxPacket{
+  uint8_t length;
+  uint8_t operation;
+  RxData data;
+};
+
+union TxData{
+  TxCommand cmd;
+  TxResend resed;
+};
+
+struct TxPacket{
+  uint8_t length;
+  uint8_t operation;
+  TxData data;
+};
+
+// extern Message message;
+extern TelemetryData telemetryData;
+extern RxPacket rxPacket;
+extern TxPacket txPacket;
 
 void updateRFComm();
 
 void sendTelemetry();
-void satReceiveCallback();
+void onReceive(uint8_t* received_buffer, unsigned int size);
 
 #endif

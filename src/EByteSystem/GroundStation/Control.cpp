@@ -159,7 +159,7 @@ void parseSerial(uint8_t c){
       parsing_function = control_setOperationMode;
       break;
     case FLUSH:
-      telemetry_index = 0;
+      // telemetry_index = 0;
       break;
     case SET_MESSAGE_DATA:
       break;

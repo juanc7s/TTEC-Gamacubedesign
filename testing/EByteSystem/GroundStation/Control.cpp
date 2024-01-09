@@ -137,7 +137,7 @@ void parseSerial(uint8_t c){
       }
       break;
     case READ_ALL:
-      printConfiguration();
+      // printConfiguration();
     case SET_ADDH:
       parsing_function = control_setAddh;
       break;

@@ -30,20 +30,22 @@ void setup(){
   setTransmissionPower(TRANSMISSION_POWER_20dBm);
   setConfiguration();
   
-  for(uint8_t i = 0; i < N; i++){ // Initialize array
-    telemetry.data[i] = 0xA1;
-  }
-  telemetry.data[N] = (uint8_t)'\n';
+  // for(uint8_t i = 0; i < N; i++){ // Initialize array
+  //   telemetry.data[i] = 0xA1;
+  // }
+  // telemetry.data[N] = (uint8_t)'\n';
   
   // printConfiguration();
   setNormalMode();
+  
+  setReceiveCallback(onReceive);
 }
 
-String receiving_serial = "";
-String received_serial = "";
-bool serial_received = false;
+// String receiving_serial = "";
+// String received_serial = "";
+// bool serial_received = false;
 
-bool state_sending = false;
+// bool state_sending = false;
 
 void loop(){
   checkSerial();
@@ -53,17 +55,17 @@ void loop(){
 }
 
 void checkSerial(){
-  char c;
-  while(Serial.available() && !serial_received){
-    c = Serial.read();
-    if(c=='\n'){
-      received_serial = receiving_serial;
-      receiving_serial = "";
-      serial_received = true;
-    } else{
-      receiving_serial += c;
-    }
-  }
+  // char c;
+  // while(Serial.available() && !serial_received){
+  //   c = Serial.read();
+    // if(c=='\n'){
+    //   received_serial = receiving_serial;
+    //   receiving_serial = "";
+    //   serial_received = true;
+    // } else{
+    //   receiving_serial += c;
+    // }
+  // }
 
   // if(serial_received){
   //   serial_received = false;

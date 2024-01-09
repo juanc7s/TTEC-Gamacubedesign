@@ -21,7 +21,7 @@ void setup(){
   setADDL(rxAddl);
   setChannel(rxChan);
   setParity(UART_PARITY_BIT_8N1);
-  setBaudRate(TTL_UART_BAUD_RATE_57600);
+  setBaudRate(TTL_UART_BAUD_RATE_9600);
   setAirDataRate(AIR_DATA_RATE_19200);
   setTransmissionMode(FIXED_TRANSMISSION_MODE);
   setIODriveMode(IO_DRIVE_MODE_PUSH_PULL);
@@ -35,7 +35,7 @@ void setup(){
   }
   telemetry.data[N] = (uint8_t)'\n';
   
-  printConfiguration();
+  // printConfiguration();
   setNormalMode();
 }
 
@@ -89,22 +89,22 @@ void checkSerial(){
       }
     } else if(received_serial[0] == 'G'){
       if(received_serial.startsWith("GAddh")){
-        printADDH();
-      } else if(received_serial.startsWith("GAddl")){
-        printADDL();
-      } else if(received_serial.startsWith("GParity")){
-        printParity();
-      } else if(received_serial.startsWith("GAirDataRate")){
-        printAirDataRate();
-      } else if(received_serial.startsWith("GBaudRate")){
-        printBaudRate();
-      } else if(received_serial.startsWith("GChannel")){
-        printChannel();
-      } else if(received_serial.startsWith("GTxPower")){
-        printTransmissionPower();
+      //   printADDH();
+      // } else if(received_serial.startsWith("GAddl")){
+      //   printADDL();
+      // } else if(received_serial.startsWith("GParity")){
+      //   printParity();
+      // } else if(received_serial.startsWith("GAirDataRate")){
+      //   printAirDataRate();
+      // } else if(received_serial.startsWith("GBaudRate")){
+      //   printBaudRate();
+      // } else if(received_serial.startsWith("GChannel")){
+      //   printChannel();
+      // } else if(received_serial.startsWith("GTxPower")){
+      //   printTransmissionPower();
       }
     } else if(received_serial[0] == 'S'){
-      parseMessage(received_serial.substring(1));
+      // parseMessage(received_serial.substring(1));
     } else if(received_serial[0] == 'M'){
       Serial.println("Set telemetry index to 0");
       comm_pointer = 0;

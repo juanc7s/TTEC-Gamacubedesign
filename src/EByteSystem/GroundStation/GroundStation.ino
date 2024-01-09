@@ -27,6 +27,7 @@ void setup(){
   
   // printConfiguration();
   setNormalMode();
+  setReceiveCallback(updateRFComm);
 }
 
 // String receiving_serial = "";
@@ -41,7 +42,7 @@ unsigned long next_transmission = 0;
 
 void loop(){
   checkControl();
-  updateRFComm();
+  // updateRFComm();
 
   if(millis() >= next_transmission){
     next_transmission += transmission_timer;
