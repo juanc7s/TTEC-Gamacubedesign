@@ -20,12 +20,7 @@ uint8_t txAddl = 0xf7;
 // #define N 127
 TelemetryData telemetryData = {
   .length = sizeof(TelemetryData),
-  // .type = "Telemetry",
-  // .telemetry_message = "General Kenobi!",
-  // .actuator_1 = false,
-  // .actuator_2 = true,
-  // .actuator_3 = true,
-  // .actuator_4 = false
+  .data = {0xa1, 0xa1}
 };
 RxPacket rxPacket;
 TxPacket txPacket;
@@ -39,6 +34,9 @@ void sendTelemetry(){
 }
 
 void updateRFComm(){
+  if(packet_received){
+    processPacket(onReceive);
+  }
   // char c;
   // while(e32serial.available()){
   //   if(e32serial.overflow()){
@@ -70,12 +68,12 @@ void updateRFComm(){
 void onReceive(uint8_t* received_buffer, unsigned int size){
   Serial.print("Received packet with length ");
   Serial.println(size);
-  if(size < 2){
-    return;
-  }
-  for(unsigned int i = 2; i < size; i++){
+  // if(size < 2){
+  //   return;
+  // }
+  for(unsigned int i = 0; i < size; i++){
     ((uint8_t*)(&txPacket))[i] = received_buffer[i];
-    Serial.println(received_buffer[i], HEX);
+    // Serial.println(received_buffer[i], HEX);
   }
   Serial.println(txPacket.operation);
   switch(txPacket.operation){

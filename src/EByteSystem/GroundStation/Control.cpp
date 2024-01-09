@@ -8,7 +8,7 @@ unsigned int message_data_index = 0;
 void (*parsing_function)(uint8_t c) = parseSerial;
 
 void checkControl(){
-  char c;
+  uint8_t c;
   while(Serial.available()){
     c = Serial.read();
     // Serial.println((uint8_t)c);

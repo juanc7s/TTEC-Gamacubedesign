@@ -38,7 +38,7 @@ void setup(){
   // printConfiguration();
   setNormalMode();
   
-  setReceiveCallback(onReceive);
+  // setReceiveCallback(onReceive);
 }
 
 // String receiving_serial = "";

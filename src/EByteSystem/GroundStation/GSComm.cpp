@@ -11,54 +11,80 @@ uint8_t rxAddl = 0xf7;
 // unsigned int telemetry_index = 0;
 bool telemetry_received = false;
 
-// uint8_t telemetry_state = 0;
+uint8_t telemetry_state = 0;
   
 TelemetryData telemetryData;
 RxPacket rxPacket;
 TxPacket txPacket;
 
-void sendCommand(){
+void sendTxPacket(){
   // telemetry_index = 0;
   Serial.print("Sending a message of length ");
   Serial.println(sizeof(txPacket));
-  txPacket.operation = PROTOCOL_GREETING;
   if(getTransmissionMode()==FIXED_TRANSMISSION_MODE){
-    asynchronousWriteFixedTransmission(txAddh, txAddl, txChan, (uint8_t*)&txPacket, sizeof(txPacket));
+    writeFixedTransmission(txAddh, txAddl, txChan, (uint8_t*)&txPacket, sizeof(txPacket));
   } else{
-    asynchronousWrite((uint8_t*)&txPacket, sizeof(txPacket));
+    write((uint8_t*)&txPacket, sizeof(txPacket));
   }
+}
+
+void sendCommand(){
+  txPacket.length = 1;
+  txPacket.operation = PROTOCOL_GREETING;
+  unsigned long int t0 = millis();
+  sendTxPacket();
   if(!getTransmissionResult(500)){
     Serial.println("Transmission failed.\nSkipping to next iteration.");
   } else{
-    // delay(3000);
-    // Serial.println("Waiting for response");
-    // if(listenForResponse(1000)){
-    //   ;
-    // }
+    Serial.print("Communication took ");
+    Serial.println(millis() - t0);
+    Serial.println("Waiting for response");
+    if(listenForResponse(1000)){
+      txPacket.length = 1;
+      txPacket.operation = PROTOCOL_START_TELEMETRY_TRANSMISSION;
+      t0 = millis();
+      sendTxPacket();
+      if(!getTransmissionResult(500)){
+        Serial.println("Transmission failed.\nSkipping to next iteration.");
+      } else{
+        Serial.print("Communication took ");
+        Serial.println(millis() - t0);
+        Serial.println("Waiting for response");
+        if(listenForResponse(1000)){
+          Serial.println(rxPacket.data.numberOfPackets);
+          Serial.println(rxPacket.data.telemetryPacket.index);
+        } else{
+          Serial.print("No response");
+        }
+      }
+    } else{
+      Serial.println("No response");
+    }
   }
 }
 
 bool listenForResponse(unsigned long int timeout){
-
   unsigned long int to = millis() + timeout;
   while(millis() < to){
-    // updateRFComm();
+    updateRFComm();
     if(telemetry_received){
       telemetry_received = false;
       return true;
     }
   }
-  Serial.println("No response");
   return false;
 }
 
-void updateRFComm(uint8_t* received_buffer, unsigned int size){
-  // char c;
+void updateRFComm(){
+  if(packet_received){
+    Serial.println("Processing");
+    processPacket(onReceive);
+  }
+}
+
+void onReceive(uint8_t* received_buffer, unsigned int size){
   telemetry_received = true;
   for(unsigned int i = 0; i < size; i++){
-    // if(e32serial.overflow()){
-    //   Serial.println("Serial OVERFLOW");
-    // }
     ((uint8_t*)&rxPacket)[i] = received_buffer[i];
     if(i == 2){
       Serial.print("\n\nReceiving telemetry of length ");

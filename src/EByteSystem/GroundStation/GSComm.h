@@ -71,6 +71,7 @@ extern TxPacket txPacket;
 void sendCommand();
 bool listenForResponse(unsigned long int timeout);
 
-void updateRFComm(uint8_t* received_buffer, unsigned int size);
+void updateRFComm();
+void onReceive(uint8_t* received_buffer, unsigned int size);
 
 #endif

@@ -23,7 +23,7 @@ struct TxCommand{
   bool actuator_4;
 }; // sending a struct with multiple fields
 
-#define N 10 // Size of the added array
+#define N 2 // Size of the added array
 struct TelemetryData{
   uint8_t length;
   uint8_t data[N];
