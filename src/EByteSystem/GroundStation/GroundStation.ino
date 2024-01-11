@@ -41,24 +41,26 @@ unsigned long transmission_timer = 1500;
 unsigned long next_transmission = 0;
 
 void loop(){
-  checkControl();
   updateRFComm();
+  checkControl();
 
   if(millis() >= next_transmission){
     next_transmission += transmission_timer;
-    if(state_sending){
-      unsigned long int t0 = millis();
-      sendCommand();
-      Serial.print("Communication took ");
-      Serial.print(millis() - t0);
-      Serial.println("ms");
-    } else if(send_tx > 0){
-      send_tx--;
-      unsigned long int t0 = millis();
-      sendCommand();
-      Serial.print("Communication took ");
-      Serial.print(millis() - t0);
-      Serial.println("ms");
+     if(state_query_imaging){
+      startQueryStatusProtocol();
+     } else if(send_query_status > 0){
+      send_query_status--;
+      startQueryStatusProtocol();
+     } else if(state_query_imaging){
+      startQueryImagingDataProtocol();
+     } else if(send_query_imaging > 0){
+      send_query_imaging--;
+      startQueryImagingDataProtocol();
+     } else if(state_command){
+      startCommandProtocol();
+    } else if(send_command > 0){
+      send_command--;
+      startCommandProtocol();
     }
   }
 }

@@ -14,8 +14,13 @@ extern uint8_t rxChan;
 // extern String receiving_serial;
 // extern bool serial_received;
 
-extern bool state_sending;
-extern uint8_t send_tx;
+extern bool state_query_status;
+extern uint8_t send_query_status;
+extern bool state_query_imaging;
+extern uint8_t send_query_imaging;
+extern bool state_command;
+extern uint8_t send_command;
+
 extern unsigned int telemetry_index;
 extern unsigned int message_data_index;
 
@@ -46,8 +51,12 @@ enum CONTROL_COMMAND{
   SET_OPERATION_MODE,
   SET_ALL,
 
-  TOGGLE_TX,
-  SEND_TX,
+  TOGGLE_QUERY_STATUS,
+  SEND_QUERY_STATUS,
+  TOGGLE_QUERY_IMAGING,
+  SEND_QUERY_IMAGING,
+  TOGGLE_COMMAND,
+  SEND_COMMAND,
 
   SET_TX_ADDH,
   SET_TX_ADDL,
@@ -61,7 +70,6 @@ void checkControl();
 void decodeSerial();
 void parseSerial(uint8_t c);
 
-void control_toggleTx(uint8_t);
 void control_setTxChannel(uint8_t);
 void control_setTxAddh(uint8_t);
 void control_setTxAddl(uint8_t);
@@ -74,5 +82,9 @@ void control_setAirDataRate(uint8_t c);
 void control_setTxPower(uint8_t c);
 void control_setTxMode(uint8_t c);
 void control_setOperationMode(uint8_t c);
+
+void control_toggleQueryStatus(uint8_t);
+void control_toggleQueryImaging(uint8_t);
+void control_toggleCommand(uint8_t);
 
 #endif

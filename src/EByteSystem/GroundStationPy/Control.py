@@ -30,8 +30,12 @@ control_commands = [
   "SET_OPERATION_MODE",
   "SET_ALL",
 
-  "TOGGLE_TX",
-  "SEND_TX",
+  "TOGGLE_QUERY_STATUS",
+  "SEND_QUERY_STATUS",
+  "TOGGLE_QUERY_IMAGING",
+  "SEND_QUERY_IMAGING",
+  "TOGGLE_COMMAND",
+  "SEND_COMMAND",
 
   "SET_TX_ADDH",
   "SET_TX_ADDL",
@@ -383,10 +387,10 @@ class ControlFrame(ttk.LabelFrame):
     elif self.toggle_transmission_variable.get() == 'OFF':
       self.transmission_flag = True
       self.toggle_transmission_variable.set('ON')
-    self.write([control_commands.index("TOGGLE_TX"), self.transmission_flag])
+    self.write([control_commands.index("TOGGLE_QUERY_STATUS"), self.transmission_flag])
   
   def send_transmission(self):
-    self.write([control_commands.index("SEND_TX")])
+    self.write([control_commands.index("SEND_QUERY_STATUS")])
 
   # def entry_changed(in):
 

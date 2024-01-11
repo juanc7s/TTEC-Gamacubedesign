@@ -1,9 +1,18 @@
 #include "Arduino.h"
 #include "Control.h"
 
+const char CONTROL_STR[] = "CONTROL:";
+
 bool serialFlag = false;
 
 unsigned int message_data_index = 0;
+
+bool state_query_status = false;
+uint8_t send_query_status = 0;
+bool state_query_imaging = false;
+uint8_t send_query_imaging = 0;
+bool state_command = false;
+uint8_t send_command = 0;
 
 void (*parsing_function)(uint8_t c) = parseSerial;
 
@@ -32,9 +41,6 @@ void checkControl(){
 
 void parseSerial(uint8_t c){
   switch(c){
-    case TOGGLE_TX:
-      parsing_function = control_toggleTx;
-      break;
     case SET_TX_CHAN:
       parsing_function = control_setTxChannel;
       break;
@@ -163,16 +169,26 @@ void parseSerial(uint8_t c){
       break;
     case SET_MESSAGE_DATA:
       break;
-    case SEND_TX:
-      send_tx++;
+    case TOGGLE_QUERY_STATUS:
+      parsing_function = control_toggleQueryStatus;
+      break;
+    case SEND_QUERY_STATUS:
+      send_query_status++;
+      break;
+    case TOGGLE_QUERY_IMAGING:
+      parsing_function = control_toggleQueryImaging;
+      break;
+    case SEND_QUERY_IMAGING:
+      send_query_imaging++;
+      break;
+    case TOGGLE_COMMAND:
+      parsing_function = control_toggleCommand;
+      break;
+    case SEND_COMMAND:
+      send_command++;
       break;
   }
   // delay(400);
-}
-
-void control_toggleTx(uint8_t c){
-  state_sending = c != 0;
-  parsing_function = parseSerial;
 }
 
 void control_setTxChannel(uint8_t c){
@@ -316,5 +332,20 @@ void control_setTxMode(uint8_t c){
 
 void control_setOperationMode(uint8_t c){
   setOperationMode((OperationMode)c);
+  parsing_function = parseSerial;
+}
+
+void control_toggleQueryStatus(uint8_t c){
+  state_query_status = c != 0;
+  parsing_function = parseSerial;
+}
+
+void control_toggleQueryImaging(uint8_t c){
+  state_query_imaging = c != 0;
+  parsing_function = parseSerial;
+}
+
+void control_toggleCommand(uint8_t c){
+  state_command = c != 0;
   parsing_function = parseSerial;
 }
