@@ -7,10 +7,10 @@ bool serialFlag = false;
 
 unsigned int message_data_index = 0;
 
-bool state_query_status = false;
-uint8_t send_query_status = 0;
-bool state_query_imaging = false;
-uint8_t send_query_imaging = 0;
+bool state_request_status = false;
+uint8_t send_request_status = 0;
+bool state_request_imaging = false;
+uint8_t send_request_imaging = 0;
 bool state_command = false;
 uint8_t send_command = 0;
 
@@ -173,13 +173,13 @@ void parseSerial(uint8_t c){
       parsing_function = control_toggleQueryStatus;
       break;
     case SEND_QUERY_STATUS:
-      send_query_status++;
+      send_request_status++;
       break;
     case TOGGLE_QUERY_IMAGING:
       parsing_function = control_toggleQueryImaging;
       break;
     case SEND_QUERY_IMAGING:
-      send_query_imaging++;
+      send_request_imaging++;
       break;
     case TOGGLE_COMMAND:
       parsing_function = control_toggleCommand;
@@ -336,12 +336,12 @@ void control_setOperationMode(uint8_t c){
 }
 
 void control_toggleQueryStatus(uint8_t c){
-  state_query_status = c != 0;
+  state_request_status = c != 0;
   parsing_function = parseSerial;
 }
 
 void control_toggleQueryImaging(uint8_t c){
-  state_query_imaging = c != 0;
+  state_request_imaging = c != 0;
   parsing_function = parseSerial;
 }
 

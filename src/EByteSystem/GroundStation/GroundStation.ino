@@ -37,7 +37,7 @@ void setup(){
 bool state_sending = false;
 uint8_t send_tx = 0;
 
-unsigned long transmission_timer = 1500;
+unsigned long transmission_timer = 100;
 unsigned long next_transmission = 0;
 
 void loop(){
@@ -46,21 +46,21 @@ void loop(){
 
   if(millis() >= next_transmission){
     next_transmission += transmission_timer;
-     if(state_query_imaging){
-      startQueryStatusProtocol();
-     } else if(send_query_status > 0){
-      send_query_status--;
-      startQueryStatusProtocol();
-     } else if(state_query_imaging){
-      startQueryImagingDataProtocol();
-     } else if(send_query_imaging > 0){
-      send_query_imaging--;
-      startQueryImagingDataProtocol();
+     if(state_request_status){
+      startRequestStatusProtocol();
+     } else if(send_request_status > 0){
+      send_request_status--;
+      startRequestStatusProtocol();
+     } else if(state_request_imaging){
+      startRequestImagingDataProtocol();
+     } else if(send_request_imaging > 0){
+      send_request_imaging--;
+      startRequestImagingDataProtocol();
      } else if(state_command){
-      startCommandProtocol();
+      startSetOperationProtocol();
     } else if(send_command > 0){
       send_command--;
-      startCommandProtocol();
+      startSetOperationProtocol();
     }
   }
 }

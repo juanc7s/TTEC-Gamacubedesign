@@ -32,12 +32,12 @@ bool listenForResponse(unsigned long int timeout);
 void updateRFComm();
 void onReceive();
 
-void startQueryStatusProtocol();
-void startQueryImagingDataProtocol();
-void startCommandProtocol();
+void startRequestStatusProtocol();
+void startRequestImagingDataProtocol();
+void startSetOperationProtocol();
 
-void switchStatus();
-void switchImagingData();
-void switchSetOperation();
+void switchCaseStatusProtocol();
+void switchCaseImagingDataProtocol();
+void switchCaseSetOperationProtocol();
 
 #endif

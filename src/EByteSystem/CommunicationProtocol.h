@@ -1,31 +1,36 @@
 #include "Arduino.h"
 
-enum PROTOCOLS{
-  QUERY_STATUS,
-  QUERY_IMAGING_DATA,
-  SET_OPERATION
+enum PROTOCOL{
+  PROTOCOL_STATUS,
+  PROTOCOL_IMAGING_DATA,
+  PROTOCOL_SET_OPERATION
 };  
 
-enum PROTOCOL_QUERY_STATUS{
-  GS_QUERY_STATUS_GREETING,
-  SATELLITE_SEND_STATUS,
-  GS_QUERY_STATUS_DONE,
-  SATELLITE_QUERY_STATUS_DONE
+enum PROTOCOL_STATUS{
+  GS_STATUS_REQUEST,
+  SATELLITE_STATUS_PACKETS_AVAILABLE,
+  GS_STATUS_START_TRANSMISSION,
+  SATELLITE_STATUS_PACKET,
+  SATELLITE_STATUS_PACKETS_DONE,
+  GS_STATUS_RESEND_PACKET,
+  GS_STATUS_DONE,
+  SATELLITE_STATUS_DONE
 };
 
-enum PROTOCOL_QUERY_IMAGING_DATA{
-  GS_QUERY_IMAGING_GREETING,
-  SATELLITE_PACKETS_AVAILABLE,
-  GS_START_TELEMETRY_TRANSMISSION,
-  SATELLITE_SEND_PACKETS,
-  GS_RESEND_STATUS,
-  SATELLITE_QUERY_IMAGING_DONE,
-  GS_QUERY_IMAGING_DONE
+enum PROTOCOL_IMAGING_DATA{
+  GS_IMAGING_REQUEST,
+  SATELLITE_IMAGING_PACKETS_AVAILABLE,
+  GS_IMAGING_START_TRANSMISSION,
+  SATELLITE_IMAGING_PACKET,
+  SATELLITE_IMAGING_PACKETS_DONE,
+  GS_IMAGING_RESEND_STATUS,
+  SATELLITE_IMAGING_DONE,
+  GS_IMAGING_DONE
 };
 
 enum PROTOCOL_SET_OPERATION{
-    GS_SEND_OPERATION,
-    SATELLITE_REPEAT_OPERATION,
+    GS_SET_OPERATION,
+    SATELLITE_SET_OPERATION_ECHO,
     GS_SET_OPERATION_DONE,
     SATELLITE_SET_OPERATION_DONE
 };
@@ -35,7 +40,7 @@ struct ProtocolOperation{
     unsigned operation : 6;
 };
 
-struct GSCommand{
+struct GSOperation{
   unsigned switch_active_thermal_control : 1;
   unsigned switch_attitude_control : 1;
   unsigned switch_imaging : 1;
@@ -54,7 +59,7 @@ struct GSResend{
 };
 
 union GSData{
-  GSCommand command;
+  GSOperation operation;
   GSResend resend;
 };
 
@@ -66,8 +71,8 @@ struct GSPacket{
 
 #define N 10 // Size of the added array
 struct HealthData{
-  uint8_t length;
-  uint8_t type;
+//   uint8_t length;
+//   uint8_t type;
   float battery_voltage;
   float battery_current;
   float battery_charge;
@@ -85,8 +90,8 @@ struct LightningData{
 };
 
 struct ImagingData{
-  uint8_t length;
-  uint8_t type;
+//   uint8_t length;
+//   uint8_t type;
   LightningData lightnings[5];
 };
 
@@ -97,14 +102,15 @@ struct ImagingData{
 
 union SatData{
   uint8_t number_of_packets;
-  uint8_t index;
   HealthData healthData;
   ImagingData imagingData;
+  GSOperation operation_echo;
 };
 
 struct SatPacket{
   uint8_t length;
   ProtocolOperation operation;
+  uint8_t index;
   SatData data;
 };
 

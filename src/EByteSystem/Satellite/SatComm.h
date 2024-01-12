@@ -18,8 +18,19 @@ void sendSatPacket();
 void updateRFComm();
 void onReceive();
 
+void preStatusProtocol();
+void updateStatusPacket(uint8_t index);
+void postStatusProtocol();
+void preImagingDataProtocol();
+void updateImagingDataPacket(uint8_t index);
+void postImagingDataProtocol();
+
+void switchCaseStatusProtocol();
+void switchCaseImagingDataProtocol();
+void switchCaseSetOperationProtocol();
+
 void sendNumberOfPackets();
-void sendPacket(unsigned int packet_index);
-void sendDone();
+void sendPacket(unsigned int packet_index, uint8_t protocol, uint8_t operation);
+void sendDone(uint8_t protocol, uint8_t operation);
 
 #endif

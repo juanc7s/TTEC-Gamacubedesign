@@ -14,10 +14,10 @@ extern uint8_t rxChan;
 // extern String receiving_serial;
 // extern bool serial_received;
 
-extern bool state_query_status;
-extern uint8_t send_query_status;
-extern bool state_query_imaging;
-extern uint8_t send_query_imaging;
+extern bool state_request_status;
+extern uint8_t send_request_status;
+extern bool state_request_imaging;
+extern uint8_t send_request_imaging;
 extern bool state_command;
 extern uint8_t send_command;
 
