@@ -51,19 +51,19 @@ void parseSerial(uint8_t c){
       parsing_function = control_setTxAddl;
       break;
     case READ_ADDH:
-      Serial.print("CONTROL:ADDH:");
+      Serial.print(CONTROL_STR);Serial.print("ADDH:");
       Serial.println(getADDH(), HEX);
       break;
     case READ_ADDL:
-      Serial.print("CONTROL:ADDL:");
+      Serial.print(CONTROL_STR);Serial.print("ADDL:");
       Serial.println(getADDL(), HEX);
       break;
     case READ_CHAN:
-      Serial.print("CONTROL:CHAN:");
+      Serial.print(CONTROL_STR);Serial.print("CHAN:");
       Serial.println(getChannel(), HEX);
       break;
     case READ_PARITY:
-      Serial.print("CONTROL:PARITY:");
+      Serial.print(CONTROL_STR);Serial.print("PARITY:");
       switch(getParity()){
         case UART_PARITY_BIT_8N1:
           Serial.println("8N1");
@@ -80,17 +80,17 @@ void parseSerial(uint8_t c){
       }
       break;
     case READ_UART_BAUD_RATE:
-      Serial.print("CONTROL:UART_BAUD_RATE:");
+      Serial.print(CONTROL_STR);Serial.print("UART_BAUD_RATE:");
       Serial.print(getBaudRate());
       Serial.println(" bps");
       break;
     case READ_AIR_DATA_RATE:
-      Serial.print("CONTROL:AIR_DATA_RATE:");
+      Serial.print(CONTROL_STR);Serial.print("AIR_DATA_RATE:");
       Serial.print(getAirDataRate());
       Serial.println(" bps");
       break;
     case READ_TRANSMISSION_POWER:
-      Serial.print("CONTROL:TXPW:");
+      Serial.print(CONTROL_STR);Serial.print("TXPW:");
       switch(getTransmissionPower()){
         case TRANSMISSION_POWER_20dBm:
           Serial.println("20 dBm");
@@ -107,7 +107,7 @@ void parseSerial(uint8_t c){
       }
       break;
     case READ_TRANSMISSION_MODE:
-      Serial.print("CONTROL:TXMO:");
+      Serial.print(CONTROL_STR);Serial.print("TXMO:");
       switch(getTransmissionMode()){
         case TRANSPARENT_TRANSMISSION_MODE:
           Serial.println("TRANSPARENT TRANSMISSION");
@@ -118,7 +118,7 @@ void parseSerial(uint8_t c){
       }
       break;
     case READ_OPERATION_MODE:
-      Serial.print("CONTROL:OPMO:");
+      Serial.print(CONTROL_STR);Serial.print("OPMO:");
       switch(getOperationMode()){
         case NORMAL:
           Serial.println("NORMAL");
@@ -186,6 +186,21 @@ void parseSerial(uint8_t c){
       break;
     case SEND_COMMAND:
       send_command++;
+      break;
+    case SET_ACTIVE_THERMAL_CONTROL:
+      parsing_function = setActiveThermalControl;
+      break;
+    case SET_ATTITUDE_CONTROL:
+      parsing_function = setAttitudeControl;
+      break;
+    case SET_IMAGING:
+      parsing_function = setImaging;
+      break;
+    case SET_IMAGING_MODE:
+      parsing_function = setImagingMode;
+      break;
+    case SET_STAND_BY_MODE:
+      parsing_function = setStandByMode;
       break;
   }
   // delay(400);
@@ -348,4 +363,24 @@ void control_toggleQueryImaging(uint8_t c){
 void control_toggleCommand(uint8_t c){
   state_command = c != 0;
   parsing_function = parseSerial;
+}
+
+void setActiveThermalControl(uint8_t c){
+  operation.switch_active_thermal_control = c==1;
+}
+
+void setAttitudeControl(uint8_t c){
+  operation.switch_attitude_control = c==1;
+}
+
+void setImaging(uint8_t c){
+  operation.switch_imaging = c==1;
+}
+
+void setImagingMode(uint8_t c){
+  operation.switch_imaging_mode = c==1;
+}
+
+void setStandByMode(uint8_t c){
+  operation.switch_stand_by_mode = c==1;
 }

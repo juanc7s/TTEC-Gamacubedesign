@@ -14,11 +14,13 @@ const unsigned long int communication_timeout_limit = 1000;
 bool telemetry_received = false;
 uint8_t telemetry_state = 0;
 
-bool switch_active_thermal_control = false;
-bool switch_attitude_control = false;
-bool switch_imaging = false;
-bool switch_imaging_mode = false;
-bool switch_stand_by_mode = false;
+Operation operation = {
+  .switch_active_thermal_control = false,
+  .switch_attitude_control = false,
+  .switch_imaging = false,
+  .switch_imaging_mode = false,
+  .switch_stand_by_mode = false,
+};
 
 uint8_t rx_pointer = 0;
   
@@ -144,11 +146,11 @@ void startSetOperationProtocol(){
   }
   gsPacket.operation.protocol = PROTOCOL_SET_OPERATION;
   gsPacket.operation.operation = GS_SET_OPERATION;
-  gsPacket.data.operation.switch_active_thermal_control = switch_active_thermal_control;
-  gsPacket.data.operation.switch_attitude_control = switch_attitude_control;
-  gsPacket.data.operation.switch_imaging = switch_imaging;
-  gsPacket.data.operation.switch_imaging_mode = switch_imaging_mode;
-  gsPacket.data.operation.switch_stand_by_mode = switch_stand_by_mode;
+  gsPacket.data.operation.switch_active_thermal_control = operation.switch_active_thermal_control;
+  gsPacket.data.operation.switch_attitude_control = operation.switch_attitude_control;
+  gsPacket.data.operation.switch_imaging = operation.switch_imaging;
+  gsPacket.data.operation.switch_imaging_mode = operation.switch_imaging_mode;
+  gsPacket.data.operation.switch_stand_by_mode = operation.switch_stand_by_mode;
 
   gsPacket.length = 3;
 
@@ -301,9 +303,20 @@ void switchCaseSetOperationProtocol(){
   switch(satPacket.operation.operation){
     case SATELLITE_SET_OPERATION_ECHO:
       Serial.println("Set operation: Echo");
+      if(satPacket.data.byte == *((uint8_t*)&operation)){
+        Serial.println("Operation correct");
+        gsPacket.operation.protocol = PROTOCOL_SET_OPERATION;
+        gsPacket.operation.operation = GS_SET_OPERATION_DONE;
+        gsPacket.length = 2;
+        sendGSPacket();
+      } else{
+        Serial.println("Operation incorrect, resending");
+        startSetOperationProtocol();
+      }
       break;
     case SATELLITE_SET_OPERATION_DONE:
       Serial.println("Set operation: Done");
+      rx_pointer = 0;
       talking = false;
       break;
   }

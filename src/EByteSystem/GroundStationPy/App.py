@@ -3,15 +3,20 @@ import tkinter.filedialog
 from tkinter import ttk
 
 import serial.tools.list_ports
+import SerialTransmission
 
 import Control
+import GroundStation
 
 class App(tk.Tk):
   def __init__(self):
     tk.Tk.__init__(self)
     self.title('GamaCubedesign Groud Station')
 
-    self.control = Control.ControlFrame(self)
+    self.serial = SerialTransmission.SerialTransmission(self)
+
+    # left_frame = ttk.Frame(master=self)
+    # left_frame.pack(side='left', fill='both')
     
     self.init_variables()
     self.init_layout()
@@ -40,7 +45,10 @@ class App(tk.Tk):
     open_frame.pack(side='left',fill='both')
     ttk.Button(master=open_frame,textvariable=self.open_close_variable,command=self.open_close_channel).pack(side='left',fill='both')
 
-    # self.control_frame = tk.Frame(master=self)
+    self.control_frame = tk.Frame(master=self)
+    self.control = Control.ControlFrame(self.control_frame, self.serial)
+    self.ground_station_frame = tk.Frame(master=self)
+    self.ground_station = GroundStation.GroundStation(root=self.ground_station_frame, serial=self.serial)
   
   def detect_ports(self):
     self.ports_dict = dict()
@@ -53,19 +61,26 @@ class App(tk.Tk):
   
   def open_close_channel(self):
     if self.open_close_variable.get()=="Open channel":
-      if self.control.begin(self.ports_dict[self.port_combobox.get()], self.baudrate.get()):
+      if self.serial.begin(self.ports_dict[self.port_combobox.get()], self.baudrate.get()):
+        self.control_frame.pack(side='left',fill='both')
+        self.ground_station_frame.pack(side='left',fill='both')
+        self.control.begin(self.serial)
+        self.ground_station.begin(self.serial)
         self.open_close_variable.set("Close channel")
-        # self.control.pack(side='bottom',fill='both')
         self.update_id = self.after(ms=500,func=self.update)
     elif self.open_close_variable.get()=="Close channel":
+      self.after_cancel(self.update_id)
+      self.ground_station.close()
       self.control.close()
+      self.serial.close()
+      self.control_frame.pack_forget()
+      self.ground_station_frame.pack_forget()
       self.open_close_variable.set("Open channel")
       # self.control_frame.pack_forget()
-      self.after_cancel(self.update_id)
       # self.control_frame.pack()
   
   def update(self):
-    self.control.update()
+    self.serial.update()
     self.update_id = self.after(ms=500,func=self.update)
 
 

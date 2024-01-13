@@ -2,6 +2,7 @@
 #define CONTROL_H
 
 #include <EbyteLib.h>
+#include "GSComm.h"
 
 extern uint8_t txAddh;
 extern uint8_t txAddl;
@@ -63,7 +64,13 @@ enum CONTROL_COMMAND{
   SET_TX_CHAN,
 
   FLUSH,
-  SET_MESSAGE_DATA
+  SET_MESSAGE_DATA,
+
+  SET_ACTIVE_THERMAL_CONTROL,
+  SET_ATTITUDE_CONTROL,
+  SET_IMAGING,
+  SET_IMAGING_MODE,
+  SET_STAND_BY_MODE
 };
 
 void checkControl();
@@ -86,5 +93,11 @@ void control_setOperationMode(uint8_t c);
 void control_toggleQueryStatus(uint8_t);
 void control_toggleQueryImaging(uint8_t);
 void control_toggleCommand(uint8_t);
+
+void setActiveThermalControl(uint8_t);
+void setAttitudeControl(uint8_t);
+void setImaging(uint8_t);
+void setImagingMode(uint8_t);
+void setStandByMode(uint8_t);
 
 #endif

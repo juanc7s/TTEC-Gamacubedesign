@@ -14,11 +14,13 @@ const unsigned long int communication_timeout_limit = 1000;
 bool telemetry_received = false;
 uint8_t telemetry_state = 0;
 
-bool switch_active_thermal_control = false;
-bool switch_attitude_control = false;
-bool switch_imaging = false;
-bool switch_imaging_mode = false;
-bool switch_stand_by_mode = false;
+Operation operation = {
+  .switch_active_thermal_control = false,
+  .switch_attitude_control = false,
+  .switch_imaging = false,
+  .switch_imaging_mode = false,
+  .switch_stand_by_mode = false,
+};
 
 // TelemetryData telemetryData = {
 //   .length = sizeof(TelemetryData),
@@ -283,6 +285,11 @@ void switchCaseSetOperationProtocol(){
       break;
     case GS_SET_OPERATION_DONE:
       Serial.println("Set operation: Done");
+      *((uint8_t*)&operation) = satPacket.data.byte;
+      satPacket.operation.protocol = PROTOCOL_SET_OPERATION;
+      satPacket.operation.operation = SATELLITE_SET_OPERATION_DONE;
+      satPacket.length = 2;
+      sendSatPacket();
       rx_pointer = 0;
       talking = false;
       break;

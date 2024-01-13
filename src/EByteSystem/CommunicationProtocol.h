@@ -101,6 +101,7 @@ struct ImagingData{
 // };
 
 union SatData{
+  uint8_t byte;
   uint8_t number_of_packets;
   HealthData healthData;
   ImagingData imagingData;
@@ -114,7 +115,16 @@ struct SatPacket{
   SatData data;
 };
 
+struct Operation{
+  unsigned switch_active_thermal_control : 1;
+  unsigned switch_attitude_control : 1;
+  unsigned switch_imaging : 1;
+  unsigned switch_imaging_mode : 1;
+  unsigned switch_stand_by_mode : 1;
+};
+
 // extern Message message;
 // extern TelemetryData telemetryData;
 extern SatPacket satPacket;
 extern GSPacket gsPacket;
+extern Operation operation;

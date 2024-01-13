@@ -1,7 +1,7 @@
 #include <EbyteLib.h>
 
 #include "Control.h"
-#include "GSComm.h"
+// #include "GSComm.h"
 
 void setup(){
   Serial.begin(57600);
