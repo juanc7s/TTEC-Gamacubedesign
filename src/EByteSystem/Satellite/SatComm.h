@@ -2,7 +2,8 @@
 #define SAT_COMM_H
 
 #include <EbyteLib.h>
-#include "C:\Users\Vitinho\Desktop\TTEC-Gamacubedesign\src\EByteSystem\CommunicationProtocol.h"
+// #include "C:\Users\Vitinho\Desktop\TTEC-Gamacubedesign\src\EByteSystem\CommunicationProtocol.h"
+#include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/src/EByteSystem/CommunicationProtocol.h"
 
 extern uint8_t rxAddh;
 extern uint8_t rxAddl;
