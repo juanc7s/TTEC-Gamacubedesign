@@ -44,7 +44,7 @@ void sdWriteSatStatusPacket(){
   data.add(0x08);
   data.add(0x09);
   data.add(0x0a);
-  serualizeJson(doc, current_status_writing_file);
+  serializeJson(doc, current_status_writing_file);
 }
 
 bool sdReadSatImagingDataPacket(){

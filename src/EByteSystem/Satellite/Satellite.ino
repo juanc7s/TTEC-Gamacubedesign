@@ -1,10 +1,10 @@
 #include <EbyteLib.h>
-#include <Transmission.h>
-#include <Utils.h>
-#include <configurations.h>
-#include <debugging.h>
-#include <definitions.h>
-#include <modes.h>
+// #include <Transmission.h>
+// #include <Utils.h>
+// #include <configurations.h>
+// #include <debugging.h>
+// #include <definitions.h>
+// #include <modes.h>
 
 #include "SatComm.h"
 
