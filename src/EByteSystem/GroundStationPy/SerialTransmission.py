@@ -55,11 +55,11 @@ class SerialTransmission:
           self.parse_message()
           self.receiving_buffer = bytes()
         else:
-          self.receiving_buffer += b.to_bytes()
+          self.receiving_buffer += b.to_bytes(1,'little')
       elif b==13:
         self.receiving_flag = True
       else:
-        self.receiving_buffer += b.to_bytes()
+        self.receiving_buffer += b.to_bytes(1,'little')
   
   def parse_message(self):
     # print(self.receiving_buffer)

@@ -6,6 +6,7 @@
 // #include <definitions.h>
 // #include <modes.h>
 
+#include "SDData.h"
 #include "SatComm.h"
 
 void setup(){
@@ -30,28 +31,41 @@ void setup(){
   setTransmissionPower(TRANSMISSION_POWER_20dBm);
   setConfiguration();
   
-  // for(uint8_t i = 0; i < N; i++){ // Initialize array
-  //   telemetry.data[i] = 0xA1;
-  // }
-  // telemetry.data[N] = (uint8_t)'\n';
-  
-  // printConfiguration();
   setNormalMode();
+
+  init_sd_logger();
   
   // setReceiveCallback(onReceive);
 }
 
-// String receiving_serial = "";
-// String received_serial = "";
-// bool serial_received = false;
-
-// bool state_sending = false;
+unsigned long int status_write_period = 500;
+unsigned long int imaging_write_period = 250;
+unsigned long int status_write_time = 0;
+unsigned long int imaging_write_time = 0;
 
 void loop(){
   checkSerial();
   updateRFComm();
 
-  delay(500);
+  unsigned long int t = millis();
+  if(t < status_write_time){
+    status_write_time += status_write_period;
+    // write_status_data();
+    Serial.println("Writing status data");
+  }
+  if(t < imaging_write_time){
+    imaging_write_time += imaging_write_period;
+    Serial.println("Writing imaging data");
+    // write_imaging_data();
+  }
+}
+
+void write_status_data(){
+  uint8_t rasp_data[10] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
+  // sdWriteSatStatusPacket(millis(), 3.3, 1.0, 1.1, 30.0, 40.0, 50.0, 1000, rasp_data);
+}
+
+void write_imaging_data(){
 }
 
 void checkSerial(){
