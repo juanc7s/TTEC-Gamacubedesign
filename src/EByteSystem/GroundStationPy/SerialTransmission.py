@@ -50,6 +50,7 @@ class SerialTransmission:
   def read(self):
     while self.channel.in_waiting > 0:
       b = self.channel.read()[0]
+      # print(b)
       if self.receiving_flag:
         if b==10:
           self.parse_message()

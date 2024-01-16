@@ -1,3 +1,6 @@
+#ifndef COMMUNICATION_PROTOCOL_H
+#define COMMUNICATION_PROTOCOL_H
+
 #include "Arduino.h"
 
 enum PROTOCOL{
@@ -73,6 +76,7 @@ struct GSPacket{
 struct HealthData{
 //   uint8_t length;
 //   uint8_t type;
+  unsigned long int time;
   float battery_voltage;
   float battery_current;
   float battery_charge;
@@ -87,6 +91,7 @@ struct LightningData{
   float x;
   float y;
   float radius;
+  float duration;
 };
 
 struct ImagingData{
@@ -128,3 +133,5 @@ struct Operation{
 extern SatPacket satPacket;
 extern GSPacket gsPacket;
 extern Operation operation;
+
+#endif

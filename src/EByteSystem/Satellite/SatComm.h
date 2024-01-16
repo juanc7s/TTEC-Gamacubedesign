@@ -3,9 +3,10 @@
 
 // #include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/libraries/EbyteLib/EbyteLib.h"
 #include <EbyteLib.h>
+
 // #include "C:\Users\Vitinho\Desktop\TTEC-Gamacubedesign\src\EByteSystem\CommunicationProtocol.h"
 #include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/src/EByteSystem/CommunicationProtocol.h"
-// #include "CommunicationProtocol.h"
+// #include "SDData.h"
 
 extern uint8_t rxAddh;
 extern uint8_t rxAddl;
@@ -15,6 +16,20 @@ extern uint8_t txAddl;
 extern uint8_t txChan;
 
 extern uint8_t rx_pointer;
+extern SatPacket satPacket;
+extern GSPacket gsPacket;
+
+extern uint8_t number_of_packets;
+extern const uint8_t N_status;
+extern const uint8_t N_imaging;
+
+extern unsigned long int reading_status_counter;
+extern unsigned long int reading_imaging_counter;
+extern unsigned long int writing_status_counter;
+extern unsigned long int writing_imaging_counter;
+
+extern unsigned int reading_status_file_pointer;
+extern unsigned int reading_imaging_file_pointer;
 
 void sendSatPacket();
 
@@ -35,5 +50,14 @@ void switchCaseSetOperationProtocol();
 void sendNumberOfPackets();
 void sendPacket(unsigned int packet_index, uint8_t protocol, uint8_t operation);
 void sendDone(uint8_t protocol, uint8_t operation);
+
+
+bool sdReadSatStatusPacket(HealthData *healthData, unsigned int index);
+void sdWriteSatStatusPacket(unsigned long int t,
+  float bv, float bcu, float bch, float bt, float ti, float te,
+  unsigned long int sd, uint8_t* rasp_data);
+
+bool sdReadSatImagingDataPacket(ImagingData *imagingData, unsigned int index);
+void sdWriteSatImagingDataPacket();
 
 #endif

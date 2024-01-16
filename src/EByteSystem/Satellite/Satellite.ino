@@ -33,7 +33,7 @@ void setup(){
   
   setNormalMode();
 
-  init_sd_logger();
+  // init_sd_logger();
   
   // setReceiveCallback(onReceive);
 }
@@ -43,6 +43,8 @@ unsigned long int imaging_write_period = 250;
 unsigned long int status_write_time = 0;
 unsigned long int imaging_write_time = 0;
 
+bool tmpflag = false;
+
 void loop(){
   checkSerial();
   updateRFComm();
@@ -50,19 +52,24 @@ void loop(){
   unsigned long int t = millis();
   if(t < status_write_time){
     status_write_time += status_write_period;
-    // write_status_data();
     Serial.println("Writing status data");
+    write_status_data();
   }
   if(t < imaging_write_time){
     imaging_write_time += imaging_write_period;
     Serial.println("Writing imaging data");
-    // write_imaging_data();
+    write_imaging_data();
   }
+
+  // if(!tmpflag && millis() < 10000){
+  //   sdReadSatStatusPacket();
+  //   sdReadSatImagingDataPacket();
+  // }
 }
 
 void write_status_data(){
   uint8_t rasp_data[10] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
-  // sdWriteSatStatusPacket(millis(), 3.3, 1.0, 1.1, 30.0, 40.0, 50.0, 1000, rasp_data);
+  sdWriteSatStatusPacket(millis(), 3.3, 1.0, 1.1, 30.0, 40.0, 50.0, 1000, rasp_data);
 }
 
 void write_imaging_data(){

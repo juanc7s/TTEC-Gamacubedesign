@@ -14,6 +14,10 @@ const unsigned long int communication_timeout_limit = 1000;
 bool telemetry_received = false;
 uint8_t telemetry_state = 0;
 
+uint8_t number_of_packets = 0;
+const uint8_t N_status = 10;
+const uint8_t N_imaging = 20;
+
 Operation operation = {
   .switch_active_thermal_control = false,
   .switch_attitude_control = false,
@@ -22,54 +26,51 @@ Operation operation = {
   .switch_stand_by_mode = false,
 };
 
-// TelemetryData telemetryData = {
-//   .length = sizeof(TelemetryData),
-//   .data = {0xa1, 0xa1}
-// };
 SatPacket satPacket;
 GSPacket gsPacket;
 
 uint8_t rx_pointer = 0;
 
 void preStatusProtocol(){
-
+  number_of_packets = reading_status_counter;
+  if(number_of_packets > N_status){
+    number_of_packets = N_status;
+  }
 }
 
 void updateStatusPacket(uint8_t index){
-  satPacket.data.healthData.battery_voltage = 3.3;
-  satPacket.data.healthData.battery_current = 50.0;
-  satPacket.data.healthData.battery_charge = -10.0;
-  satPacket.data.healthData.battery_temperature = 1000.8;
-  satPacket.data.healthData.internal_temperature = index*3.3;
-  satPacket.data.healthData.external_temperature = 3.3;
-  satPacket.data.healthData.sd_memory_usage = 50.0;
-  for(uint8_t i = 0; i < 10; i++){
-    satPacket.data.healthData.rasp_data[i] = 0xa1;
-  }
+  // for(unsigned int i = 0; i < sizeof(HealthData); i++){
+  //   ((uint8_t*)(&satPacket.data.healthData))[i] = ((uint8_t*)(&(dataBuffer.statusData[index])))[i];
+  // }
+  sdReadSatStatusPacket(&satPacket.data.healthData, index);
 }
 
 void postStatusProtocol(){
-
+  reading_status_file_pointer += sizeof(HealthData)*number_of_packets;
+  reading_status_counter -= number_of_packets;
 }
 
 void preImagingDataProtocol(){
-  
+  number_of_packets = reading_status_counter;
+  if(number_of_packets > N_imaging){
+    number_of_packets = N_imaging;
+  }
+  // for(unsigned int i = 0; i < n; i++){
+  //   sdReadSatStatusPacket(&(dataBuffer.statusData[i]));
+  // }
 }
 
 void updateImagingDataPacket(uint8_t index){
-  for(uint8_t i = 0; i < 5; i++){
-    satPacket.data.imagingData.lightnings[i].x = index*10 - i;
-    satPacket.data.imagingData.lightnings[i].y = index*7 + i;
-    satPacket.data.imagingData.lightnings[i].radius = index*20;
-  }
+  
 }
 
 void postImagingDataProtocol(){
-
+  reading_imaging_file_pointer += sizeof(ImagingData)*number_of_packets;
+  reading_imaging_counter -= number_of_packets;
 }
 
 void sendSatPacket(){
-  Serial.print("Sending packet of length ");
+  Serial.print("S:");
   Serial.print(satPacket.length);Serial.print("    ");
   Serial.print(satPacket.operation.protocol);Serial.print("    ");
   Serial.println(satPacket.operation.operation);
@@ -81,7 +82,7 @@ void updateRFComm(){
   uint8_t b;
   if(e32serial.available()){
     if(millis() > communication_timeout){
-      Serial.println("Timeout");
+      Serial.println("T:1");
       rx_pointer = 0;
       talking = false;
     }
@@ -101,7 +102,7 @@ void updateRFComm(){
   }
   if(talking){
     if(millis() > communication_timeout){
-      Serial.println("Timeout");
+      Serial.println("T:2");
       rx_pointer = 0;
       talking = false;
     }
@@ -109,21 +110,21 @@ void updateRFComm(){
 }
 
 void onReceive(){
-  Serial.print("Received packet with length ");
+  Serial.print("P:R:");
   Serial.println(gsPacket.length);
   switch(gsPacket.operation.protocol){
     case PROTOCOL_STATUS:
-      Serial.println("Protocol: Status");
+      Serial.println("P:S");
       satPacket.operation.protocol = PROTOCOL_STATUS;
       switchCaseStatusProtocol();
       break;
     case PROTOCOL_IMAGING_DATA:
-      Serial.println("Protocol: Imaging data");
+      Serial.println("P:I");
       satPacket.operation.protocol = PROTOCOL_IMAGING_DATA;
       switchCaseImagingDataProtocol();
       break;
     case PROTOCOL_SET_OPERATION:
-      Serial.println("Protocol: Set operation");
+      Serial.println("P:O");
       satPacket.operation.protocol = PROTOCOL_SET_OPERATION;
       switchCaseSetOperationProtocol();
       break;
@@ -133,17 +134,17 @@ void onReceive(){
 void switchCaseStatusProtocol(){
   switch(gsPacket.operation.operation){
     case GS_STATUS_REQUEST:
-      Serial.println("Status: Request");
+      Serial.println("S:1");
       preStatusProtocol();
       satPacket.operation.protocol = PROTOCOL_STATUS;
       satPacket.operation.operation = SATELLITE_STATUS_PACKETS_AVAILABLE;
-      satPacket.data.number_of_packets = 10;
+      satPacket.data.number_of_packets = number_of_packets;
       satPacket.length = 4;
       sendSatPacket();
       break;
     case GS_STATUS_START_TRANSMISSION:
-      Serial.println("Status: Start transmission");
-      for(unsigned int i = 0; i < 10; i++){
+      Serial.println("S:2");
+      for(unsigned int i = 0; i < number_of_packets; i++){
         updateStatusPacket(i);
         satPacket.operation.protocol = PROTOCOL_STATUS;
         satPacket.operation.operation = SATELLITE_STATUS_PACKET;
@@ -151,14 +152,14 @@ void switchCaseStatusProtocol(){
         satPacket.length = 3+sizeof(HealthData);
         sendSatPacket();
       }
-      Serial.println("Status: Packets done");
+      Serial.println("S:3");
       satPacket.operation.protocol = PROTOCOL_STATUS;
       satPacket.operation.operation = SATELLITE_STATUS_PACKETS_DONE;
       satPacket.length = 2;
       sendSatPacket();
       break;
     case GS_STATUS_RESEND_PACKET:
-      Serial.println("Status: Resend packets");
+      Serial.println("S:4");
       if(!gsPacket.data.resend.isDone){
         Serial.println("Recalling packets");
         for(unsigned int i = 0; i < 32; i++){
@@ -176,16 +177,16 @@ void switchCaseStatusProtocol(){
           }
         }
       } else{
-        Serial.println("All packets transmitted");
+        Serial.println("S:A");
       }
-      Serial.println("Protocol done");
+      Serial.println("PD");
       satPacket.operation.protocol = PROTOCOL_STATUS;
       satPacket.operation.operation = SATELLITE_STATUS_PACKETS_DONE;
       satPacket.length = 2;
       sendSatPacket();
       break;
     case GS_STATUS_DONE:
-      Serial.println("Status: Done");
+      Serial.println("S:D");
       satPacket.operation.protocol = PROTOCOL_STATUS;
       satPacket.operation.operation = SATELLITE_STATUS_DONE;
       satPacket.length = 2;
@@ -200,17 +201,17 @@ void switchCaseStatusProtocol(){
 void switchCaseImagingDataProtocol(){
   switch(gsPacket.operation.operation){
     case GS_IMAGING_REQUEST:
-      Serial.println("Imaging data: Request");
+      Serial.println("I:1");
       preImagingDataProtocol();
       satPacket.operation.protocol = PROTOCOL_IMAGING_DATA;
       satPacket.operation.operation = SATELLITE_IMAGING_PACKETS_AVAILABLE;
-      satPacket.data.number_of_packets = 10;
+      satPacket.data.number_of_packets = number_of_packets;
       satPacket.length = 4;
       sendSatPacket();
       break;
     case GS_IMAGING_START_TRANSMISSION:
-      Serial.println("Imaging data: Start transmission");
-      for(unsigned int i = 0; i < 10; i++){
+      Serial.println("I:2");
+      for(unsigned int i = 0; i < number_of_packets; i++){
         updateImagingDataPacket(i);
         satPacket.operation.protocol = PROTOCOL_IMAGING_DATA;
         satPacket.operation.operation = SATELLITE_IMAGING_PACKET;
@@ -218,20 +219,20 @@ void switchCaseImagingDataProtocol(){
         satPacket.length = 3+sizeof(ImagingData);
         sendSatPacket();
       }
-      Serial.println("Protocol done");
+      Serial.println("I:D");
       satPacket.length = 2;
       satPacket.operation.protocol = PROTOCOL_IMAGING_DATA;
       satPacket.operation.operation = SATELLITE_IMAGING_PACKETS_DONE;
       sendSatPacket();
       break;
     case GS_IMAGING_RESEND_STATUS:
-      Serial.println("Imaging data: Resend status");
+      Serial.println("I:3");
       if(!gsPacket.data.resend.isDone){
-        Serial.println("Recalling packets");
+        Serial.println("I:R");
         for(unsigned int i = 0; i < 32; i++){
           for(unsigned int j = 0; j < 8; j++){
             if(bitRead(gsPacket.data.resend.packets[i], j)){
-              Serial.print("Resending packet ");
+              Serial.print("I:R:");
               Serial.println(i*8+j);
               updateImagingDataPacket(i*8+j);
               satPacket.operation.protocol = PROTOCOL_IMAGING_DATA;
@@ -243,16 +244,16 @@ void switchCaseImagingDataProtocol(){
           }
         }
       } else{
-        Serial.println("All packets transmitted");
+        Serial.println("I:A");
       }
-      Serial.println("Protocol done");
+      Serial.println("I:D");
       satPacket.operation.protocol = PROTOCOL_IMAGING_DATA;
       satPacket.operation.operation = SATELLITE_IMAGING_PACKETS_DONE;
       satPacket.length = 2;
       sendSatPacket();
       break;
     case GS_IMAGING_DONE:
-      Serial.println("Protocol done");
+      Serial.println("I:4");
       satPacket.operation.protocol = PROTOCOL_IMAGING_DATA;
       satPacket.operation.operation = SATELLITE_IMAGING_DONE;
       satPacket.length = 2;
@@ -267,7 +268,7 @@ void switchCaseImagingDataProtocol(){
 void switchCaseSetOperationProtocol(){
   switch(gsPacket.operation.operation){
     case GS_SET_OPERATION:
-      Serial.println("Set operation");
+      Serial.println("O:1");
       Serial.print("Active thermal control: ");Serial.println(gsPacket.data.operation.switch_active_thermal_control ? "ON" : "OFF");
       Serial.print("Attitude control: ");Serial.println(gsPacket.data.operation.switch_attitude_control ? "ON" : "OFF");
       Serial.print("Imaging: ");Serial.println(gsPacket.data.operation.switch_imaging ? "ON" : "OFF");
@@ -284,7 +285,7 @@ void switchCaseSetOperationProtocol(){
       sendSatPacket();
       break;
     case GS_SET_OPERATION_DONE:
-      Serial.println("Set operation: Done");
+      Serial.println("O:D");
       *((uint8_t*)&operation) = satPacket.data.byte;
       satPacket.operation.protocol = PROTOCOL_SET_OPERATION;
       satPacket.operation.operation = SATELLITE_SET_OPERATION_DONE;
