@@ -26,6 +26,6 @@ void sdWriteSatStatusPacket(unsigned long int t,
   unsigned long int sd, uint8_t* rasp_data);
 
 void sdReadSatImagingDataPacket(ImagingData *imagingData, unsigned int index);
-void sdWriteSatImagingDataPacket();
+void sdWriteSatImagingDataPacket(ImagingData im);
 
 #endif

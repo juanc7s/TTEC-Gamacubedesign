@@ -72,6 +72,15 @@ void write_status_data(){
 }
 
 void write_imaging_data(){
+  ImagingData imagingData;
+  imagingData.time = millis();
+  for(uint8_t i = 0; i < 5; i++){
+    imagingData->lightnings[i].x = 10 - i;
+    imagingData->lightnings[i].y = 7 + i;
+    imagingData->lightnings[i].radius = 20;
+    imagingData->lightnings[i].duration = i;
+  }
+  sdWriteSatImagingPacket(imagingData);
 }
 
 void checkSerial(){

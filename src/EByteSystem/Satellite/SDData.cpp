@@ -106,14 +106,18 @@ void sdWriteSatStatusPacket(unsigned long int t,
 
 void sdReadSatImagingDataPacket(ImagingData* imagingData, unsigned int index){
   File f = SD.open(current_imaging_reading_file, FILE_READ);
-  for(uint8_t i = 0; i < 5; i++){
-    imagingData->lightnings[i].x = index*10 - i;
-    imagingData->lightnings[i].y = index*7 + i;
-    imagingData->lightnings[i].radius = 20;
-    imagingData->lightnings[i].duration = i;
+  f.seek(index*sizeof(HealthData));
+  for(unsigned int i = 0; i < sizeof(ImagingData); i++){
+    ((uint8_t*)imagingData)[i] = f.read();
   }
   f.close();
 }
-void sdWriteSatImagingDataPacket(){
+void sdWriteSatImagingDataPacket(ImagingData im){
+  File f = SD.open(current_imaging_writing_file, FILE_WRITE);
+  for(unsigned int i = 0; i < sizeof(ImagingData); i++){
+    // "0"
+    f.write(((uint8_t*)(&im))[i]);
+  }
+  f.close();
   writing_imaging_counter++;
 }
