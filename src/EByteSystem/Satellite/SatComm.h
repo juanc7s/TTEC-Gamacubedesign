@@ -52,12 +52,15 @@ void sendPacket(unsigned int packet_index, uint8_t protocol, uint8_t operation);
 void sendDone(uint8_t protocol, uint8_t operation);
 
 
-bool sdReadSatStatusPacket(HealthData *healthData, unsigned int index);
+void switch_status_file();
+void switch_imaging_file();
+
+void sdReadSatStatusPacket(HealthData *healthData, unsigned int index);
 void sdWriteSatStatusPacket(unsigned long int t,
   float bv, float bcu, float bch, float bt, float ti, float te,
   unsigned long int sd, uint8_t* rasp_data);
 
-bool sdReadSatImagingDataPacket(ImagingData *imagingData, unsigned int index);
+void sdReadSatImagingDataPacket(ImagingData *imagingData, unsigned int index);
 void sdWriteSatImagingDataPacket();
 
 #endif

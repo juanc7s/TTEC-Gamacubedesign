@@ -32,10 +32,20 @@ GSPacket gsPacket;
 uint8_t rx_pointer = 0;
 
 void preStatusProtocol(){
+  if(reading_status_counter==0){
+    if(writing_status_counter>0){
+      switch_status_file();
+    } else{
+      number_of_packets = 0;
+      return;
+    }
+  }
   number_of_packets = reading_status_counter;
   if(number_of_packets > N_status){
     number_of_packets = N_status;
   }
+  Serial.print("Packets available: ");
+  Serial.println(number_of_packets);
 }
 
 void updateStatusPacket(uint8_t index){
@@ -51,6 +61,14 @@ void postStatusProtocol(){
 }
 
 void preImagingDataProtocol(){
+  if(reading_imaging_counter==0){
+    if(writing_imaging_counter>0){
+      switch_imaging_file();
+    } else{
+      number_of_packets = 0;
+      return;
+    }
+  }
   number_of_packets = reading_status_counter;
   if(number_of_packets > N_imaging){
     number_of_packets = N_imaging;
@@ -58,6 +76,8 @@ void preImagingDataProtocol(){
   // for(unsigned int i = 0; i < n; i++){
   //   sdReadSatStatusPacket(&(dataBuffer.statusData[i]));
   // }
+  Serial.print("Packets available: ");
+  Serial.println(number_of_packets);
 }
 
 void updateImagingDataPacket(uint8_t index){

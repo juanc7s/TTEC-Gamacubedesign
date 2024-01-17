@@ -209,6 +209,7 @@ void switchCaseStatusProtocol(){
       Serial.println(satPacket.index);
       bitClear(gsPacket.data.resend.packets[satPacket.index>>3],satPacket.index&0x07);
       
+      Serial.print("Reading time: ");Serial.println(satPacket.data.healthData.time);
       Serial.print("Battery voltage: ");Serial.println(satPacket.data.healthData.battery_voltage);
       Serial.print("Battery current: ");Serial.println(satPacket.data.healthData.battery_current);
       Serial.print("Battery charge: ");Serial.println(satPacket.data.healthData.battery_charge);

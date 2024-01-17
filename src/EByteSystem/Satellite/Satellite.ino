@@ -33,7 +33,7 @@ void setup(){
   
   setNormalMode();
 
-  // init_sd_logger();
+  init_sd_logger();
   
   // setReceiveCallback(onReceive);
 }
@@ -43,28 +43,27 @@ unsigned long int imaging_write_period = 250;
 unsigned long int status_write_time = 0;
 unsigned long int imaging_write_time = 0;
 
-bool tmpflag = false;
+bool enable_writing = false;
 
 void loop(){
   checkSerial();
   updateRFComm();
 
   unsigned long int t = millis();
-  if(t < status_write_time){
+  if(t > status_write_time){
     status_write_time += status_write_period;
-    Serial.println("Writing status data");
-    write_status_data();
+    if(enable_writing){
+      Serial.println("Writing status data");
+      write_status_data();
+    }
   }
-  if(t < imaging_write_time){
+  if(t > imaging_write_time){
     imaging_write_time += imaging_write_period;
-    Serial.println("Writing imaging data");
-    write_imaging_data();
+    if(enable_writing){
+      Serial.println("Writing imaging data");
+      write_imaging_data();
+    }
   }
-
-  // if(!tmpflag && millis() < 10000){
-  //   sdReadSatStatusPacket();
-  //   sdReadSatImagingDataPacket();
-  // }
 }
 
 void write_status_data(){
@@ -76,9 +75,16 @@ void write_imaging_data(){
 }
 
 void checkSerial(){
-  // char c;
-  // while(Serial.available() && !serial_received){
-  //   c = Serial.read();
+  char c;
+  while(Serial.available()){
+    c = Serial.read();
+    if(c=='0'){
+      enable_writing = !enable_writing;
+    } else if(c=='1'){
+      switch_status_file();
+    } else if(c=='2'){
+      switch_imaging_file();
+    }
     // if(c=='\n'){
     //   received_serial = receiving_serial;
     //   receiving_serial = "";
@@ -132,6 +138,6 @@ void checkSerial(){
   //     Serial.println("Set telemetry index to 0");
   //     comm_pointer = 0;
   //   }
-  // }
+  }
 }
 
