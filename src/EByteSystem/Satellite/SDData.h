@@ -8,7 +8,7 @@
 #include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/src/EByteSystem/CommunicationProtocol.h"
 #include "SatComm.h"
 
-extern const int chipSelect;
+extern const int sd_chipSelect;
 
 extern char* current_status_reading_file;
 extern char* current_status_writing_file;

@@ -1,6 +1,14 @@
 #ifndef SAT_COMM_H
 #define SAT_COMM_H
 
+#ifdef DEBUGGING
+#define DBG_Print(x) Serial.print(x)
+#define DBG_Println(x) Serial.println(x)
+#else
+#define DBG_Print(x)
+#define DBG_Println(x)
+#endif
+
 // #include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/libraries/EbyteLib/EbyteLib.h"
 #include <EbyteLib.h>
 

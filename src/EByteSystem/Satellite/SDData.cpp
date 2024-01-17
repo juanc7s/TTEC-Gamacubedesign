@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "SDData.h"
 
-const int chipSelect = 10;
+const int sd_chipSelect = 10;
 const char* stf1 = "stf1.dat";
 const char* imf1 = "imf1.dat";
 const char* stf2 = "stf2.dat";
@@ -25,7 +25,7 @@ unsigned int reading_imaging_file_pointer = 0;
 bool SD_on = false;
 
 void init_sd_logger(){
-  if (!SD.begin(chipSelect)) {
+  if (!SD.begin(sd_chipSelect)) {
     Serial.println("SD:F");
     while(1);
   } else{
@@ -36,7 +36,6 @@ void init_sd_logger(){
   }
 }
 void switch_status_file(){
-  Serial.println("Switch status");
   if(st_state){
     if(current_status_reading_file){
       SD.remove(stf2);
@@ -75,17 +74,6 @@ void switch_imaging_file(){
 
 void sdReadSatStatusPacket(HealthData* healthData, unsigned int index){
   File f = SD.open(current_status_reading_file, FILE_READ);
-  // healthData->time = millis();
-  // healthData->battery_voltage = 3.3;
-  // healthData->battery_current = 50.0;
-  // healthData->battery_charge = -10.0;
-  // healthData->battery_temperature = index*1000.8;
-  // healthData->internal_temperature = 3.3;
-  // healthData->external_temperature = 3.3;
-  // healthData->sd_memory_usage = 50.0;
-  // for(uint8_t i = 0; i < 10; i++){
-  //   healthData->rasp_data[i] = 0xa1;
-  // }
   f.seek(index*sizeof(HealthData));
   for(unsigned int i = 0; i < sizeof(HealthData); i++){
     ((uint8_t*)healthData)[i] = f.read();
