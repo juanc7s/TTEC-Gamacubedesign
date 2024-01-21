@@ -2,8 +2,8 @@
 #define SAT_COMM_H
 
 #ifdef DEBUGGING
-#define DBG_Print(x) Serial.print(x)
-#define DBG_Println(x) Serial.println(x)
+#define DBG_Print(x) std::cout << x
+#define DBG_Println(x) std::cout << x
 #else
 #define DBG_Print(x)
 #define DBG_Println(x)
