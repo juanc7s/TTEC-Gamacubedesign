@@ -1,0 +1,1 @@
+cd ./gamasat/TTEC-Gamacubedesign/main/
