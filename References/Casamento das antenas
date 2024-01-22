@@ -1,0 +1,8 @@
+E32 - casamento em 868MHz
+Antena 1 - casamento em 433MHz
+Antena 2 - casamento em 2.15 a 2.433GHz (wifi)
+Antenas 3 e 4 (pequenas) - casamento em Wifi
+
+Módulo E32: utilizar canal 0x02, aparece que é 412MHz mas o SDR captou na frequência de 433MHz, ou SDR descalibrado ou biblioteca com erro
+Utilizar alimentação 5V do arduino para os módulos para garantir transmissão
+LEMBRAR DE USAR 3.3V NO ARDUINO PARA COMUNICAÇÃO OU CONVERSOR LÓGICO DIGITAL OU DIVISOR DE TENSÃO

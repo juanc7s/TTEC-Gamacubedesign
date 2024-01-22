@@ -1,3 +1,0 @@
-https://github.com/tapparelj/gr-lora_sdr/tree/master
-https://wiki.gnuradio.org/index.php/Message_Passing
-https://wiki.gnuradio.org/index.php?title=Polymorphic_Types_(PMTs)

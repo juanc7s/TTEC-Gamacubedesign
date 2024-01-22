@@ -1,0 +1,98 @@
+{
+    "control_commands" : [
+        "READ_HEAD",
+        "READ_ADDH",
+        "READ_ADDL",
+        "READ_CHAN",
+        "READ_AIR_DATA_RATE",
+        "READ_UART_BAUD_RATE",
+        "READ_PARITY",
+        "READ_TX_POWER",
+        "READ_TX_MODE",
+        "READ_OPERATION_MODE",
+        "READ_ALL",
+    
+        "SET_HEAD",
+        "SET_ADDH",
+        "SET_ADDL",
+        "SET_CHAN",
+        "SET_AIR_DATA_RATE",
+        "SET_UART_BAUD_RATE",
+        "SET_PARITY",
+        "SET_TX_POWER",
+        "SET_TX_MODE",
+        "SET_OPERATION_MODE",
+        "SET_ALL",
+    
+        "TOGGLE_QUERY_STATUS",
+        "SEND_QUERY_STATUS",
+        "TOGGLE_QUERY_IMAGING",
+        "SEND_QUERY_IMAGING",
+        "TOGGLE_COMMAND",
+        "SEND_COMMAND",
+    
+        "SET_TX_ADDH",
+        "SET_TX_ADDL",
+        "SET_TX_CHAN",
+        
+        "FLUSH",
+        "SET_MESSAGE_DATA",
+
+        "SET_ACTIVE_THERMAL_CONTROL",
+        "SET_ATTITUDE_CONTROL",
+        "SET_IMAGING",
+        "SET_IMAGING_MODE",
+        "SET_STAND_BY_MODE"],
+    
+    "uart_baud_rate_dict" : {
+        "1200 bps":0,
+        "2400 bps":1,
+        "4800 bps":2,
+        "9600 bps":3,
+        "19200 bps":4,
+        "38400 bps":5,
+        "57600 bps":6,
+        "115200 bps":7
+    },
+    
+    "air_data_rate_dict" : {
+        "300 bps":0,
+        "1200 bps":1,
+        "2400 bps":2,
+        "4800 bps":3,
+        "9600 bps":4,
+        "19200 bps":5
+    },
+    
+    "parity_dict" : {
+        "8N1":"ord(\"N\")",
+        "8O1":"ord(\"O\")",
+        "8E1":"ord(\"E\")"
+    },
+    
+    "transmission_power_dict" : {
+        "10 dBm":10,
+        "14 dBm":14,
+        "17 dBm":17,
+        "20 dBm":20
+    },
+    
+    "transmission_mode_dict" : {
+        "TRANSPARENT TRANSMISSION":0,
+        "FIXED TRANSMISSION":1
+    },
+    
+    "operation_mode_dict" : {
+        "NORMAL":0,
+        "WAKE UP":1,
+        "POWER SAVING":2,
+        "SLEEP":3
+    },
+    
+    "head_dict" : {
+        "SAVE ON POWER DOWN":"0xC0",
+        "DONT SAVE ON POWER DOWN":"0xC2"
+    }
+}
+  
+  

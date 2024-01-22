@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Go to repo",
+      "type": "process",
+      "command": "cd",
+      "args": ["./gamasat/TTEC-Gamacubedesign/main/"]
+    }
+  ]
+}
