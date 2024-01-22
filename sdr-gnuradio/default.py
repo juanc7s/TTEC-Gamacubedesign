@@ -61,8 +61,8 @@ class default(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 250000
-        self.freq = freq = 433e6
+        self.samp_rate = samp_rate = 3200000
+        self.freq = freq = 434.8e6
 
         ##################################################
         # Blocks
@@ -112,10 +112,10 @@ class default(gr.top_block, Qt.QWidget):
             1,
             None # parent
         )
-        self.qtgui_freq_sink_x_0.set_update_time(0.050)
+        self.qtgui_freq_sink_x_0.set_update_time(0.10)
         self.qtgui_freq_sink_x_0.set_y_axis((-140), 10)
         self.qtgui_freq_sink_x_0.set_y_label('Relative Gain', 'dB')
-        self.qtgui_freq_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_NORM, -50.0, 0, "")
+        self.qtgui_freq_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, -50.0, 0, "")
         self.qtgui_freq_sink_x_0.enable_autoscale(False)
         self.qtgui_freq_sink_x_0.enable_grid(False)
         self.qtgui_freq_sink_x_0.set_fft_average(1.0)

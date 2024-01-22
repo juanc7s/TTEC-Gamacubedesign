@@ -37,7 +37,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: 433e6
+    value: 434.8e6
   states:
     bus_sink: false
     bus_source: false
@@ -70,7 +70,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '250000'
+    value: '3200000'
   states:
     bus_sink: false
     bus_source: false
@@ -134,11 +134,11 @@ blocks:
     showports: 'False'
     tr_chan: '0'
     tr_level: '-50.0'
-    tr_mode: qtgui.TRIG_MODE_NORM
+    tr_mode: qtgui.TRIG_MODE_FREE
     tr_tag: '""'
     type: complex
     units: dB
-    update_time: '0.050'
+    update_time: '0.10'
     width1: '1'
     width10: '1'
     width2: '1'
