@@ -44,7 +44,7 @@ blocks:
     bus_structure: null
     coordinate: [304, 20.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: freq
   id: variable_qtgui_range
   parameters:
@@ -65,7 +65,7 @@ blocks:
     bus_structure: null
     coordinate: [432, 52.0]
     rotation: 0
-    state: disabled
+    state: enabled
 - name: samp_rate
   id: variable
   parameters:
@@ -138,7 +138,7 @@ blocks:
     tr_tag: '""'
     type: complex
     units: dB
-    update_time: '0.10'
+    update_time: '0.010'
     width1: '1'
     width10: '1'
     width2: '1'

@@ -21,6 +21,8 @@ from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import soapy
+from gnuradio.qtgui import Range, RangeWidget
+from PyQt5 import QtCore
 import sip
 
 
@@ -62,12 +64,15 @@ class default(gr.top_block, Qt.QWidget):
         # Variables
         ##################################################
         self.samp_rate = samp_rate = 3200000
-        self.freq = freq = 434.8e6
+        self.freq = freq = 415e6
 
         ##################################################
         # Blocks
         ##################################################
 
+        self._freq_range = Range(400e6, 433e6, 1e6, 415e6, 200)
+        self._freq_win = RangeWidget(self._freq_range, self.set_freq, "'freq'", "counter_slider", float, QtCore.Qt.Horizontal)
+        self.top_layout.addWidget(self._freq_win)
         self.soapy_rtlsdr_source_0 = None
         dev = 'driver=rtlsdr'
         stream_args = ''
@@ -112,7 +117,7 @@ class default(gr.top_block, Qt.QWidget):
             1,
             None # parent
         )
-        self.qtgui_freq_sink_x_0.set_update_time(0.10)
+        self.qtgui_freq_sink_x_0.set_update_time(0.010)
         self.qtgui_freq_sink_x_0.set_y_axis((-140), 10)
         self.qtgui_freq_sink_x_0.set_y_label('Relative Gain', 'dB')
         self.qtgui_freq_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, -50.0, 0, "")
