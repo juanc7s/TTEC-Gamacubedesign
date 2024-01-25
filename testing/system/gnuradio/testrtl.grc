@@ -37,14 +37,14 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: 433e6
+    value: 434.8e6
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
     coordinate: [304, 20.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: freq
   id: variable_qtgui_range
   parameters:
@@ -65,12 +65,12 @@ blocks:
     bus_structure: null
     coordinate: [432, 52.0]
     rotation: 0
-    state: disabled
+    state: enabled
 - name: samp_rate
   id: variable
   parameters:
     comment: ''
-    value: '250000'
+    value: '3200000'
   states:
     bus_sink: false
     bus_source: false
@@ -134,11 +134,11 @@ blocks:
     showports: 'False'
     tr_chan: '0'
     tr_level: '-50.0'
-    tr_mode: qtgui.TRIG_MODE_NORM
+    tr_mode: qtgui.TRIG_MODE_FREE
     tr_tag: '""'
     type: complex
     units: dB
-    update_time: '0.050'
+    update_time: '0.010'
     width1: '1'
     width10: '1'
     width2: '1'

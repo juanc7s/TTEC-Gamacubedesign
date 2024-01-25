@@ -33,13 +33,13 @@ class lora_RX(gr.top_block):
         # Variables
         ##################################################
         self.soft_decoding = soft_decoding = True
-        self.sf = sf = 7
-        self.samp_rate = samp_rate = 3200000
-        self.pay_len = pay_len = 6
+        self.sf = sf = 8
+        self.samp_rate = samp_rate = 250000
+        self.pay_len = pay_len = 11
         self.impl_head = impl_head = False
-        self.has_crc = has_crc = False
+        self.has_crc = has_crc = True
         self.cr = cr = 1
-        self.center_freq = center_freq = 433e6
+        self.center_freq = center_freq = 434.8e6
         self.bw = bw = 125000
 
         ##################################################

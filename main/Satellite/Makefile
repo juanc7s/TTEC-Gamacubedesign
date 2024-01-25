@@ -15,9 +15,9 @@ RFModule.o: RFModule.cpp
 SatTTC.o: SatTTC.cpp
 	g++ -c SatTTC.cpp -o SatTTC.o -lpigpio -lrt -pthread -lm
 
-SatTTC: LoRa.o Logger.o RFModule.o SatTTC.o
-	g++ -o SatTTC SatTTC.o ./libs/sx1278-LoRa-RaspberryPi/LoRa.o RFModule.o SatTTC.o -lpigpio -lrt -pthread -lm
+SatTTC.out: LoRa.o Logger.o RFModule.o SatTTC.o
+	g++ -o SatTTC.out SatTTC.o ./libs/sx1278-LoRa-RaspberryPi/LoRa.o RFModule.o SatTTC.o -lpigpio -lrt -pthread -lm
 
 clean:
-	rm *.o SatTTC
+	rm *.o *.out SatTTC.out
 

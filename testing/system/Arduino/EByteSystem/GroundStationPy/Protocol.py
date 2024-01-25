@@ -2,7 +2,7 @@ import json
 
 def get_protocol():
     protocol = None
-    with open("src/EByteSystem/GroundStationPy/Protocol.json", 'r') as f:
+    with open("Protocol.json", 'r') as f:
         protocol = json.load(f);
     return protocol
 

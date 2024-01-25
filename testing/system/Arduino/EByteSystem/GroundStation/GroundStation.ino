@@ -22,7 +22,7 @@ void setup(){
   setIODriveMode(IO_DRIVE_MODE_PUSH_PULL);
   setWirelessWakeUpTime(WIRELESS_WAKE_UP_TIME_250ms);
   setFECSwitch(FEC_SWITCH_ON);
-  setTransmissionPower(TRANSMISSION_POWER_20dBm);
+  setTransmissionPower(TRANSMISSION_POWER_10dBm);
   setConfiguration();
   
   // printConfiguration();

@@ -74,6 +74,7 @@ struct GSPacket{
 struct HealthData{
 //   uint8_t length;
 //   uint8_t type;
+  unsigned long int index;
   unsigned long int time;
   float battery_voltage;
   float battery_current;
@@ -86,6 +87,7 @@ struct HealthData{
 };
 
 struct LightningData{
+  unsigned long int index;
   float x;
   float y;
   float radius;
