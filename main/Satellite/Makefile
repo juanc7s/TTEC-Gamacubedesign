@@ -1,7 +1,9 @@
 all: SatTTC
 
-LoRa.o: ./libs/sx1278-LoRa-RaspberryPi/LoRa.c
-	gcc -c ./libs/sx1278-LoRa-RaspberryPi/LoRa.c -o ./libs/sx1278-LoRa-RaspberryPi/LoRa.o -lpigpio -lrt -pthread -lm
+LibFolder := /mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/libraries
+
+LoRa.o: $(LibFolder)/sx1278-LoRa-RaspberryPi/LoRa.c
+	gcc -c $(LibFolder)/sx1278-LoRa-RaspberryPi/LoRa.c -o $(LibFolder)/sx1278-LoRa-RaspberryPi/LoRa.o -lpigpio -lrt -pthread -lm
 
 CommunicationProtocol.o: CommunicationProtocol.h
 	g++ -c CommunicationProtocol.h -o CommunicationProtocol.o
