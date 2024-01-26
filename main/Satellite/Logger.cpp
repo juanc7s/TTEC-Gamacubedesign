@@ -189,6 +189,8 @@ void printStatusPacket(Logger *logger){
   std::cout << std::endl;
 }
 
+// #define debbuging_logger 
+#ifdef debbuging_logger
 int main(){
   Logger logger;
   for(int i = 0; i < 5; i++){
@@ -211,3 +213,4 @@ int main(){
   }
   return 0;
 }
+#endif

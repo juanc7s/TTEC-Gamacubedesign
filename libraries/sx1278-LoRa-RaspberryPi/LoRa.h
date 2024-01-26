@@ -7,6 +7,10 @@
 #include <sys/time.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+  #define _Bool bool
+#endif
+
 #define REG_FIFO 0x00
 #define REG_OP_MODE 0x01
 #define REG_FR_MSB 0x06

@@ -1,4 +1,4 @@
-#include "Arduino.h"
+// #include "Arduino.h"
 #include "SatComm.h"
 
 uint8_t rxChan = 23;

@@ -1,22 +1,23 @@
 #include <iostream>
 using namespace std;
 
-// #include "libs/sx1278-LoRa-RaspberryPi/LoRa.h"
 #ifdef __cplusplus
-extern "C" {
-  #include "./libs/sx1278-LoRa-RaspberryPi/LoRa.h"
-}
+  extern "C" {
+    #include "sx1278-LoRa-RaspberryPi/LoRa.h"
+  }
 #endif
-/*
-#include <EbyteLib.h>
-*/
-// extern "C"{
-// #include "LoRa.h"
-// }
-// #include "SDData.h"
-// #include "SatComm.h"
 
-// int running = 1;
+#include "Logger.h"
+
+LoRa_ctl modem;
+Logger logger;
+
+unsigned long int status_write_period = 500;
+unsigned long int imaging_write_period = 250;
+unsigned long int status_write_time = 0;
+unsigned long int imaging_write_time = 0;
+
+bool enable_writing = false;
 
 void * rx_f(void *p){
     rxData *rx = (rxData *)p;
@@ -30,74 +31,92 @@ void * rx_f(void *p){
     return NULL;
 }
 
+void tx_f(txData *tx){
+    printf("tx done \n");
+}
+
 void initRFModule(){
+  char txbuf[255];
 
-    LoRa_ctl modem;
+  //See for typedefs, enumerations and there values in LoRa.h header file
+  modem.spiCS = 0;//Raspberry SPI CE pin number
+  modem.tx.callback = tx_f;
+  modem.tx.data.buf = txbuf;
+  memcpy(modem.tx.data.buf, "LoRa", 5);//copy data we'll sent to buffer
+  modem.tx.data.size = 5;//Payload len
+  modem.eth.preambleLen=6;
+  modem.eth.bw = BW62_5;//Bandwidth 62.5KHz
+  modem.eth.sf = SF12;//Spreading Factor 12
+  modem.eth.ecr = CR8;//Error coding rate CR4/8
+  modem.eth.CRC = 1;//Turn on CRC checking
+  modem.eth.freq = 434800000;// 434.8MHz
+  modem.eth.resetGpioN = 4;//GPIO4 on lora RESET pin
+  modem.eth.dio0GpioN = 17;//GPIO17 on lora DIO0 pin to control Rxdone and Txdone interrupts
+  modem.eth.outPower = OP20;//Output power
+  modem.eth.powerOutPin = PA_BOOST;//Power Amplifire pin
+  modem.eth.AGC = 1;//Auto Gain Control
+  modem.eth.OCP = 240;// 45 to 240 mA. 0 to turn off protection
+  modem.eth.implicitHeader = 0;//Explicit header mode
+  modem.eth.syncWord = 0x12;
+  //For detail information about SF, Error Coding Rate, Explicit header, Bandwidth, AGC, Over current protection and other features refer to sx127x datasheet https://www.semtech.com/uploads/documents/DS_SX1276-7-8-9_W_APP_V5.pdf
 
-    //See for typedefs, enumerations and there values in LoRa.h header file
-    modem.spiCS = 0;//Raspberry SPI CE pin number
-    modem.rx.callback = rx_f;
-    modem.eth.payloadLen = 5;//payload len used in implicit header mode
-    modem.eth.preambleLen=6;
-    modem.eth.bw = BW62_5;//Bandwidth 62.5KHz
-    modem.eth.sf = SF12;//Spreading Factor 12
-    modem.eth.ecr = CR8;//Error coding rate CR4/8
-    modem.eth.CRC = 1;//Turn on CRC checking
-    modem.eth.freq = 434800000;// 434.8MHz
-    modem.eth.resetGpioN = 4;//GPIO4 on lora RESET pi
-    modem.eth.dio0GpioN = 17;//GPIO17 on lora DIO0 pin to control Rxdone and Txdone interrupts
-    modem.eth.outPower = OP20;//Output power
-    modem.eth.powerOutPin = PA_BOOST;//Power Amplifire pin
-    modem.eth.AGC = 1;//Auto Gain Control
-    modem.eth.OCP = 240;// 45 to 240 mA. 0 to turn off protection
-    modem.eth.implicitHeader = 1;//Implicit header mode
-    modem.eth.syncWord = 0x12;
-    //For detail information about SF, Error Coding Rate, Explicit header, Bandwidth, AGC, Over current protection and other features refer to sx127x datasheet https://www.semtech.com/uploads/documents/DS_SX1276-7-8-9_W_APP_V5.pdf
-
-    LoRa_begin(&modem);
-    LoRa_receive(&modem);
-
-    sleep(60);
-    printf("end\n");
-    LoRa_end(&modem);
+  LoRa_begin(&modem);
 }
 
-int main(){
-  std::cout << "Testing Raspberry Gama Satellite communication system with LoRa Ra-01 rf module\n";
+void tx_send(){
+  LoRa_send(&modem);
 
-  initRFModule();
-  std::cout << "Device initiated successfully\n";
+  printf("Tsym: %f\n", modem.tx.data.Tsym);
+  printf("Tpkt: %f\n", modem.tx.data.Tpkt);
+  printf("payloadSymbNb: %u\n", modem.tx.data.payloadSymbNb);
 
-  // init_sd_logger();
-  
-  // setReceiveCallback(onReceive);
+  printf("sleep %d seconds to transmitt complete\n", (int)modem.tx.data.Tpkt/1000);
+  sleep(((int)modem.tx.data.Tpkt/1000)+1);
 
-  // while(running){
-  //   loop();
-  // }
+  printf("end\n");
 
-  return 0;
+  LoRa_end(&modem);
 }
-/*
-unsigned long int status_write_period = 500;
-unsigned long int imaging_write_period = 250;
-unsigned long int status_write_time = 0;
-unsigned long int imaging_write_time = 0;
 
-bool enable_writing = false;
+void write_status_data(){
+  HealthData he = {
+    .index = writing_status_counter,
+    .time = 1,
+    .battery_voltage = 3.7,
+    .battery_current = 2.0,
+    .battery_charge = 100.0,
+    .battery_temperature = 33.0,
+    .internal_temperature = 37.9,
+    .external_temperature = 51.2,
+    .sd_memory_usage = (unsigned long)3,
+    .rasp_data = {0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1},
+  };
+  logger->writeSatStatusPacket(he);
+}
+void write_imaging_data(){
+  ImagingData im;
+  for(int i = 0 ; i < 5; i++){
+    im.lightnings[i].index = writing_imaging_counter;
+    im.lightnings[i].duration = 5;
+    im.lightnings[i].radius = 1;
+    im.lightnings[i].x = i*10;
+    im.lightnings[i].y = i*20;
+  }
+  logger->writeSatImagingDataPacket(im);
+}
 
 void loop(){
   // checkSerial();
   // updateRFComm();
 
-  // unsigned long int t = millis();
-  // if(t > status_write_time){
-  //   status_write_time += status_write_period;
-  //   if(enable_writing){
-  //     std::cout << "Writing status data";
-  //     // write_status_data();
-  //   }
-  // }
+  unsigned long int t = millis();
+  if(t > status_write_time){
+    status_write_time += status_write_period;
+    if(enable_writing){
+      std::cout << "Writing status data";
+      // write_status_data();
+    }
+  }
   // if(t > imaging_write_time){
   //   imaging_write_time += imaging_write_period;
   //   if(enable_writing){
@@ -106,23 +125,6 @@ void loop(){
   //   }
   // }
 }
-
-void write_status_data(){
-  uint8_t rasp_data[10] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
-  // sdWriteSatStatusPacket(millis(), 3.3, 1.0, 1.1, 30.0, 40.0, 50.0, 1000, rasp_data);
-}
-*/
-// void write_imaging_data(){
-//   ImagingData imagingData;
-//   imagingData.time = millis();
-//   for(uint8_t i = 0; i < 5; i++){
-//     imagingData->lightnings[i].x = 10 - i;
-//     imagingData->lightnings[i].y = 7 + i;
-//     imagingData->lightnings[i].radius = 20;
-//     imagingData->lightnings[i].duration = i;
-//   }
-//   sdWriteSatImagingPacket(imagingData);
-// }
 
 /*
 void checkSerial(){
@@ -193,3 +195,24 @@ void checkSerial(){
 }
 
 */
+
+void init_sd_logger(){
+}
+
+int main(){
+  std::cout << "Testing Raspberry Gama Satellite communication system with LoRa Ra-01 rf module\n";
+
+  initRFModule();
+  std::cout << "Device initiated successfully\n";
+
+  init_sd_logger();
+  std::cout << "Logger initiated successfully\n";
+  
+  // setReceiveCallback(onReceive);
+
+  // while(running){
+  //   loop();
+  // }
+
+  return 0;
+}
