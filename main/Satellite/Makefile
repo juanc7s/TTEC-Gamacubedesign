@@ -1,9 +1,9 @@
 all: SatTTC.out
 
-HomeFolder := $(shell pwd)/../..
+HomeFolder := $(shell pwd)/..
 # HomeFolder := ~/gamasat/TTEC-Gamacubedesign
 # HomeFolder := /mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign
-LibFolder := $(HomeFolder)/libraries
+LibFolder := $(HomeFolder)
 
 LoraLib := $(LibFolder)/sx1278-LoRa-RaspberryPi
 

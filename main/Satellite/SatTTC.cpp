@@ -91,7 +91,7 @@ void write_status_data(){
     .sd_memory_usage = (unsigned long)3,
     .rasp_data = {0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1},
   };
-  logger->writeSatStatusPacket(he);
+  logger.writeSatStatusPacket(he);
 }
 void write_imaging_data(){
   ImagingData im;
@@ -102,21 +102,21 @@ void write_imaging_data(){
     im.lightnings[i].x = i*10;
     im.lightnings[i].y = i*20;
   }
-  logger->writeSatImagingDataPacket(im);
+  logger.writeSatImagingDataPacket(im);
 }
 
 void loop(){
   // checkSerial();
   // updateRFComm();
 
-  unsigned long int t = millis();
-  if(t > status_write_time){
-    status_write_time += status_write_period;
-    if(enable_writing){
-      std::cout << "Writing status data";
+  // unsigned long int t = millis();
+  // if(t > status_write_time){
+  //   status_write_time += status_write_period;
+  //   if(enable_writing){
+  //     std::cout << "Writing status data";
       // write_status_data();
-    }
-  }
+  //   }
+  // }
   // if(t > imaging_write_time){
   //   imaging_write_time += imaging_write_period;
   //   if(enable_writing){
