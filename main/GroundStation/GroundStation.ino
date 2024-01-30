@@ -1,38 +1,28 @@
-#include <EbyteLib.h>
+#include <SPI.h>              // include libraries
+#include <LoRa.h>
 
 #include "Control.h"
-// #include "GSComm.h"
+#include "GSComm.h"
+
+const int csPin = 10;          // LoRa radio chip select
+const int resetPin = 9;       // LoRa radio reset
+const int irqPin = 8;         // change for your board; must be a hardware interrupt pin
 
 void setup(){
-  Serial.begin(57600);
+  Serial.begin(57600);                   // initialize serial
+  while (!Serial);
 
-  Serial.println("Testing Gama Ground Station communication system with EByte32 rf module");
+  Serial.println("Testing Gama Ground Station communication system with LoRa Ra-01 rf module");
 
-  initE32();
+  // override the default CS, reset, and IRQ pins (optional)
+  LoRa.setPins(csPin, resetPin, irqPin);// set CS, reset, IRQ pin
+
+  if (!LoRa.begin(433E6)) {             // initialize ratio at 915 MHz
+    Serial.println("CONTROL:LoRa init failed. Check your connections.");
+    while (true);                       // if failed, do nothing
+  }
   Serial.println("CONTROL:Device initiated successfully");
-
-  setHEAD(SAVE_ON_POWER_DOWN);
-  setADDH(rxAddh);
-  setADDL(rxAddl);
-  setChannel(rxChan);
-  setParity(UART_PARITY_BIT_8N1);
-  setBaudRate(TTL_UART_BAUD_RATE_57600);
-  setAirDataRate(AIR_DATA_RATE_19200);
-  setTransmissionMode(FIXED_TRANSMISSION_MODE);
-  setIODriveMode(IO_DRIVE_MODE_PUSH_PULL);
-  setWirelessWakeUpTime(WIRELESS_WAKE_UP_TIME_250ms);
-  setFECSwitch(FEC_SWITCH_ON);
-  setTransmissionPower(TRANSMISSION_POWER_20dBm);
-  setConfiguration();
-  
-  // printConfiguration();
-  setNormalMode();
-  // setReceiveCallback(onReceive);
 }
-
-// String receiving_serial = "";
-// String received_serial = "";
-// bool serial_received = false;
 
 bool state_sending = false;
 uint8_t send_tx = 0;

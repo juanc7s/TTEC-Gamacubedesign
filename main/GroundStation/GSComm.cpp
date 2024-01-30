@@ -31,11 +31,16 @@ GSPacket gsPacket;
 void sendGSPacket(){
   Serial.print("Sending a message of length ");
   Serial.println(gsPacket.length);
-  if(getTransmissionMode()==FIXED_TRANSMISSION_MODE){
-    writeFixedTransmission(txAddh, txAddl, txChan, (uint8_t*)&gsPacket, gsPacket.length);
-  } else{
-    write((uint8_t*)&gsPacket, sizeof(gsPacket));
-  }
+
+  LoRa.beginPacket();                                 // start packet
+  LoRa.write(txAddh);                                 // add destination high address
+  LoRa.write(txAddl);                                 // add destination low address
+  LoRa.write(rxAddh);                                 // add sender high address
+  LoRa.write(rxAddl);                                 // add sender low address
+  LoRa.write(gsPacket.length);                        // add payload length
+  LoRa.write((uint8_t*)&gsPacket, gsPacket.length);   // add payload
+  LoRa.endPacket();                                   // finish packet and send it
+
   communication_timeout = millis() + communication_timeout_limit;
 }
 
@@ -88,27 +93,31 @@ bool listenForResponse(unsigned long int timeout){
 
 void updateRFComm(){
   uint8_t b;
-  if(e32serial.available()){
-    if(e32serial.overflow()){
-      Serial.println("SERIAL OVERFLOW");
-      while(1);
-    } else{
-      while(e32serial.available()){
-        b = e32serial.read();
-        // Serial.println(b);
-        ((uint8_t*)(&satPacket))[rx_pointer++] = b;
-        if(rx_pointer>0 && rx_pointer==satPacket.length){
-          telemetry_received = true;
-          onReceive();
-          rx_pointer = 0;
-        }
-        if(rx_pointer >= sizeof(satPacket)){
-          rx_pointer = 0;
-        }
+
+  // parse for a packet, and call onReceive with the result:
+  unsigned int packetSize = LoRa.parsePacket();
+  if(packetSize > 0){
+    unsigned int recipient = (LoRa.read()<<8) | LoRa.read();          // recipient address
+    unsigned int sender = (LoRa.read()<<8) | LoRa.read();            // sender address
+    unsigned int incomingLength = LoRa.read();    // incoming msg length
+
+    uint8_t b;
+    while(LoRa.available()){
+      b = LoRa.read();
+      // Serial.println(b);
+      ((uint8_t*)(&satPacket))[rx_pointer++] = b;
+      if(rx_pointer>0 && rx_pointer==satPacket.length){
+        telemetry_received = true;
+        onReceive();
+        rx_pointer = 0;
+      }
+      if(rx_pointer >= sizeof(satPacket)){
+        rx_pointer = 0;
       }
     }
     communication_timeout = millis() + communication_timeout_limit;
   }
+
   if(talking){
     if(millis() > communication_timeout){
       Serial.println("Timeout");

@@ -1,9 +1,10 @@
 #ifndef GS_COMM_H
 #define GS_COMM_H
 
-#include <EbyteLib.h>
-// #include "C:\Users\Vitinho\Desktop\TTEC-Gamacubedesign\src\EByteSystem\CommunicationProtocol.h"
-#include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/src/EByteSystem/CommunicationProtocol.h"
+#include <SPI.h>              // include libraries
+#include <LoRa.h>
+// #include "C:\Users\Vitinho\Desktop\TTEC-Gamacubedesign\main\CommunicationProtocol.h"
+#include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/main/CommunicationProtocol.h"
 
 extern uint8_t txAddh;
 extern uint8_t txAddl;
