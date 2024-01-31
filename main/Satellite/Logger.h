@@ -9,6 +9,11 @@ using namespace std;
 #include "../CommunicationProtocol.h"
 // #include "RFModule.h"
 
+extern unsigned long int reading_status_counter;
+extern unsigned long int reading_imaging_counter;
+extern unsigned long int writing_status_counter;
+extern unsigned long int writing_imaging_counter;
+
 class Logger{
   public:
     char* current_status_reading_file;

@@ -10,7 +10,7 @@
 #endif
 
 // #include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/libraries/EbyteLib/EbyteLib.h"
-#include <EbyteLib.h>
+// #include <EbyteLib.h>
 
 // #include "C:\Users\Vitinho\Desktop\TTEC-Gamacubedesign\src\EByteSystem\CommunicationProtocol.h"
 // #include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/src/EByteSystem/CommunicationProtocol.h"

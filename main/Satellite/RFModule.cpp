@@ -1,6 +1,12 @@
 // #include "Arduino.h"
 #include "SatComm.h"
 
+#ifdef __cplusplus
+  extern "C" {
+    #include "sx1278-LoRa-RaspberryPi/LoRa.h"
+  }
+#endif
+
 uint8_t rxChan = 23;
 uint8_t rxAddh = 0xa1;
 uint8_t rxAddl = 0x06;
