@@ -206,38 +206,3 @@ class ControlFrame(ttk.LabelFrame):
     self.ser.write([protocol['control_commands'].index("SET_OPERATION_MODE"), protocol['operation_mode_dict'][self.operation_mode_variable.get()]])
   def read_operation_mode(self):
     self.ser.write([protocol['control_commands'].index("READ_OPERATION_MODE")])
-
-  # def entry_changed(in):
-
-
-
-
-
-
-# ControlCommand = Enum('Control command', 
-#   [
-#     'READ_ADDH',
-#     'READ_ADDL',
-#     'READ_CHAN',
-#     'READ_AIR_DATA_RATE',
-#     'READ_UART_BAUD_RATE',
-#     'READ_PARITY',
-#     'READ_TRANSMISSION_POWER',
-#     'READ_TRANSMISSION_MODE',
-#     'READ_ALL',
-#     'SET_ADDH',
-#     'SET_ADDL',
-#     'SET_CHAN',
-#     'SET_AIR_DATA_RATE',
-#     'SET_UART_BAUD_RATE',
-#     'SET_PARITY',
-#     'SET_TRANSMISSION_POWER',
-#     'SET_ALL',
-#     'TOGGLE_COMMUNICATION',
-#     'SEND_TX',
-#     'SET_TX_ADDH',
-#     'SET_TX_ADDL',
-#     'SET_TX_CHAN',
-#     'FLUSH',
-#     'SET_MESSAGE_DATA'
-#   ])

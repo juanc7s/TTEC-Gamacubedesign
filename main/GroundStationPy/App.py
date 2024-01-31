@@ -8,6 +8,10 @@ import SerialTransmission
 import Control
 import GroundStation
 
+import sys
+
+workspace = sys.argv[1]
+
 class App(tk.Tk):
   def __init__(self):
     tk.Tk.__init__(self)
