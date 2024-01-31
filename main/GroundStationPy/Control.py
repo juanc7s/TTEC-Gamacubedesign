@@ -56,62 +56,56 @@ class ControlFrame(ttk.LabelFrame):
     left_frame = ttk.Frame(master=self)
     left_frame.pack(side='left', fill='both')
 
-    top_frame = ttk.LabelFrame(master=left_frame,text="rx ADDH")
+    top_frame = ttk.LabelFrame(master=left_frame,text="Rx ADDH")
     top_frame.pack(side='top',fill='both')
-    ttk.Entry(master=top_frame,textvariable=self.addh_variable,width=4,justify='center').pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="read",command=self.read_addh).pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="set",command=self.set_addh).pack(side='left',fill='both')
+    ttk.Entry(master=top_frame,textvariable=self.rx_addh_variable,width=4,justify='center').pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_rx_addh).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_rx_addh).pack(side='left',fill='both')
 
-    top_frame = ttk.LabelFrame(master=left_frame,text="ADDL")
+    top_frame = ttk.LabelFrame(master=left_frame,text=" Rx ADDL")
     top_frame.pack(side='top',fill='both')
-    ttk.Entry(master=top_frame,textvariable=self.addl_variable,width=4,justify='center').pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="read",command=self.read_addl).pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="set",command=self.set_addl).pack(side='left',fill='both')
+    ttk.Entry(master=top_frame,textvariable=self.rx_addl_variable,width=4,justify='center').pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_rx_addl).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_rx_addl).pack(side='left',fill='both')
 
-    top_frame = ttk.LabelFrame(master=left_frame,text="Channel")
+    top_frame = ttk.LabelFrame(master=left_frame,text="Tx ADDH")
     top_frame.pack(side='top',fill='both')
-    ttk.Entry(master=top_frame,textvariable=self.chan_variable,width=4,justify='center').pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="read",command=self.read_channel).pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="set",command=self.set_channel).pack(side='left',fill='both')
+    ttk.Entry(master=top_frame,textvariable=self.tx_addh_variable,width=4,justify='center').pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_tx_addh).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_tx_addh).pack(side='left',fill='both')
 
-    top_frame = ttk.LabelFrame(master=left_frame, text='Parity')
+    top_frame = ttk.LabelFrame(master=left_frame,text=" Tx ADDL")
     top_frame.pack(side='top',fill='both')
-    ttk.Combobox(master=top_frame, values=list(protocol['parity_dict'].keys()), textvariable=self.parity_variable, state='readonly').pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="read",command=self.read_parity).pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="set",command=self.set_parity).pack(side='left',fill='both')
+    ttk.Entry(master=top_frame,textvariable=self.tx_addl_variable,width=4,justify='center').pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_tx_addl).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_tx_addl).pack(side='left',fill='both')
 
-    top_frame = ttk.LabelFrame(master=left_frame, text='Operation mode')
+    top_frame = ttk.LabelFrame(master=left_frame,text="Frequency")
     top_frame.pack(side='top',fill='both')
-    ttk.Combobox(master=top_frame, values=list(protocol['operation_mode_dict'].keys()), textvariable=self.operation_mode_variable, state='readonly').pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="read",command=self.read_operation_mode).pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="set",command=self.set_operation_mode).pack(side='left',fill='both')
+    ttk.Entry(master=top_frame,textvariable=self.frequency_variable,width=4,justify='center').pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_frequency).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_frequency).pack(side='left',fill='both')
 
     left_frame = ttk.Frame(master=self)
     left_frame.pack(side='left', fill='both')
 
-    top_frame = ttk.LabelFrame(master=left_frame, text='UART baud rate')
+    top_frame = ttk.LabelFrame(master=left_frame, text='SPI frequency')
     top_frame.pack(side='top',fill='both')
-    ttk.Combobox(master=top_frame, values=list(protocol['uart_baud_rate_dict'].keys()), textvariable=self.uart_baud_rate_variable, state='readonly').pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="read",command=self.read_uart_baud_rate).pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="set",command=self.set_uart_baud_rate).pack(side='left',fill='both')
+    ttk.Entry(master=top_frame,textvariable=self.spi_frequency_variable,width=4,justify='center').pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_spi_frequency).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_spi_frequency).pack(side='left',fill='both')
 
-    top_frame = ttk.LabelFrame(master=left_frame, text='Air data rate')
+    top_frame = ttk.LabelFrame(master=left_frame, text='Spreading factor')
     top_frame.pack(side='top',fill='both')
-    ttk.Combobox(master=top_frame, values=list(protocol['air_data_rate_dict'].keys()), textvariable=self.air_data_rate_variable, state='readonly').pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="read",command=self.read_air_data_rate).pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="set",command=self.set_air_data_rate).pack(side='left',fill='both')
+    ttk.Entry(master=top_frame,textvariable=self.spreading_factor_variable,width=4,justify='center').pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="read",command=self.read_spreading_factor).pack(side='left',fill='both')
+    ttk.Button(master=top_frame,text="set",command=self.set_spreading_factor).pack(side='left',fill='both')
 
     top_frame = ttk.LabelFrame(master=left_frame, text='Transmission power')
     top_frame.pack(side='top',fill='both')
     ttk.Combobox(master=top_frame, values=list(protocol['transmission_power_dict'].keys()), textvariable=self.tx_power_variable, state='readonly').pack(side='left',fill='both')
     ttk.Button(master=top_frame,text="read",command=self.read_tx_power).pack(side='left',fill='both')
     ttk.Button(master=top_frame,text="set",command=self.set_tx_power).pack(side='left',fill='both')
-
-    top_frame = ttk.LabelFrame(master=left_frame, text='Transmission mode')
-    top_frame.pack(side='top',fill='both')
-    ttk.Combobox(master=top_frame, values=list(protocol['transmission_mode_dict'].keys()), textvariable=self.tx_mode_variable, state='readonly').pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="read",command=self.read_tx_mode).pack(side='left',fill='both')
-    ttk.Button(master=top_frame,text="set",command=self.set_tx_mode).pack(side='left',fill='both')
   
   def begin(self, serial):
       self.ser = serial
@@ -157,52 +151,42 @@ class ControlFrame(ttk.LabelFrame):
     # self.read_tx_power()
     # self.read_operation_mode()
   
-  def set_head(self):
-    self.ser.write([protocol['control_commands'].index("SET_HEAD"), int(self.head_variable.get(), 16)])
-  def read_head(self):
-    self.ser.write([protocol['control_commands'].index("READ_HEAD")])
+  def set_rx_addh(self):
+    self.ser.write([protocol['control_commands'].index("SET_RX_ADDH"), int(self.rx_addh_variable.get(), 16)])
+  def read_rx_addh(self):
+    self.ser.write([protocol['control_commands'].index("READ_RX_ADDH")])
   
-  def set_addh(self):
-    self.ser.write([protocol['control_commands'].index("SET_ADDH"), int(self.addh_variable.get(), 16)])
-  def read_addh(self):
-    self.ser.write([protocol['control_commands'].index("READ_ADDH")])
+  def set_rx_addl(self):
+    self.ser.write([protocol['control_commands'].index("SET_RX_ADDL"), int(self.rx_addl_variable.get(), 16)])
+  def read_rx_addl(self):
+    self.ser.write([protocol['control_commands'].index("READ_RX_ADDL")])
   
-  def set_addl(self):
-    self.ser.write([protocol['control_commands'].index("SET_ADDL"), int(self.addl_variable.get(), 16)])
-  def read_addl(self):
-    self.ser.write([protocol['control_commands'].index("READ_ADDL")])
+  def set_tx_addh(self):
+    self.ser.write([protocol['control_commands'].index("SET_TX_ADDH"), int(self.tx_addh_variable.get(), 16)])
+  def read_tx_addh(self):
+    self.ser.write([protocol['control_commands'].index("READ_TX_ADDH")])
   
-  def set_channel(self):
-    self.ser.write([protocol['control_commands'].index("SET_CHAN"), int(self.chan_variable.get(), 16)])
-  def read_channel(self):
-    self.ser.write([protocol['control_commands'].index("READ_CHAN")])
+  def set_tx_addl(self):
+    self.ser.write([protocol['control_commands'].index("SET_TX_ADDL"), int(self.tx_addl_variable.get(), 16)])
+  def read_tx_addl(self):
+    self.ser.write([protocol['control_commands'].index("READ_TX_ADDL")])
   
-  def set_parity(self):
-    self.ser.write([protocol['control_commands'].index("SET_PARITY"), protocol['parity_dict'][self.parity_variable.get()]])
-  def read_parity(self):
-    self.ser.write([protocol['control_commands'].index("READ_PARITY")])
+  def set_frequency(self):
+    self.ser.write([protocol['control_commands'].index("SET_FREQUENCY"), int(self.frequency_variable.get(), 16)])
+  def read_frequency(self):
+    self.ser.write([protocol['control_commands'].index("READ_FREQUENCY")])
   
-  def set_uart_baud_rate(self):
-    self.ser.write([protocol['control_commands'].index("SET_UART_BAUD_RATE"), protocol['uart_baud_rate_dict'][self.uart_baud_rate_variable.get()]])
-  def read_uart_baud_rate(self):
-    self.ser.write([protocol['control_commands'].index("READ_UART_BAUD_RATE")])
+  def set_spi_frequency(self):
+    self.ser.write([protocol['control_commands'].index("SET_SPI_FREQUENCY"), int(self.spi_frequency_variable.get())])
+  def read_spi_frequency(self):
+    self.ser.write([protocol['control_commands'].index("READ_SPI_FREQUENCY")])
   
-  def set_air_data_rate(self):
-    self.ser.write([protocol['control_commands'].index("SET_AIR_DATA_RATE"), protocol['air_data_rate_dict'][self.air_data_rate_variable.get()]])
-  def read_air_data_rate(self):
-    self.ser.write([protocol['control_commands'].index("READ_AIR_DATA_RATE")])
+  def set_spreading_factor(self):
+    self.ser.write([protocol['control_commands'].index("SET_SPREADING_FACTOR"), int(self.spreading_factor_variable.get())])
+  def read_spreading_factor(self):
+    self.ser.write([protocol['control_commands'].index("READ_SPREADING_FACTOR")])
   
   def set_tx_power(self):
     self.ser.write([protocol['control_commands'].index("SET_TX_POWER"), protocol['transmission_power_dict'][self.tx_power_variable.get()]])
   def read_tx_power(self):
     self.ser.write([protocol['control_commands'].index("READ_TX_POWER")])
-  
-  def set_tx_mode(self):
-    self.ser.write([protocol['control_commands'].index("SET_TX_MODE"), protocol['transmission_mode_dict'][self.tx_mode_variable.get()]])
-  def read_tx_mode(self):
-    self.ser.write([protocol['control_commands'].index("READ_TX_MODE")])
-  
-  def set_operation_mode(self):
-    self.ser.write([protocol['control_commands'].index("SET_OPERATION_MODE"), protocol['operation_mode_dict'][self.operation_mode_variable.get()]])
-  def read_operation_mode(self):
-    self.ser.write([protocol['control_commands'].index("READ_OPERATION_MODE")])
