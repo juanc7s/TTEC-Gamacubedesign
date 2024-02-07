@@ -8,10 +8,15 @@
 
 extern uint8_t txAddh;
 extern uint8_t txAddl;
-extern uint8_t txChan;
+// extern uint8_t txChan;
 extern uint8_t rxAddh;
 extern uint8_t rxAddl;
-extern uint8_t rxChan;
+// extern uint8_t rxChan;
+extern uint8_t bandwidth;
+extern unsigned long spi_frequency;
+extern unsigned long frequency;
+extern uint8_t spreading_factor;
+extern uint8_t tx_power;
 
 // extern bool switch_active_thermal_control;
 // extern bool switch_attitude_control;

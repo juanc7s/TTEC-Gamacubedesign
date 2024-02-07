@@ -23,6 +23,7 @@ void checkControl(){
     // Serial.println((uint8_t)c);
     if(serialFlag){
       parsing_function(c);
+      serialFlag = false;
     } else if(c==13){
       serialFlag = true;
     } else if(c=='\n'){
@@ -35,14 +36,72 @@ void checkControl(){
   }
 }
 
+unsigned long number_parser_N = 0;
+void (*number_parser_callback)();
+void number_parser(uint8_t c){
+  if(c==':'){
+    number_parser_callback();
+  } else{
+    number_parser_N *= 10;
+    number_parser_N += c-48;
+  }
+} 
+
 // void decodeSerial(){
 
 // }
 
 void parseSerial(uint8_t c){
   switch(c){
-    case SET_TX_CHAN:
-      parsing_function = control_setTxChannel;
+    case READ_RX_ADDH:
+      Serial.print(CONTROL_STR);Serial.print("RX_ADDH:");
+      Serial.println(rxAddh, HEX);
+      break;
+    case READ_RX_ADDL:
+      Serial.print(CONTROL_STR);Serial.print("RX_ADDL:");
+      Serial.println(rxAddl, HEX);
+      break;
+    case READ_TX_ADDH:
+      Serial.print(CONTROL_STR);Serial.print("TX_ADDH:");
+      Serial.println(txAddh, HEX);
+      break;
+    case READ_TX_ADDL:
+      Serial.print(CONTROL_STR);Serial.print("TX_ADDL:");
+      Serial.println(txAddl, HEX);
+      break;
+    case READ_BANDWIDTH:
+      Serial.print(CONTROL_STR);Serial.print("BANDWIDTH:");
+      Serial.println(bandwidth);
+      // Serial.print(" Hz");
+      break;
+    case READ_FREQUENCY:
+      Serial.print(CONTROL_STR);Serial.print("FREQUENCY:");
+      Serial.print(frequency);
+      Serial.println(" MHz");
+      break;
+    case READ_SPI_FREQUENCY:
+      Serial.print(CONTROL_STR);Serial.print("SPI_FREQUENCY:");
+      Serial.print(spi_frequency);
+      Serial.println(" Hz");
+      break;
+    case READ_SPREADING_FACTOR:
+      Serial.print(CONTROL_STR);Serial.print("SPREADING_FACTOR:");
+      Serial.println(spreading_factor);
+      break;
+    case READ_TRANSMISSION_POWER:
+      Serial.print(CONTROL_STR);Serial.print("TXPW:");
+      Serial.print(tx_power);
+      Serial.println(" dBm");
+      break;
+    case READ_ALL:
+      // printConfiguration();
+      break;
+    
+    case SET_RX_ADDH:
+      parsing_function = control_setRxAddh;
+      break;
+    case SET_RX_ADDL:
+      parsing_function = control_setRxAddl;
       break;
     case SET_TX_ADDH:
       parsing_function = control_setTxAddh;
@@ -50,125 +109,30 @@ void parseSerial(uint8_t c){
     case SET_TX_ADDL:
       parsing_function = control_setTxAddl;
       break;
-    case READ_ADDH:
-      Serial.print(CONTROL_STR);Serial.print("ADDH:");
-      Serial.println(rxAddh, HEX);
+    case SET_BANDWIDTH:
+      parsing_function = control_setBandwidth;
       break;
-    case READ_ADDL:
-      Serial.print(CONTROL_STR);Serial.print("ADDL:");
-      Serial.println(rxAddl, HEX);
+    case SET_FREQUENCY:
+      parsing_function = number_parser;
+      number_parser_callback = control_setFrequency;
       break;
-    case READ_CHAN:
-      // Serial.print(CONTROL_STR);Serial.print("CHAN:");
-      // Serial.println(getChannel(), HEX);
+    case SET_SPI_FREQUENCY:
+      parsing_function = number_parser;
+      number_parser_callback = control_setSPIFrequency;
       break;
-    case READ_PARITY:
-      Serial.print(CONTROL_STR);Serial.print("PARITY:");
-      // switch(getParity()){
-      //   case UART_PARITY_BIT_8N1:
-      //     Serial.println("8N1");
-      //     break;
-      //   case UART_PARITY_BIT_8O1:
-      //     Serial.println("8O1");
-      //     break;
-      //   case UART_PARITY_BIT_8E1:
-      //     Serial.println("8E1");
-      //     break;
-      //   case UART_PARITY_BIT_8N1_11:
-      //     Serial.println("8N1");
-      //     break;
-      // }
-      break;
-    case READ_UART_BAUD_RATE:
-      Serial.print(CONTROL_STR);Serial.print("UART_BAUD_RATE:");
-      // Serial.print(getBaudRate());
-      Serial.println(" bps");
-      break;
-    case READ_AIR_DATA_RATE:
-      Serial.print(CONTROL_STR);Serial.print("AIR_DATA_RATE:");
-      // Serial.print(getAirDataRate());
-      Serial.println(" bps");
-      break;
-    case READ_TRANSMISSION_POWER:
-      Serial.print(CONTROL_STR);Serial.print("TXPW:");
-      // switch(getTransmissionPower()){
-      //   case TRANSMISSION_POWER_20dBm:
-      //     Serial.println("20 dBm");
-      //     break;
-      //   case TRANSMISSION_POWER_17dBm:
-      //     Serial.println("17 dBm");
-      //     break;
-      //   case TRANSMISSION_POWER_14dBm:
-      //     Serial.println("14 dBm");
-      //     break;
-      //   case TRANSMISSION_POWER_10dBm:
-      //     Serial.println("10 dBm");
-      //     break;
-      // }
-      break;
-    case READ_TRANSMISSION_MODE:
-      Serial.print(CONTROL_STR);Serial.print("TXMO:");
-      // switch(getTransmissionMode()){
-      //   case TRANSPARENT_TRANSMISSION_MODE:
-      //     Serial.println("TRANSPARENT TRANSMISSION");
-      //     break;
-      //   case FIXED_TRANSMISSION_MODE:
-      //     Serial.println("FIXED TRANSMISSION");
-      //     break;
-      // }
-      break;
-    case READ_OPERATION_MODE:
-      Serial.print(CONTROL_STR);Serial.print("OPMO:");
-      // switch(getOperationMode()){
-      //   case NORMAL:
-      //     Serial.println("NORMAL");
-      //     break;
-      //   case WAKE_UP:
-      //     Serial.println("WAKE_UP");
-      //     break;
-      //   case POWER_SAVING:
-      //     Serial.println("POWER_SAVING");
-      //     break;
-      //   case SLEEP:
-      //     Serial.println("SLEEP");
-      //     break;
-      // }
-      break;
-    case READ_ALL:
-      // printConfiguration();
-      break;
-    case SET_ADDH:
-      parsing_function = control_setAddh;
-      break;
-    case SET_ADDL:
-      parsing_function = control_setAddl;
-      break;
-    case SET_CHAN:
-      parsing_function = control_setChannel;
-      break;
-    case SET_PARITY:
-      parsing_function = control_setParity;
-      break;
-    case SET_UART_BAUD_RATE:
-      parsing_function = control_setUARTBaudRate;
-      break;
-    case SET_AIR_DATA_RATE:
-      parsing_function = control_setAirDataRate;
+    case SET_SPREADING_FACTOR:
+      parsing_function = control_setSpreadingFactor;
       break;
     case SET_TRANSMISSION_POWER:
       parsing_function = control_setTxPower;
       break;
-    case SET_TRANSMISSION_MODE:
-      parsing_function = control_setTxMode;
-      break;
-    case SET_OPERATION_MODE:
-      parsing_function = control_setOperationMode;
-      break;
+    
     case FLUSH:
       // telemetry_index = 0;
       break;
     case SET_MESSAGE_DATA:
       break;
+    
     case TOGGLE_QUERY_STATUS:
       parsing_function = control_toggleQueryStatus;
       break;
@@ -187,6 +151,7 @@ void parseSerial(uint8_t c){
     case SEND_COMMAND:
       send_command++;
       break;
+    
     case SET_ACTIVE_THERMAL_CONTROL:
       parsing_function = setActiveThermalControl;
       break;
@@ -203,11 +168,15 @@ void parseSerial(uint8_t c){
       parsing_function = setStandByMode;
       break;
   }
-  // delay(400);
 }
 
-void control_setTxChannel(uint8_t c){
-  txChan = c;
+void control_setRxAddh(uint8_t c){
+  rxAddh = c;
+  parsing_function = parseSerial;
+}
+
+void control_setRxAddl(uint8_t c){
+  rxAddl = c;
   parsing_function = parseSerial;
 }
 
@@ -221,132 +190,70 @@ void control_setTxAddl(uint8_t c){
   parsing_function = parseSerial;
 }
 
-void control_setAddh(uint8_t c){
-  rxAddh = (uint8_t)c;
-  // setConfiguration();
+void control_setBandwidth(uint8_t c){
+  bandwidth = c;
+  long sbw = 125E3;
+  switch(bandwidth){
+    case 0:
+      sbw = 7.8E3;
+      break;
+    case 1:
+      sbw = 10.4E3;
+      break;
+    case 2:
+      sbw = 15.6E3;
+      break;
+    case 3:
+      sbw = 20.8E3;
+      break;
+    case 4:
+      sbw = 31.25E3;
+      break;
+    case 5:
+      sbw = 41.7E3;
+      break;
+    case 6:
+      sbw = 62.5E3;
+      break;
+    case 7:
+      sbw = 125E3;
+      break;
+    case 8:
+      sbw = 250E3;
+      break;
+    case 9:
+      sbw = 500E3;
+      break;
+  }
+  LoRa.setSignalBandwidth(sbw);
+}
+
+void control_setFrequency(){
+  frequency = number_parser_N;
+  LoRa.setFrequency(frequency);
   parsing_function = parseSerial;
 }
 
-void control_setAddl(uint8_t c){
-  rxAddl = (uint8_t)c;
-  // setConfiguration();  
+void control_setSPIFrequency(){
+  LoRa.end();
+  spi_frequency = number_parser_N;
+  LoRa.setSPIFrequency(spi_frequency);
+  if (!LoRa.begin(frequency)) {             // initialize ratio at set frequency
+    Serial.println("CONTROL:LoRa init failed. Check your connections.");
+    while (true);                       // if failed, do nothing
+  }
   parsing_function = parseSerial;
 }
 
-void control_setChannel(uint8_t c){
-  // setChannel((uint8_t)c);
-  // setConfiguration();
-  parsing_function = parseSerial;
-}
-
-void control_setParity(uint8_t c){
-  // switch(c){
-  //   case 'N':
-  //     setParity(UART_PARITY_BIT_8N1);
-  //     break;
-  //   case 'O':
-  //     setParity(UART_PARITY_BIT_8O1);
-  //     break;
-  //   case 'E':
-  //     setParity(UART_PARITY_BIT_8E1);
-  //     break;
-  // }
-  // setConfiguration();
-  parsing_function = parseSerial;
-}
-
-void control_setUARTBaudRate(uint8_t c){
-  // switch(((unsigned int)c)<<8 + (unsigned int)received_serial[2]){
-  //   case 12:
-  //     setBaudRate(TTL_UART_BAUD_RATE_1200);
-  //     break;
-  //   case 24:
-  //     setBaudRate(TTL_UART_BAUD_RATE_2400);
-  //     break;
-  //   case 48:
-  //     setBaudRate(TTL_UART_BAUD_RATE_4800);
-  //     break;
-  //   case 96:
-  //     setBaudRate(TTL_UART_BAUD_RATE_9600);
-  //     break;
-  //   case 192:
-  //     setBaudRate(TTL_UART_BAUD_RATE_19200);
-  //     break;
-  //   case 384:
-  //     setBaudRate(TTL_UART_BAUD_RATE_38400);
-  //     break;
-  //   case 576:
-  //     setBaudRate(TTL_UART_BAUD_RATE_57600);
-  //     break;
-  //   case 1152:
-  //     setBaudRate(TTL_UART_BAUD_RATE_115200);
-  //     break;
-  // }
-  // setBaudRate((TTL_UART_BAUD_RATE)c);
-  // setConfiguration();
-  parsing_function = parseSerial;
-}
-
-void control_setAirDataRate(uint8_t c){
-  // switch((uint8_t)c){
-  //   case 3:
-  //     setAirDataRate(AIR_DATA_RATE_300);
-  //     break;
-  //   case 12:
-  //     setAirDataRate(AIR_DATA_RATE_1200);
-  //     break;
-  //   case 24:
-  //     setAirDataRate(AIR_DATA_RATE_2400);
-  //     break;
-  //   case 48:
-  //     setAirDataRate(AIR_DATA_RATE_4800);
-  //     break;
-  //   case 96:
-  //     setAirDataRate(AIR_DATA_RATE_9600);
-  //     break;
-  //   case 192:
-  //     setAirDataRate(AIR_DATA_RATE_19200);
-  //     break;
-  // }
-  // setAirDataRate((AIR_DATA_RATE)c);
-  // setConfiguration();
+void control_setSpreadingFactor(uint8_t c){
+  spreading_factor = c;
+  LoRa.setSpreadingFactor(spreading_factor);
   parsing_function = parseSerial;
 }
 
 void control_setTxPower(uint8_t c){
-  // switch((uint8_t)c){
-  //   case 10:
-  //     setTransmissionPower(TRANSMISSION_POWER_10dBm);
-  //     break;
-  //   case 14:
-  //     setTransmissionPower(TRANSMISSION_POWER_14dBm);
-  //     break;
-  //   case 17:
-  //     setTransmissionPower(TRANSMISSION_POWER_17dBm);
-  //     break;
-  //   case 20:
-  //     setTransmissionPower(TRANSMISSION_POWER_20dBm);
-  //     break;
-  // }
-  // setConfiguration();
-  parsing_function = parseSerial;
-}
-
-void control_setTxMode(uint8_t c){
-  // switch((uint8_t)c){
-  //   case 0:
-  //     setTransmissionMode(TRANSPARENT_TRANSMISSION_MODE);
-  //     break;
-  //   case 1:
-  //     setTransmissionMode(FIXED_TRANSMISSION_MODE);
-  //     break;
-  // }
-  // setConfiguration();
-  parsing_function = parseSerial;
-}
-
-void control_setOperationMode(uint8_t c){
-  // setOperationMode((OperationMode)c);
+  tx_power = c;
+  LoRa.setTxPower(tx_power);
   parsing_function = parseSerial;
 }
 

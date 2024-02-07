@@ -8,10 +8,15 @@
 
 extern uint8_t txAddh;
 extern uint8_t txAddl;
-extern uint8_t txChan;
+// extern uint8_t txChan;
 extern uint8_t rxAddh;
 extern uint8_t rxAddl;
-extern uint8_t rxChan;
+// extern uint8_t rxChan;
+extern uint8_t bandwidth;
+extern unsigned long spi_frequency;
+extern unsigned long frequency;
+extern uint8_t spreading_factor;
+extern uint8_t tx_power;
 
 // extern String received_serial;
 // extern String receiving_serial;
@@ -27,24 +32,22 @@ extern uint8_t send_command;
 extern unsigned int telemetry_index;
 extern unsigned int message_data_index;
 
-extern void (*parsing_function)(uint8_t c);
+extern void (*parsing_function)(uint8_t);
 
 void checkControl();
 void decodeSerial();
-void parseSerial(uint8_t c);
+void parseSerial(uint8_t);
+void parse_number(uint8_t);
 
-void control_setTxChannel(uint8_t);
+void control_setRxAddh(uint8_t);
+void control_setRxAddl(uint8_t);
 void control_setTxAddh(uint8_t);
 void control_setTxAddl(uint8_t);
-void control_setAddh(uint8_t c);
-void control_setAddl(uint8_t c);
-void control_setChannel(uint8_t c);
-void control_setParity(uint8_t c);
-void control_setUARTBaudRate(uint8_t c);
-void control_setAirDataRate(uint8_t c);
-void control_setTxPower(uint8_t c);
-void control_setTxMode(uint8_t c);
-void control_setOperationMode(uint8_t c);
+void control_setBandwidth(uint8_t);
+void control_setFrequency();
+void control_setSPIFrequency();
+void control_setSpreadingFactor(uint8_t);
+void control_setTxPower(uint8_t);
 
 void control_toggleQueryStatus(uint8_t);
 void control_toggleQueryImaging(uint8_t);

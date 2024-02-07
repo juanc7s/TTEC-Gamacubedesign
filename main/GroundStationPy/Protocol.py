@@ -1,5 +1,9 @@
 import json
 
+import sys
+
+workspace = sys.argv[1]
+
 def get_protocol():
     protocol = None
     with open("main/GroundStationPy/Protocol.json", 'r') as f:

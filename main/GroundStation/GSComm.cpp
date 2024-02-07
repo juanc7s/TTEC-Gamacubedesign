@@ -1,12 +1,17 @@
 #include "Arduino.h"
 #include "GSComm.h"
 
-uint8_t txChan = 23;
+// uint8_t txChan = 23;
 uint8_t txAddh = 0xa1;
 uint8_t txAddl = 0x06;
-uint8_t rxChan = 10;
+// uint8_t rxChan = 10;
 uint8_t rxAddh = 0x8f;
 uint8_t rxAddl = 0xf7;
+uint8_t bandwidth = 7;
+unsigned long spi_frequency = 8E6;
+unsigned long frequency = 433E6;
+uint8_t spreading_factor = 9;
+uint8_t tx_power = 17;
 
 bool talking = false;
 unsigned long int communication_timeout;

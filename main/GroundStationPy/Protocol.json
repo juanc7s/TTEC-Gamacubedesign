@@ -1,27 +1,25 @@
 {
     "control_commands" : [
-        "READ_HEAD",
-        "READ_ADDH",
-        "READ_ADDL",
-        "READ_CHAN",
-        "READ_AIR_DATA_RATE",
-        "READ_UART_BAUD_RATE",
-        "READ_PARITY",
+        "READ_RX_ADDH",
+        "READ_RX_ADDL",
+        "READ_TX_ADDH",
+        "READ_TX_ADDL",
+        "READ_BANDWIDTH",
+        "READ_FREQUENCY",
+        "READ_SPI_FREQUENCY",
+        "READ_SPREADING_FACTOR",
         "READ_TX_POWER",
-        "READ_TX_MODE",
-        "READ_OPERATION_MODE",
         "READ_ALL",
     
-        "SET_HEAD",
-        "SET_ADDH",
-        "SET_ADDL",
-        "SET_CHAN",
-        "SET_AIR_DATA_RATE",
-        "SET_UART_BAUD_RATE",
-        "SET_PARITY",
+        "SET_RX_ADDH",
+        "SET_RX_ADDL",
+        "SET_TX_ADDH",
+        "SET_TX_ADDL",
+        "SET_BANDWIDTH",
+        "SET_FREQUENCY",
+        "SET_SPI_FREQUENCY",
+        "SET_SPREADING_FACTOR",
         "SET_TX_POWER",
-        "SET_TX_MODE",
-        "SET_OPERATION_MODE",
         "SET_ALL",
     
         "TOGGLE_QUERY_STATUS",
@@ -30,10 +28,6 @@
         "SEND_QUERY_IMAGING",
         "TOGGLE_COMMAND",
         "SEND_COMMAND",
-    
-        "SET_TX_ADDH",
-        "SET_TX_ADDL",
-        "SET_TX_CHAN",
         
         "FLUSH",
         "SET_MESSAGE_DATA",
@@ -44,54 +38,49 @@
         "SET_IMAGING_MODE",
         "SET_STAND_BY_MODE"],
     
-    "uart_baud_rate_dict" : {
-        "1200 bps":0,
-        "2400 bps":1,
-        "4800 bps":2,
-        "9600 bps":3,
-        "19200 bps":4,
-        "38400 bps":5,
-        "57600 bps":6,
-        "115200 bps":7
+    "bandwidth_dict" : {
+        "7.8 kHz":0,
+        "10.4 kHz":1,
+        "15.6 kHz":2,
+        "20.8 kHz":3,
+        "31.25 kHz":4,
+        "41.7 kHz":5,
+        "62.5 kHz":6,
+        "125 kHz":7,
+        "250 kHz":8,
+        "500 kHz":9
     },
     
-    "air_data_rate_dict" : {
-        "300 bps":0,
-        "1200 bps":1,
-        "2400 bps":2,
-        "4800 bps":3,
-        "9600 bps":4,
-        "19200 bps":5
-    },
-    
-    "parity_dict" : {
-        "8N1":"ord(\"N\")",
-        "8O1":"ord(\"O\")",
-        "8E1":"ord(\"E\")"
+    "spreading_factor_dict" : {
+        "6":6,
+        "7":7,
+        "8":8,
+        "9":9,
+        "10":10,
+        "11":11,
+        "12":12
     },
     
     "transmission_power_dict" : {
+        "2 dBm":2,
+        "3 dBm":3,
+        "4 dBm":4,
+        "5 dBm":5,
+        "6 dBm":6,
+        "7 dBm":7,
+        "8 dBm":8,
+        "9 dBm":9,
         "10 dBm":10,
+        "11 dBm":11,
+        "12 dBm":12,
+        "13 dBm":13,
         "14 dBm":14,
+        "15 dBm":15,
+        "16 dBm":16,
         "17 dBm":17,
+        "18 dBm":18,
+        "19 dBm":19,
         "20 dBm":20
-    },
-    
-    "transmission_mode_dict" : {
-        "TRANSPARENT TRANSMISSION":0,
-        "FIXED TRANSMISSION":1
-    },
-    
-    "operation_mode_dict" : {
-        "NORMAL":0,
-        "WAKE UP":1,
-        "POWER SAVING":2,
-        "SLEEP":3
-    },
-    
-    "head_dict" : {
-        "SAVE ON POWER DOWN":"0xC0",
-        "DONT SAVE ON POWER DOWN":"0xC2"
     }
 }
   
