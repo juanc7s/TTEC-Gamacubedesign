@@ -1,16 +1,10 @@
 #include <iostream>
 using namespace std;
 
-#ifdef __cplusplus
-  extern "C" {
-    #include "sx1278-LoRa-RaspberryPi/LoRa.h"
-  }
-#endif
-
 #include "Logger.h"
-
-LoRa_ctl modem;
-Logger logger;
+#include "RFModemOffline.h"
+#include "RFModule.h"
+#include "Timing.h"
 
 unsigned long int status_write_period = 500;
 unsigned long int imaging_write_period = 250;
@@ -18,65 +12,6 @@ unsigned long int status_write_time = 0;
 unsigned long int imaging_write_time = 0;
 
 bool enable_writing = false;
-
-void * rx_f(void *p){
-    rxData *rx = (rxData *)p;
-    printf("rx done \n");
-    printf("CRC error: %d\n", rx->CRC);
-    printf("Data size: %d\n", rx->size);
-    printf("string: %s\n", rx->buf);//Data we'v received
-    printf("RSSI: %d\n", rx->RSSI);
-    printf("SNR: %f\n", rx->SNR);
-    free(p);
-    return NULL;
-}
-
-void tx_f(txData *tx){
-    printf("tx done \n");
-}
-
-void initRFModule(){
-  char txbuf[255];
-
-  //See for typedefs, enumerations and there values in LoRa.h header file
-  modem.spiCS = 0;//Raspberry SPI CE pin number
-  modem.tx.callback = tx_f;
-  modem.tx.data.buf = txbuf;
-  memcpy(modem.tx.data.buf, "LoRa", 5);//copy data we'll sent to buffer
-  modem.tx.data.size = 5;//Payload len
-  modem.eth.preambleLen=6;
-  modem.eth.bw = BW62_5;//Bandwidth 62.5KHz
-  modem.eth.sf = SF12;//Spreading Factor 12
-  modem.eth.ecr = CR8;//Error coding rate CR4/8
-  modem.eth.CRC = 1;//Turn on CRC checking
-  modem.eth.freq = 434800000;// 434.8MHz
-  modem.eth.resetGpioN = 4;//GPIO4 on lora RESET pin
-  modem.eth.dio0GpioN = 17;//GPIO17 on lora DIO0 pin to control Rxdone and Txdone interrupts
-  modem.eth.outPower = OP20;//Output power
-  modem.eth.powerOutPin = PA_BOOST;//Power Amplifire pin
-  modem.eth.AGC = 1;//Auto Gain Control
-  modem.eth.OCP = 240;// 45 to 240 mA. 0 to turn off protection
-  modem.eth.implicitHeader = 0;//Explicit header mode
-  modem.eth.syncWord = 0x12;
-  //For detail information about SF, Error Coding Rate, Explicit header, Bandwidth, AGC, Over current protection and other features refer to sx127x datasheet https://www.semtech.com/uploads/documents/DS_SX1276-7-8-9_W_APP_V5.pdf
-
-  LoRa_begin(&modem);
-}
-
-void tx_send(){
-  LoRa_send(&modem);
-
-  printf("Tsym: %f\n", modem.tx.data.Tsym);
-  printf("Tpkt: %f\n", modem.tx.data.Tpkt);
-  printf("payloadSymbNb: %u\n", modem.tx.data.payloadSymbNb);
-
-  printf("sleep %d seconds to transmitt complete\n", (int)modem.tx.data.Tpkt/1000);
-  sleep(((int)modem.tx.data.Tpkt/1000)+1);
-
-  printf("end\n");
-
-  LoRa_end(&modem);
-}
 
 void write_status_data(){
   HealthData he = {
@@ -107,23 +42,23 @@ void write_imaging_data(){
 
 void loop(){
   // checkSerial();
-  // updateRFComm();
+  updateRFComm();
 
-  // unsigned long int t = millis();
-  // if(t > status_write_time){
-  //   status_write_time += status_write_period;
-  //   if(enable_writing){
-  //     std::cout << "Writing status data";
-      // write_status_data();
-  //   }
-  // }
-  // if(t > imaging_write_time){
-  //   imaging_write_time += imaging_write_period;
-  //   if(enable_writing){
-  //     std::cout << "Writing imaging data";
-  //     // write_imaging_data();
-  //   }
-  // }
+  unsigned long int t = millis();
+  if(t > status_write_time){
+    status_write_time += status_write_period;
+    if(enable_writing){
+      std::cout << "Writing status data";
+      write_status_data();
+    }
+  }
+  if(t > imaging_write_time){
+    imaging_write_time += imaging_write_period;
+    if(enable_writing){
+      std::cout << "Writing imaging data";
+      // write_imaging_data();
+    }
+  }
 }
 
 /*
@@ -196,23 +131,18 @@ void checkSerial(){
 
 */
 
-void init_sd_logger(){
-}
-
 int main(){
   std::cout << "Testing Raspberry Gama Satellite communication system with LoRa Ra-01 rf module\n";
 
   initRFModule();
   std::cout << "Device initiated successfully\n";
-
-  init_sd_logger();
-  std::cout << "Logger initiated successfully\n";
   
   // setReceiveCallback(onReceive);
 
   // while(running){
-  //   loop();
+    loop();
   // }
 
+  // LoRa_end(&modem);
   return 0;
 }

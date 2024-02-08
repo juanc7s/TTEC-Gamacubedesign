@@ -2,7 +2,7 @@
     "version": 4,
     "configurations": [
         {
-            "name": "Arduino",
+            "name": "Arduino-linux",
             "compilerPath": "/home/vitinho/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++",
             "compilerArgs": [
                 "-w",

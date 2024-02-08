@@ -36,4 +36,6 @@ class Logger{
     void writeSatImagingDataPacket(ImagingData im);
 };
 
+extern Logger logger;
+
 #endif

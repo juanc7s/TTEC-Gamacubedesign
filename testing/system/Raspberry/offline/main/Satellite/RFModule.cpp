@@ -1,11 +1,4 @@
-// #include "Arduino.h"
-#include "SatComm.h"
-
-#ifdef __cplusplus
-  extern "C" {
-    #include "sx1278-LoRa-RaspberryPi/LoRa.h"
-  }
-#endif
+#include "RFModule.h"
 
 uint8_t rxChan = 23;
 uint8_t rxAddh = 0xa1;
@@ -40,7 +33,7 @@ uint8_t rx_pointer = 0;
 void preStatusProtocol(){
   if(reading_status_counter==0){
     if(writing_status_counter>0){
-      switch_status_file();
+      logger.switch_status_file();
     } else{
       number_of_packets = 0;
       return;
@@ -58,18 +51,18 @@ void updateStatusPacket(uint8_t index){
   // for(unsigned int i = 0; i < sizeof(HealthData); i++){
   //   ((uint8_t*)(&satPacket.data.healthData))[i] = ((uint8_t*)(&(dataBuffer.statusData[index])))[i];
   // }
-  sdReadSatStatusPacket(&satPacket.data.healthData, index);
+  logger.readSatStatusPacket(&satPacket.data.healthData, index);
 }
 
 void postStatusProtocol(){
-  reading_status_file_pointer += sizeof(HealthData)*number_of_packets;
+  logger.reading_status_file_pointer += sizeof(HealthData)*number_of_packets;
   reading_status_counter -= number_of_packets;
 }
 
 void preImagingDataProtocol(){
   if(reading_imaging_counter==0){
     if(writing_imaging_counter>0){
-      switch_imaging_file();
+      logger.switch_imaging_file();
     } else{
       number_of_packets = 0;
       return;
@@ -87,11 +80,11 @@ void preImagingDataProtocol(){
 }
 
 void updateImagingDataPacket(uint8_t index){
-  
+  logger.readSatImagingDataPacket(&satPacket.data.imagingData, index);
 }
 
 void postImagingDataProtocol(){
-  reading_imaging_file_pointer += sizeof(ImagingData)*number_of_packets;
+  logger.reading_imaging_file_pointer += sizeof(ImagingData)*number_of_packets;
   reading_imaging_counter -= number_of_packets;
 }
 
@@ -100,20 +93,19 @@ void sendSatPacket(){
   DBG_Print(satPacket.length);DBG_Print("    ");
   DBG_Print(satPacket.operation.protocol);DBG_Print("    ");
   DBG_Println(satPacket.operation.operation);
-  // asynchronousWriteFixedTransmission(txAddh, txAddl, txChan, (uint8_t*)&telemetry, sizeof(telemetry));
-  writeFixedTransmission(txAddh, txAddl, txChan, (uint8_t*)&satPacket, satPacket.length);
+  tx_send((uint8_t*)&satPacket, satPacket.length);
 }
 
 void updateRFComm(){
   uint8_t b;
-  if(e32serial.available()){
+  if(modem_available()){
     if(millis() > communication_timeout){
       DBG_Println("T:1");
       rx_pointer = 0;
       talking = false;
     }
-    while(e32serial.available()){
-      b = e32serial.read();
+    while(modem_available()){
+      b = modem_read();
       DBG_Println(b);
       ((uint8_t*)(&gsPacket))[rx_pointer++] = b;
       if(rx_pointer>0 && rx_pointer==gsPacket.length){
@@ -190,7 +182,7 @@ void switchCaseStatusProtocol(){
         DBG_Println("Recalling packets");
         for(unsigned int i = 0; i < 32; i++){
           for(unsigned int j = 0; j < 8; j++){
-            if(bitRead(gsPacket.data.resend.packets[i], j)){
+            if((gsPacket.data.resend.packets[i]>>j)&0x01){
               DBG_Print("Resending packet ");
               DBG_Println(i*8+j);
               updateImagingDataPacket(i*8+j);
@@ -257,7 +249,7 @@ void switchCaseImagingDataProtocol(){
         DBG_Println("I:R");
         for(unsigned int i = 0; i < 32; i++){
           for(unsigned int j = 0; j < 8; j++){
-            if(bitRead(gsPacket.data.resend.packets[i], j)){
+            if((gsPacket.data.resend.packets[i]>>j)&0x01){
               DBG_Print("I:R:");
               DBG_Println(i*8+j);
               updateImagingDataPacket(i*8+j);
@@ -287,7 +279,7 @@ void switchCaseImagingDataProtocol(){
       postImagingDataProtocol();
       rx_pointer = 0;
       talking = false;
-      // sendDone();
+      break;
   }
 }
 

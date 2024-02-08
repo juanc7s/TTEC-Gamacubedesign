@@ -17,6 +17,8 @@ unsigned long int reading_imaging_counter = 0;
 unsigned long int writing_status_counter = 0;
 unsigned long int writing_imaging_counter = 0;
 
+Logger logger;
+
 // unsigned int Logger::reading_status_file_pointer;
 // unsigned int Logger::reading_imaging_file_pointer;
 
@@ -28,6 +30,7 @@ Logger::Logger(){
   std::remove(imf2);
   current_status_writing_file = (char*)stf2;
   current_imaging_writing_file = (char*)imf2;
+  std::cout << "Logger initiated successfully\n";
 }
 void Logger::switch_status_file(){
   if(st_state){
