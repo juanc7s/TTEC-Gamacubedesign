@@ -38,11 +38,11 @@ void sendGSPacket(){
   Serial.println(gsPacket.length);
 
   LoRa.beginPacket();                                 // start packet
-  LoRa.write(txAddh);                                 // add destination high address
-  LoRa.write(txAddl);                                 // add destination low address
-  LoRa.write(rxAddh);                                 // add sender high address
-  LoRa.write(rxAddl);                                 // add sender low address
-  LoRa.write(gsPacket.length);                        // add payload length
+  //LoRa.write(txAddh);                                 // add destination high address
+  //LoRa.write(txAddl);                                 // add destination low address
+  //LoRa.write(rxAddh);                                 // add sender high address
+  //LoRa.write(rxAddl);                                 // add sender low address
+  //LoRa.write(gsPacket.length);                        // add payload length
   LoRa.write((uint8_t*)&gsPacket, gsPacket.length);   // add payload
   LoRa.endPacket();                                   // finish packet and send it
 

@@ -1,9 +1,10 @@
 #ifndef RF_MODULE_H
 #define RF_MODULE_H
 
+#define DEBUGGING
 #ifdef DEBUGGING
 #define DBG_Print(x) std::cout << x
-#define DBG_Println(x) std::cout << x
+#define DBG_Println(x) std::cout << x << std::endl
 #else
 #define DBG_Print(x)
 #define DBG_Println(x)

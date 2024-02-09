@@ -77,16 +77,16 @@ enum CONTROL_COMMAND{
 };
 
 struct ProtocolOperation{
-    unsigned protocol : 2;
-    unsigned operation : 6;
+    uint8_t protocol : 2;
+    uint8_t operation : 6;
 };
 
 struct GSOperation{
-  unsigned switch_active_thermal_control : 1;
-  unsigned switch_attitude_control : 1;
-  unsigned switch_imaging : 1;
-  unsigned switch_imaging_mode : 1;
-  unsigned switch_stand_by_mode : 1;
+  uint8_t switch_active_thermal_control : 1;
+  uint8_t switch_attitude_control : 1;
+  uint8_t switch_imaging : 1;
+  uint8_t switch_imaging_mode : 1;
+  uint8_t switch_stand_by_mode : 1;
 };
 
 // struct GSCommand{
@@ -146,26 +146,31 @@ struct ImagingData{
 // };
 
 union SatData{
-  uint8_t byte;
-  uint8_t number_of_packets;
   HealthData healthData;
   ImagingData imagingData;
   GSOperation operation_echo;
 };
 
+union ByteData{
+  uint8_t index;
+  uint8_t number_of_packets;
+  uint8_t byte;
+};
+
 struct SatPacket{
   uint8_t length;
   ProtocolOperation operation;
-  uint8_t index;
+  ByteData byte_data;
+  // long long number_of_packets;
   SatData data;
 };
 
 struct Operation{
-  unsigned switch_active_thermal_control : 1;
-  unsigned switch_attitude_control : 1;
-  unsigned switch_imaging : 1;
-  unsigned switch_imaging_mode : 1;
-  unsigned switch_stand_by_mode : 1;
+  uint8_t switch_active_thermal_control : 1;
+  uint8_t switch_attitude_control : 1;
+  uint8_t switch_imaging : 1;
+  uint8_t switch_imaging_mode : 1;
+  uint8_t switch_stand_by_mode : 1;
 };
 
 // extern Message message;

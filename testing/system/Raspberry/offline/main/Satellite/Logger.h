@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#include "../CommunicationProtocol.h"
+#include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/main/CommunicationProtocol.h"
 // #include "RFModule.h"
 
 extern unsigned long int reading_status_counter;

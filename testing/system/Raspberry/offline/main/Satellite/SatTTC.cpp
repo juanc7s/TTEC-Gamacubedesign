@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 using namespace std;
 
 #include "Logger.h"
@@ -12,6 +13,8 @@ unsigned long int status_write_time = 0;
 unsigned long int imaging_write_time = 0;
 
 bool enable_writing = false;
+
+bool running = true;
 
 void write_status_data(){
   HealthData he = {
@@ -40,38 +43,85 @@ void write_imaging_data(){
   logger.writeSatImagingDataPacket(im);
 }
 
-void loop(){
-  // checkSerial();
-  updateRFComm();
+uint8_t serial_buffer[256];
+unsigned int serial_buffer_writing_pointer = 0;
+unsigned int serial_buffer_reading_pointer = 0;
+unsigned int serial_buffer_size = 0;
 
-  unsigned long int t = millis();
-  if(t > status_write_time){
-    status_write_time += status_write_period;
-    if(enable_writing){
-      std::cout << "Writing status data";
-      write_status_data();
-    }
-  }
-  if(t > imaging_write_time){
-    imaging_write_time += imaging_write_period;
-    if(enable_writing){
-      std::cout << "Writing imaging data";
-      // write_imaging_data();
+void serial_receiving_thread(){
+  char c;
+  while(running){
+    std::cin >> c;
+    // std::cout << c << std::endl;
+    if(c=='e'){
+      running = false;
+    } else{
+      serial_buffer[serial_buffer_writing_pointer++] = c;
+      if(serial_buffer_writing_pointer==256){
+        serial_buffer_writing_pointer = 0;
+      }
+      serial_buffer_size++;
     }
   }
 }
 
-/*
+uint8_t serial_available(){
+  return serial_buffer_size;
+}
+
+uint8_t serial_read(){
+  serial_buffer_size--;
+  uint8_t b = serial_buffer[serial_buffer_reading_pointer++];
+  if(serial_buffer_reading_pointer==256){
+    serial_buffer_reading_pointer = 0;
+  }
+  return b;
+}
+
 void checkSerial(){
   char c;
-  while(Serial.available()){
-    c = Serial.read();
-    if(c=='0'){
-      enable_writing = !enable_writing;
-    } else if(c=='1'){
-      switch_status_file();
-    } else if(c=='2'){
-      switch_imaging_file();
+  while(serial_available()){
+    c = serial_read();
+    GSPacket sending_packet;
+    switch(c){
+      case '0':
+        std::cout << "Enabling writing" << std::endl;
+        enable_writing = !enable_writing;
+        break;
+      case '1':
+        std::cout << "Switching status file" << std::endl;
+        logger.switch_status_file();
+        break;
+      case '2':
+        std::cout << "Switching imaging data file" << std::endl;
+        logger.switch_imaging_file();
+        break;
+      case '3':
+        std::cout << "Sending status request" << std::endl;
+        sending_packet.operation.protocol = PROTOCOL_STATUS;
+        sending_packet.operation.operation = GS_STATUS_REQUEST;
+        sending_packet.length = 2;
+        std::cout << "Sending GS packet with length " << (int)sending_packet.length << std::endl;
+        std::cout << "Protocol: " << sending_packet.operation.protocol << std::endl;
+        std::cout << "Operation: " << sending_packet.operation.operation << std::endl;
+        modem_write((uint8_t*)&sending_packet, sending_packet.length);
+        break;
+      case '4':
+        std::cout << "Sending status start transmission" << std::endl;
+        sending_packet.operation.protocol = PROTOCOL_STATUS;
+        sending_packet.operation.operation = GS_STATUS_START_TRANSMISSION;
+        // ((uint8_t*)&sending_packet)[1] = 2;
+        sending_packet.length = 2;
+        std::cout << "Sending GS packet with length " << (int)sending_packet.length << std::endl;
+        std::cout << "Protocol: " << sending_packet.operation.protocol << std::endl;
+        std::cout << "Operation: " << sending_packet.operation.operation << std::endl;
+        std::cout << "Writing to rx buffer: ";
+        for(int i = 0; i < sending_packet.length; i++){
+          std::cout << (int)((uint8_t*)&sending_packet)[i] << " ";
+        }
+        std::cout << std::endl;
+        modem_write((uint8_t*)&sending_packet, sending_packet.length);
+        break;
     }
     // if(c=='\n'){
     //   received_serial = receiving_serial;
@@ -80,7 +130,7 @@ void checkSerial(){
     // } else{
     //   receiving_serial += c;
     // }
-  // }
+  }
 
   // if(serial_received){
   //   serial_received = false;
@@ -126,10 +176,29 @@ void checkSerial(){
   //     Serial.println("Set telemetry index to 0");
   //     comm_pointer = 0;
   //   }
-  }
+  // }
 }
 
-*/
+void loop(){
+  checkSerial();
+  updateRFComm();
+
+  unsigned long int t = millis();
+  if(t > status_write_time){
+    status_write_time += status_write_period;
+    if(enable_writing){
+      std::cout << "Writing status data" << std::endl;
+      write_status_data();
+    }
+  }
+  if(t > imaging_write_time){
+    imaging_write_time += imaging_write_period;
+    if(enable_writing){
+      std::cout << "Writing imaging data" << std::endl;
+      // write_imaging_data();
+    }
+  }
+}
 
 int main(){
   std::cout << "Testing Raspberry Gama Satellite communication system with LoRa Ra-01 rf module\n";
@@ -139,9 +208,15 @@ int main(){
   
   // setReceiveCallback(onReceive);
 
-  // while(running){
+    write_status_data();
+    write_status_data();
+    write_status_data();
+
+  std::thread thread_object (serial_receiving_thread);
+  while(running){
     loop();
-  // }
+  }
+  thread_object.join();
 
   // LoRa_end(&modem);
   return 0;

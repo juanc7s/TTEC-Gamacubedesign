@@ -6,12 +6,24 @@
   "configurations": [
     {
       "name": "Python: Current File",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "program": "${file}",
       "args": ["${workspaceFolder}"],
       "console": "integratedTerminal",
       "justMyCode": true
+    },
+    {
+      "name": "Testing rasp offline Launch",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/testing/system/Raspberry/offline/main/Satellite/SatTTC.out",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/testing/system/Raspberry/offline/main/Satellite/",
+      "environment": [],
+      "externalConsole": false,
+      "preLaunchTask": "clean"
     }
   ]
 }

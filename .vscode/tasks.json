@@ -6,6 +6,14 @@
       "type": "process",
       "command": "cd",
       "args": ["./gamasat/TTEC-Gamacubedesign/main/"]
+    },
+    {
+      "label": "clean",
+      "command": "make clean; make",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/testing/system/Raspberry/offline/main/Satellite/"
+      }
     }
   ]
 }
