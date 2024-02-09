@@ -1,5 +1,9 @@
 #include <iostream>
 #include <thread>
+#include <filesystem>
+#include <iostream>
+#include <sys/statvfs.h>
+#include <cstring>
 using namespace std;
 
 #include "Logger.h"
@@ -16,7 +20,21 @@ bool enable_writing = false;
 
 bool running = true;
 
+// https://www.ibm.com/docs/en/zos/2.4.0?topic=functions-statvfs-get-file-system-information
+// https://stackoverflow.com/questions/1449055/disk-space-used-free-total-how-do-i-get-this-in-c
 void write_status_data(){
+  struct statvfs fiData;
+
+  if((statvfs("/",&fiData)) < 0 ) {
+    cout << "\nFailed to stat:"  << "/";
+  } else {
+    cout << "\nDisk: " <<  "/";
+    cout << "\nBlock size: "<< fiData.f_bsize;
+    cout << "\nTotal no blocks: "<< fiData.f_blocks;
+    cout << "\nFree blocks: "<< fiData.f_bfree;
+  }
+  cout << endl;
+  long mem_usage;
   HealthData he = {
     .index = writing_status_counter,
     .time = 1,
@@ -26,7 +44,7 @@ void write_status_data(){
     .battery_temperature = 33.0,
     .internal_temperature = 37.9,
     .external_temperature = 51.2,
-    .sd_memory_usage = (unsigned long)3,
+    .sd_memory_usage = ((fiData.f_blocks-fiData.f_bfree)*fiData.f_bsize/1000000),
     .rasp_data = {0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1},
   };
   logger.writeSatStatusPacket(he);
@@ -101,25 +119,80 @@ void checkSerial(){
         sending_packet.operation.protocol = PROTOCOL_STATUS;
         sending_packet.operation.operation = GS_STATUS_REQUEST;
         sending_packet.length = 2;
-        std::cout << "Sending GS packet with length " << (int)sending_packet.length << std::endl;
-        std::cout << "Protocol: " << sending_packet.operation.protocol << std::endl;
-        std::cout << "Operation: " << sending_packet.operation.operation << std::endl;
+        // std::cout << "Sending GS packet with length " << (int)sending_packet.length << std::endl;
+        // std::cout << "Protocol: " << sending_packet.operation.protocol << std::endl;
+        // std::cout << "Operation: " << sending_packet.operation.operation << std::endl;
         modem_write((uint8_t*)&sending_packet, sending_packet.length);
         break;
       case '4':
         std::cout << "Sending status start transmission" << std::endl;
         sending_packet.operation.protocol = PROTOCOL_STATUS;
         sending_packet.operation.operation = GS_STATUS_START_TRANSMISSION;
-        // ((uint8_t*)&sending_packet)[1] = 2;
         sending_packet.length = 2;
-        std::cout << "Sending GS packet with length " << (int)sending_packet.length << std::endl;
-        std::cout << "Protocol: " << sending_packet.operation.protocol << std::endl;
-        std::cout << "Operation: " << sending_packet.operation.operation << std::endl;
-        std::cout << "Writing to rx buffer: ";
-        for(int i = 0; i < sending_packet.length; i++){
-          std::cout << (int)((uint8_t*)&sending_packet)[i] << " ";
+        // std::cout << "Sending GS packet with length " << (int)sending_packet.length << std::endl;
+        // std::cout << "Protocol: " << sending_packet.operation.protocol << std::endl;
+        // std::cout << "Operation: " << sending_packet.operation.operation << std::endl;
+        // std::cout << "Writing to rx buffer: ";
+        // for(int i = 0; i < sending_packet.length; i++){
+        //   std::cout << (int)((uint8_t*)&sending_packet)[i] << " ";
+        // }
+        // std::cout << std::endl;
+        modem_write((uint8_t*)&sending_packet, sending_packet.length);
+        break;
+      case '5':
+        std::cout << "Sending resend status" << std::endl;
+        sending_packet.operation.protocol = PROTOCOL_STATUS;
+        sending_packet.operation.operation = GS_STATUS_RESEND_PACKET;
+        for(unsigned int i = 0; i < 32; i++){
+          sending_packet.data.resend.packets[i] = 0;
         }
-        std::cout << std::endl;
+        sending_packet.data.resend.packets[0] |= 0x2;
+        // sending_packet.data.resend.packets[10] |= 0x10;
+        // sending_packet.data.resend.packets[23] |= 0x8;
+        gsPacket.data.resend.isDone = false;
+        sending_packet.length = 35;
+        modem_write((uint8_t*)&sending_packet, sending_packet.length);
+        break;
+      case '6':
+        std::cout << "Sending status done" << std::endl;
+        sending_packet.operation.protocol = PROTOCOL_STATUS;
+        sending_packet.operation.operation = GS_STATUS_DONE;
+        sending_packet.length = 2;
+        modem_write((uint8_t*)&sending_packet, sending_packet.length);
+        break;
+      case '7':
+        std::cout << "Sending imaging request" << std::endl;
+        sending_packet.operation.protocol = PROTOCOL_IMAGING_DATA;
+        sending_packet.operation.operation = GS_IMAGING_REQUEST;
+        sending_packet.length = 2;
+        modem_write((uint8_t*)&sending_packet, sending_packet.length);
+        break;
+      case '8':
+        std::cout << "Sending status start transmission" << std::endl;
+        sending_packet.operation.protocol = PROTOCOL_IMAGING_DATA;
+        sending_packet.operation.operation = GS_IMAGING_START_TRANSMISSION;
+        sending_packet.length = 2;
+        modem_write((uint8_t*)&sending_packet, sending_packet.length);
+        break;
+      case '9':
+        std::cout << "Sending resend status" << std::endl;
+        sending_packet.operation.protocol = PROTOCOL_IMAGING_DATA;
+        sending_packet.operation.operation = GS_IMAGING_RESEND_STATUS;
+        for(unsigned int i = 0; i < 32; i++){
+          gsPacket.data.resend.packets[i] = 0;
+        }
+        gsPacket.data.resend.packets[2] |= 0x2;
+        gsPacket.data.resend.packets[10] |= 0x10;
+        gsPacket.data.resend.packets[23] |= 0x8;
+        gsPacket.data.resend.isDone = false;
+        sending_packet.length = 35;
+        modem_write((uint8_t*)&sending_packet, sending_packet.length);
+        break;
+      case 'a':
+        std::cout << "Sending status done" << std::endl;
+        sending_packet.operation.protocol = PROTOCOL_IMAGING_DATA;
+        sending_packet.operation.operation = GS_IMAGING_DONE;
+        sending_packet.length = 2;
         modem_write((uint8_t*)&sending_packet, sending_packet.length);
         break;
     }
@@ -200,17 +273,19 @@ void loop(){
   }
 }
 
-int main(){
+int main( int argc, char *argv[] ){
   std::cout << "Testing Raspberry Gama Satellite communication system with LoRa Ra-01 rf module\n";
 
   initRFModule();
   std::cout << "Device initiated successfully\n";
   
   // setReceiveCallback(onReceive);
-
+  for(int i = 0; i < 30; i++){
     write_status_data();
-    write_status_data();
-    write_status_data();
+  }
+  for(int i = 0; i < 30; i++){
+    write_imaging_data();
+  }
 
   std::thread thread_object (serial_receiving_thread);
   while(running){

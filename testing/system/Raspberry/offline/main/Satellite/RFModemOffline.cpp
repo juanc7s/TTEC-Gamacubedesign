@@ -93,7 +93,16 @@ void print_satPacket_status(SatPacket packet){
       print_satPacket_bytes(packet);
       break;
     case SATELLITE_STATUS_PACKET:
-      std::cout << "Packet: " << (int)packet.byte_data.index;
+      std::cout << "Packet: " << (int)packet.byte_data.index << std::endl;
+      std::cout << "Time: " << packet.data.healthData.time << std::endl;
+      std::cout << "Index: " << packet.data.healthData.index << std::endl;
+      std::cout << "Battery charge: " << packet.data.healthData.battery_charge << std::endl;
+      std::cout << "Battery voltage: " << packet.data.healthData.battery_voltage << std::endl;
+      std::cout << "Battery current: " << packet.data.healthData.battery_current << std::endl;
+      std::cout << "Battery temperature: " << packet.data.healthData.battery_temperature << std::endl;
+      std::cout << "Internal temperature: " << packet.data.healthData.internal_temperature << std::endl;
+      std::cout << "External temperature: " << packet.data.healthData.external_temperature << std::endl;
+      std::cout << "SD memory usage: " << packet.data.healthData.sd_memory_usage << std::endl;
       break;
     case SATELLITE_STATUS_PACKETS_DONE:
       std::cout << "Packets done";
@@ -107,7 +116,7 @@ void print_satPacket_status(SatPacket packet){
 }
 
 void print_satPacket_imaging(SatPacket packet){
-  std::cout << "Protocol: PROTOCOL_IMAGING_DATA";
+  std::cout << "Protocol: PROTOCOL_IMAGING_DATA" << std::endl;
   std::cout << "Operation: ";
   switch(packet.operation.operation){
     case SATELLITE_IMAGING_PACKETS_AVAILABLE:
@@ -128,7 +137,7 @@ void print_satPacket_imaging(SatPacket packet){
 }
 
 void print_satPacket_setOperation(SatPacket packet){
-  std::cout << "Protocol: PROTOCOL_SET_OPERATION";
+  std::cout << "Protocol: PROTOCOL_SET_OPERATION" << std::endl;
   std::cout << "Operation: ";
   switch(packet.operation.operation){
     case SATELLITE_SET_OPERATION_ECHO:
@@ -143,7 +152,7 @@ void print_satPacket_setOperation(SatPacket packet){
 }
 
 void print_satPacket_bytes(SatPacket packet){
-  for(int i = 0; i < sizeof(SatPacket); i++){
+  for(int i = 0; i < packet.length; i++){
     std::cout << (int)((uint8_t*)&packet)[i] << " ";
   }
   std::cout << std::endl;

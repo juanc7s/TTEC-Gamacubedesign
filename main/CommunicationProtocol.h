@@ -25,8 +25,8 @@ enum PROTOCOL_IMAGING_DATA{
   SATELLITE_IMAGING_PACKET,
   SATELLITE_IMAGING_PACKETS_DONE,
   GS_IMAGING_RESEND_STATUS,
-  SATELLITE_IMAGING_DONE,
-  GS_IMAGING_DONE
+  GS_IMAGING_DONE,
+  SATELLITE_IMAGING_DONE
 };
 
 enum PROTOCOL_SET_OPERATION{
@@ -122,7 +122,7 @@ struct HealthData{
   float battery_temperature;
   float internal_temperature;
   float external_temperature;
-  unsigned long int sd_memory_usage;
+  unsigned long int sd_memory_usage; // MB
   uint8_t rasp_data[N];
 };
 

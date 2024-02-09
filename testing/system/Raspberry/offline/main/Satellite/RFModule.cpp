@@ -68,7 +68,7 @@ void preImagingDataProtocol(){
       return;
     }
   }
-  number_of_packets = reading_status_counter;
+  number_of_packets = reading_imaging_counter;
   if(number_of_packets > N_imaging){
     number_of_packets = N_imaging;
   }
@@ -93,8 +93,8 @@ void sendSatPacket(){
   DBG_Print(satPacket.length);DBG_Print("    ");
   DBG_Print((int)satPacket.operation.protocol);DBG_Print("    ");
   DBG_Println((int)satPacket.operation.operation);
-  // tx_send((uint8_t*)&satPacket, satPacket.length);
-  tx_send((uint8_t*)&satPacket, sizeof(satPacket));
+  tx_send((uint8_t*)&satPacket, satPacket.length);
+  // tx_send((uint8_t*)&satPacket, sizeof(satPacket));
 }
 
 void updateRFComm(){
@@ -107,9 +107,14 @@ void updateRFComm(){
     // }
     while(modem_available()){
       b = modem_read();
-      std::cout << (int)b << " " << (int)rx_pointer << std::endl;
+      // std::cout << (int)b << " " << (int)rx_pointer << std::endl;
       ((uint8_t*)(&gsPacket))[rx_pointer++] = b;
       if(rx_pointer>0 && rx_pointer==gsPacket.length){
+        std::cout << "Received gs: ";
+        for(int i = 0; i < gsPacket.length; i++){
+          std::cout << (int)((uint8_t*)&gsPacket)[i] << " ";
+        }
+        std::cout << std::endl;
         onReceive();
         rx_pointer = 0;
       }
@@ -160,8 +165,7 @@ void switchCaseStatusProtocol(){
       satPacket.operation.protocol = PROTOCOL_STATUS;
       satPacket.operation.operation = SATELLITE_STATUS_PACKETS_AVAILABLE;
       satPacket.byte_data.number_of_packets = number_of_packets;
-      satPacket.byte_data.index = 250;
-      satPacket.length = 4;
+      satPacket.length = 3;
       std::cout << "AAA " << (int)satPacket.byte_data.number_of_packets << std::endl;
       print_satPacket_bytes(satPacket);
       sendSatPacket();
@@ -173,7 +177,7 @@ void switchCaseStatusProtocol(){
         satPacket.operation.protocol = PROTOCOL_STATUS;
         satPacket.operation.operation = SATELLITE_STATUS_PACKET;
         satPacket.byte_data.index = i;
-        satPacket.length = 3+sizeof(HealthData);
+        satPacket.length = sizeof(int64_t)+sizeof(HealthData);
         sendSatPacket();
       }
       DBG_Println("S:3");
@@ -191,11 +195,11 @@ void switchCaseStatusProtocol(){
             if((gsPacket.data.resend.packets[i]>>j)&0x01){
               DBG_Print("Resending packet ");
               DBG_Println(i*8+j);
-              updateImagingDataPacket(i*8+j);
+              updateStatusPacket(i*8+j);
               satPacket.operation.protocol = PROTOCOL_STATUS;
               satPacket.operation.operation = SATELLITE_STATUS_PACKET;
               satPacket.byte_data.index = i*8 + j;
-              satPacket.length = 3+sizeof(HealthData);
+              satPacket.length = sizeof(int64_t)+sizeof(HealthData);
               sendSatPacket();
             }
           }
