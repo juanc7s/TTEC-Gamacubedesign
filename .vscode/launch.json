@@ -24,6 +24,30 @@
       "environment": [],
       "externalConsole": false,
       "preLaunchTask": "clean"
+    },
+    {
+      "name": "Test socket server",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceRoot}/testing/system/Raspberry/socket-example/server/server.out",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/testing/system/Raspberry/socket-example/server/",
+      "environment": [],
+      "externalConsole": false,
+      "preLaunchTask": "clean test socket server"
+    },
+    {
+      "name": "Test socket client",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceRoot}/testing/system/Raspberry/socket-example/client/client.out",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/testing/system/Raspberry/socket-example/client/",
+      "environment": [],
+      "externalConsole": false,
+      "preLaunchTask": "clean test socket client"
     }
   ]
 }

@@ -15,6 +15,24 @@
       "options": {
         "cwd": "${workspaceFolder}/testing/system/Raspberry/offline/main/Satellite/"
       }
+    },
+    {
+      "label": "clean test socket server",
+      "command": "make clean; make",
+      // "command": "make",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/testing/system/Raspberry/socket-example/server/"
+      }
+    },
+    {
+      "label": "clean test socket client",
+      "command": "make clean; make",
+      // "command": "make",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/testing/system/Raspberry/socket-example/client/"
+      }
     }
   ]
 }
