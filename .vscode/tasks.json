@@ -22,7 +22,7 @@
       // "command": "make",
       "type": "shell",
       "options": {
-        "cwd": "${workspaceFolder}/testing/system/Raspberry/socket-example/server/"
+        "cwd": "${workspaceFolder}/testing/misc/Raspberry/socket-examples/server/"
       }
     },
     {
@@ -31,7 +31,7 @@
       // "command": "make",
       "type": "shell",
       "options": {
-        "cwd": "${workspaceFolder}/testing/system/Raspberry/socket-example/client/"
+        "cwd": "${workspaceFolder}/testing/misc/Raspberry/socket-examples/client/"
       }
     }
   ]
