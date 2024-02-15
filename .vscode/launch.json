@@ -48,6 +48,17 @@
       "environment": [],
       "externalConsole": false,
       "preLaunchTask": "clean test socket client"
+    },
+    {
+      "name": "Test socket data transmission",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/testing/misc/Raspberry/socket-examples/data_transmission/run_tests.sh",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/testing/misc/Raspberry/socket-examples/data_transmission/",
+      "environment": [],
+      "externalConsole": false
     }
   ]
 }
