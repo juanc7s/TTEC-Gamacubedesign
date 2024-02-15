@@ -67,7 +67,15 @@
     "variant": "cpp",
     "iomanip": "cpp",
     "codecvt": "cpp",
-    "unistd.h": "c"
+    "unistd.h": "c",
+    "any": "cpp",
+    "bitset": "cpp",
+    "forward_list": "cpp",
+    "set": "cpp",
+    "unordered_set": "cpp",
+    "optional": "cpp",
+    "future": "cpp",
+    "typeindex": "cpp"
   },
   "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }
