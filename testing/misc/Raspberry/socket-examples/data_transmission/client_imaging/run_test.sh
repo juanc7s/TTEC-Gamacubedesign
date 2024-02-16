@@ -1,3 +1,3 @@
 make clean
 make
-./client_imaging.out
+./main.out

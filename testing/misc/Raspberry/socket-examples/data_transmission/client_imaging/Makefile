@@ -1,12 +1,15 @@
-all: client_imaging.out
+all: main.out
 
 HomeFolder := $(shell pwd)/..
 
-client_imaging.o: client_imaging.cpp
-	g++ -c client_imaging.cpp -o client_imaging.o
+ImagingDataClient.o: ImagingDataClient.cpp
+	g++ -c ImagingDataClient.cpp -o ImagingDataClient.o
 
-client_imaging.out: client_imaging.o
-	g++ -o client_imaging.out client_imaging.o
+main.o: main.cpp
+	g++ -c main.cpp -o main.o
+
+main.out: main.o ImagingDataClient.o
+	g++ -o main.out main.o ImagingDataClient.o
 
 clean:
 	rm *.o *.out

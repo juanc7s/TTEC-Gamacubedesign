@@ -1,12 +1,15 @@
-all: client_status.out
+all: main.out
 
 HomeFolder := $(shell pwd)/..
 
-client_status.o: client_status.cpp
-	g++ -c client_status.cpp -o client_status.o
+StatusDataClient.o: StatusDataClient.cpp
+	g++ -c StatusDataClient.cpp -o StatusDataClient.o
 
-client_status.out: client_status.o
-	g++ -o client_status.out client_status.o
+main.o: main.cpp
+	g++ -c main.cpp -o main.o
+
+main.out: main.o StatusDataClient.o
+	g++ -o main.out main.o StatusDataClient.o
 
 clean:
 	rm *.o *.out

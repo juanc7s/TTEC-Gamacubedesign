@@ -1,0 +1,47 @@
+
+
+// class NonBlockingInput{
+//   public:
+//     static const unsigned int buffer_size = 64;
+//     uint8_t buffer[buffer_size];
+//     unsigned int writing_pointer = 0;
+//     unsigned int reading_pointer = 0;
+//     unsigned int size = 0;
+//     bool isExit = false;
+
+//     void write(uint8_t b){
+//       buffer[writing_pointer++] = b;
+//       if(writing_pointer == buffer_size){
+//         writing_pointer = 0;
+//       }
+//       size++;
+//     }
+//     uint8_t read(){
+//       uint8_t b = buffer[reading_pointer++];
+//       if(reading_pointer == buffer_size){
+//         reading_pointer = 0;
+//       }
+//       size--;
+//       return b;
+//     }
+//     bool available(){
+//       return size > 0;
+//     }
+//     void start(){
+//       std::thread thread_1 (run);
+//     }
+//     void run(){
+//       while(!isExit){
+//         uint8_t b;
+//         cin >> b;
+//         buffer[writing_pointer++] = b;
+//         if(writing_pointer == buffer_size){
+//           writing_pointer = 0;
+//         }
+//         size++;
+//         if(b == '#'){
+//           isExit = true;
+//         }
+//       }
+//     }
+// };
