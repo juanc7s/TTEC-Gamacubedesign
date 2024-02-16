@@ -177,7 +177,7 @@ void switchCaseStatusProtocol(){
         satPacket.operation.protocol = PROTOCOL_STATUS;
         satPacket.operation.operation = SATELLITE_STATUS_PACKET;
         satPacket.byte_data.index = i;
-        satPacket.length = sizeof(int64_t)+sizeof(HealthData);
+        satPacket.length = sizeof(SatPacket);//sizeof(int64_t)+sizeof(HealthData);
         sendSatPacket();
       }
       DBG_Println("S:3");
@@ -199,7 +199,7 @@ void switchCaseStatusProtocol(){
               satPacket.operation.protocol = PROTOCOL_STATUS;
               satPacket.operation.operation = SATELLITE_STATUS_PACKET;
               satPacket.byte_data.index = i*8 + j;
-              satPacket.length = sizeof(int64_t)+sizeof(HealthData);
+              satPacket.length = sizeof(SatPacket);//sizeof(int64_t)+sizeof(HealthData);
               sendSatPacket();
             }
           }
@@ -244,7 +244,7 @@ void switchCaseImagingDataProtocol(){
         satPacket.operation.protocol = PROTOCOL_IMAGING_DATA;
         satPacket.operation.operation = SATELLITE_IMAGING_PACKET;
         satPacket.byte_data.index = i;
-        satPacket.length = 3+sizeof(ImagingData);
+        satPacket.length = sizeof(SatPacket);//3+sizeof(ImagingData);
         sendSatPacket();
       }
       DBG_Println("I:D");
@@ -266,7 +266,7 @@ void switchCaseImagingDataProtocol(){
               satPacket.operation.protocol = PROTOCOL_IMAGING_DATA;
               satPacket.operation.operation = SATELLITE_IMAGING_PACKET;
               satPacket.byte_data.index = i*8 + j;
-              satPacket.length = 3+sizeof(ImagingData);
+              satPacket.length = sizeof(SatPacket);//3+sizeof(ImagingData);
               sendSatPacket();
             }
           }

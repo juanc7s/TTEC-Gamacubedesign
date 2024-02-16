@@ -81,11 +81,11 @@ class ImagingDataServer{
       do{
         unsigned int recvN = recv(server, buffer, bufsize, 0);
         if(strcmp(buffer, "SendPacket\n")==0){
-          cout << "(Imaging) Receiving packet" << endl;
+          // cout << "(Imaging) Receiving packet" << endl;
           strcpy(buffer, "Ok\n");
           send(server, buffer, bufsize, 0);
           int recvN = recv(server, (uint8_t*)&newPacket, sizeof(ImagingData), 0);
-          cout << "(Imaging) Packet received" << endl;
+          // cout << "(Imaging) Packet received" << endl;
           if(recvN > 0){
             _fifo->write(newPacket);
           }
