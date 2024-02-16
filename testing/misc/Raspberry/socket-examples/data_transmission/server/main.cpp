@@ -42,7 +42,8 @@ void do_stuff(){
   }
 }
 
-void read_fifos(){while(imaging_fifo.available()){
+void read_fifos(){
+  while(imaging_fifo.available()){
     cout << "Imaging FIFO: " << endl;
     ImagingData newPacket = imaging_fifo.read();
     for(int i = 0; i < 5; i++){

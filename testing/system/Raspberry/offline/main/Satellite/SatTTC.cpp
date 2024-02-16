@@ -11,6 +11,9 @@ using namespace std;
 #include "RFModule.h"
 #include "Timing.h"
 
+#include "StatusServer.cpp"
+#include "ImagingServer.cpp"
+
 unsigned long int status_write_period = 500;
 unsigned long int imaging_write_period = 250;
 unsigned long int status_write_time = 0;
@@ -20,46 +23,93 @@ bool enable_writing = false;
 
 bool running = true;
 
-// https://www.ibm.com/docs/en/zos/2.4.0?topic=functions-statvfs-get-file-system-information
-// https://stackoverflow.com/questions/1449055/disk-space-used-free-total-how-do-i-get-this-in-c
-void write_status_data(){
-  struct statvfs fiData;
+ImagingFIFO imaging_fifo;
+StatusFIFO status_fifo;
+bool running = false;
+// int portNum = 8080;
 
-  if((statvfs("/",&fiData)) < 0 ) {
-    cout << "\nFailed to stat:"  << "/";
-  } else {
-    cout << "\nDisk: " <<  "/";
-    cout << "\nBlock size: "<< fiData.f_bsize;
-    cout << "\nTotal no blocks: "<< fiData.f_blocks;
-    cout << "\nFree blocks: "<< fiData.f_bfree;
-  }
-  cout << endl;
-  long mem_usage;
-  HealthData he = {
-    .index = writing_status_counter,
-    .time = 1,
-    .battery_voltage = 3.7,
-    .battery_current = 2.0,
-    .battery_charge = 100.0,
-    .battery_temperature = 33.0,
-    .internal_temperature = 37.9,
-    .external_temperature = 51.2,
-    .sd_memory_usage = ((fiData.f_blocks-fiData.f_bfree)*fiData.f_bsize/1000000),
-    .rasp_data = {0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1},
-  };
-  logger.writeSatStatusPacket(he);
+ImagingDataServer server_1(&imaging_fifo, 8080);
+StatusDataServer server_2(&status_fifo, 8081);
+
+void run_server_1(){
+  server_1.run_server();
 }
-void write_imaging_data(){
-  ImagingData im;
-  for(int i = 0 ; i < 5; i++){
-    im.lightnings[i].index = writing_imaging_counter;
-    im.lightnings[i].duration = 5;
-    im.lightnings[i].radius = 1;
-    im.lightnings[i].x = i*10;
-    im.lightnings[i].y = i*20;
-  }
-  logger.writeSatImagingDataPacket(im);
+
+void run_server_2(){
+  server_2.run_server();
 }
+
+void read_fifos(){
+  while(imaging_fifo.available()){
+    cout << "Imaging FIFO: " << endl;
+    ImagingData newPacket = imaging_fifo.read();
+    logger.writeSatImagingDataPacket(newPacket);
+    for(int i = 0; i < 5; i++){
+      cout << "Index: " << newPacket.lightnings[i].index << endl;
+      cout << "Duration: " << newPacket.lightnings[i].duration << endl;
+      cout << "Size: " << newPacket.lightnings[i].radius << endl;
+      cout << "x: " << newPacket.lightnings[i].x << endl;
+      cout << "y: " << newPacket.lightnings[i].y << endl << endl;
+    }
+    cout << endl;
+  }
+  while(status_fifo.available()){
+    cout << "Status FIFO: " << endl;
+    HealthData newPacket = status_fifo.read();
+    logger.writeSatStatusPacket(newPacket);
+    cout << "Packet index: " << newPacket.index << endl;
+    cout << "Reading time: " << newPacket.time << endl;
+    cout << "Battery charge: " << newPacket.battery_charge << endl;
+    cout << "Battery current: " << newPacket.battery_current << endl;
+    cout << "Battery voltage: " << newPacket.battery_voltage << endl;
+    cout << "Battery temperature: " << newPacket.battery_temperature << endl;
+    cout << "External temperature: " << newPacket.external_temperature << endl;
+    cout << "Internal temperature: " << newPacket.internal_temperature << endl;
+    cout << "Memory usage: " << newPacket.sd_memory_usage << endl;
+    cout << endl;
+  }
+}
+
+// // https://www.ibm.com/docs/en/zos/2.4.0?topic=functions-statvfs-get-file-system-information
+// // https://stackoverflow.com/questions/1449055/disk-space-used-free-total-how-do-i-get-this-in-c
+// void write_status_data(){
+//   struct statvfs fiData;
+
+//   if((statvfs("/",&fiData)) < 0 ) {
+//     cout << "\nFailed to stat:"  << "/";
+//   } else {
+//     cout << "\nDisk: " <<  "/";
+//     cout << "\nBlock size: "<< fiData.f_bsize;
+//     cout << "\nTotal no blocks: "<< fiData.f_blocks;
+//     cout << "\nFree blocks: "<< fiData.f_bfree;
+//   }
+//   cout << endl;
+//   long mem_usage;
+//   HealthData he = {
+//     .index = writing_status_counter,
+//     .time = 1,
+//     .battery_voltage = 3.7,
+//     .battery_current = 2.0,
+//     .battery_charge = 100.0,
+//     .battery_temperature = 33.0,
+//     .internal_temperature = 37.9,
+//     .external_temperature = 51.2,
+//     .sd_memory_usage = ((fiData.f_blocks-fiData.f_bfree)*fiData.f_bsize/1000000),
+//     .rasp_data = {0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1, 0xa1},
+//   };
+//   logger.writeSatStatusPacket(he);
+// }
+// void write_imaging_data(){
+//   ImagingData im;
+//   for(int i = 0 ; i < 5; i++){
+//     im.lightnings[i].index = writing_imaging_counter;
+//     im.lightnings[i].duration = 5;
+//     im.lightnings[i].radius = 1;
+//     im.lightnings[i].x = i*10;
+//     im.lightnings[i].y = i*20;
+//   }
+//   logger.writeSatImagingDataPacket(im);
+// }
 
 uint8_t serial_buffer[256];
 unsigned int serial_buffer_writing_pointer = 0;
@@ -255,22 +305,23 @@ void checkSerial(){
 void loop(){
   checkSerial();
   updateRFComm();
+  read_fifos();
 
-  unsigned long int t = millis();
-  if(t > status_write_time){
-    status_write_time += status_write_period;
-    if(enable_writing){
-      std::cout << "Writing status data" << std::endl;
-      write_status_data();
-    }
-  }
-  if(t > imaging_write_time){
-    imaging_write_time += imaging_write_period;
-    if(enable_writing){
-      std::cout << "Writing imaging data" << std::endl;
-      // write_imaging_data();
-    }
-  }
+  // unsigned long int t = millis();
+  // if(t > status_write_time){
+  //   status_write_time += status_write_period;
+  //   if(enable_writing){
+  //     std::cout << "Writing status data" << std::endl;
+  //     write_status_data();
+  //   }
+  // }
+  // if(t > imaging_write_time){
+  //   imaging_write_time += imaging_write_period;
+  //   if(enable_writing){
+  //     std::cout << "Writing imaging data" << std::endl;
+  //     // write_imaging_data();
+  //   }
+  // }
 }
 
 int main( int argc, char *argv[] ){
@@ -278,20 +329,31 @@ int main( int argc, char *argv[] ){
 
   initRFModule();
   std::cout << "Device initiated successfully\n";
+
+  std::thread thread_1 (run_server_1);
+  std::thread thread_2 (run_server_2);
   
   // setReceiveCallback(onReceive);
-  for(int i = 0; i < 30; i++){
-    write_status_data();
-  }
-  for(int i = 0; i < 30; i++){
-    write_imaging_data();
-  }
+  // for(int i = 0; i < 30; i++){
+  //   write_status_data();
+  // }
+  // for(int i = 0; i < 30; i++){
+  //   write_imaging_data();
+  // }
 
   std::thread thread_object (serial_receiving_thread);
   while(running){
     loop();
   }
+
+  cout << "Closing servers" << endl;
+  server_1.close_server();
+  server_2.close_server();
   thread_object.join();
+  thread_1.join();
+  thread_2.join();
+  
+  exit(1);
 
   // LoRa_end(&modem);
   return 0;
