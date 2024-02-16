@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sys/statvfs.h>
 
 #include "StatusDataClient.cpp"
 
@@ -30,7 +31,13 @@ int main(){
     do_stuff();
     statusSocket.update();
     cout << "All nominal" << endl;
-    statusSocket.send_packet(testingData);
+    struct statvfs fiData;
+    if((statvfs("/",&fiData)) < 0 ) {
+      cout << "\nFailed to stat:"  << "/";
+    } else{
+      testingData.sd_memory_usage = ((fiData.f_blocks-fiData.f_bfree)*fiData.f_bsize/1000000);
+      statusSocket.send_packet(testingData);
+    }
   }
 
   cout << "Finished" << endl;
