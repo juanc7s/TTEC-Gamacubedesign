@@ -19,11 +19,20 @@ Logger.o: Logger.cpp
 RFModule.o: RFModule.cpp
 	g++ -c RFModule.cpp -o RFModule.o -lpigpio -lrt -pthread -lm
 
+StatusDataServer.o: StatusDataServer.cpp
+	g++ -c StatusDataServer.cpp -o StatusDataServer.o
+
+ImagingDataServer.o: ImagingDataServer.cpp
+	g++ -c ImagingDataServer.cpp -o ImagingDataServer.o
+
+DataFIFO.o: DataFIFO.cpp
+	g++ -c DataFIFO.cpp -o DataFIFO.o
+
 SatTTC.o: SatTTC.cpp
 	g++ -c SatTTC.cpp -o SatTTC.o -lpigpio -lrt -pthread -lm -I $(LibFolder)
 
-SatTTC.out: $(LoraLib)/LoRa.o Logger.o SatTTC.o
-	g++ -o SatTTC.out SatTTC.o $(LoraLib)/LoRa.o Logger.o -lpigpio -lrt -pthread -lm
+SatTTC.out: $(LoraLib)/LoRa.o Logger.o SatTTC.o ImagingDataServer.o StatusDataServer.o DataFIFO.o
+	g++ -o SatTTC.out SatTTC.o $(LoraLib)/LoRa.o Logger.o ImagingDataServer.o StatusDataServer.o DataFIFO.o -lpigpio -lrt -pthread -lm
 
 clean:
 	rm *.o *.out
