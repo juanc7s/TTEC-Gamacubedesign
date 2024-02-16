@@ -24,11 +24,11 @@ RFModemOffline.o: RFModemOffline.cpp
 RFModule.o: RFModule.cpp
 	g++ -c RFModule.cpp -o RFModule.o -lrt -pthread -lm
 
-StatusDataServer.o: StatusDataServer.cpp
-	g++ -c StatusDataServer.cpp -o StatusDataServer.o
+StatusServer.o: StatusServer.cpp
+	g++ -c StatusServer.cpp -o StatusServer.o
 
-ImagingDataServer.o: ImagingDataServer.cpp
-	g++ -c ImagingDataServer.cpp -o ImagingDataServer.o
+ImagingServer.o: ImagingServer.cpp
+	g++ -c ImagingServer.cpp -o ImagingServer.o
 
 DataFIFO.o: DataFIFO.cpp
 	g++ -c DataFIFO.cpp -o DataFIFO.o
@@ -36,8 +36,8 @@ DataFIFO.o: DataFIFO.cpp
 SatTTC.o: SatTTC.cpp
 	g++ -c SatTTC.cpp -o SatTTC.o -lrt -pthread -lm
 
-SatTTC.out: Timing.o Logger.o RFModule.o RFModemOffline.o SatTTC.o ImagingDataServer.o StatusDataServer.o DataFIFO.o
-	g++ -o SatTTC.out SatTTC.o Timing.o Logger.o RFModule.o RFModemOffline.o ImagingDataServer.o StatusDataServer.o DataFIFO.o -lrt -pthread -lm
+SatTTC.out: Timing.o Logger.o RFModule.o RFModemOffline.o SatTTC.o ImagingServer.o StatusServer.o DataFIFO.o
+	g++ -o SatTTC.out SatTTC.o Timing.o Logger.o RFModule.o RFModemOffline.o ImagingServer.o StatusServer.o DataFIFO.o -lrt -pthread -lm
 
 clean:
 	rm *.o *.out

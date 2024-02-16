@@ -25,8 +25,6 @@ bool running = true;
 
 ImagingFIFO imaging_fifo;
 StatusFIFO status_fifo;
-bool running = false;
-// int portNum = 8080;
 
 ImagingDataServer server_1(&imaging_fifo, 8080);
 StatusDataServer server_2(&status_fifo, 8081);

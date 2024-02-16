@@ -17,7 +17,7 @@ int main(){
   testingData.external_temperature = 1;
   testingData.index = 1;
   testingData.internal_temperature = 1;
-  testingData.sd_memory_usage = 1;
+  // testingData.sd_memory_usage = 1;
   testingData.time = 1;
 
   if(statusSocket.connect_to_socket() < 0){
@@ -30,7 +30,13 @@ int main(){
     do_stuff();
     statusSocket.update();
     cout << "All nominal" << endl;
-    statusSocket.send_packet(testingData);
+    struct statvfs fiData;
+    if((statvfs("/",&fiData)) < 0 ) {
+      cout << "\nFailed to stat:"  << "/";
+    } else{
+      testingData.sd_memory_usage = ((fiData.f_blocks-fiData.f_bfree)*fiData.f_bsize/1000000)
+      statusSocket.send_packet(testingData);
+    }
   }
 
   cout << "Finished" << endl;
