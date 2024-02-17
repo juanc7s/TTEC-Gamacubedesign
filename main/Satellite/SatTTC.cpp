@@ -62,7 +62,7 @@ void checkConsole(){
   while(console.available() > 0){
     c = console.read();
 //     GSPacket sending_packet;
-//     switch(c){
+    switch(c){
 //       case '0':
 //         std::cout << "Enabling writing" << std::endl;
 //         enable_writing = !enable_writing;
@@ -156,7 +156,10 @@ void checkConsole(){
 //         sending_packet.length = 2;
 //         modem_write((uint8_t*)&sending_packet, sending_packet.length);
 //         break;
-//     }
+        case 'b':
+          cout << "Echo console" << endl;
+          break;
+    }
 //     // if(c=='\n'){
 //     //   received_serial = receiving_serial;
 //     //   receiving_serial = "";
