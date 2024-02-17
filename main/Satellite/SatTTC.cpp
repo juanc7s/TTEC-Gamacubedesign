@@ -20,7 +20,7 @@ using namespace std;
 #include "StatusServer.cpp"
 #include "ImagingServer.cpp"
 
-#include "asynchronous_in.cpp"
+// #include "asynchronous_in.cpp"
 #include "printing_utils.cpp"
 
 unsigned long int status_write_period = 500;
@@ -35,6 +35,8 @@ StatusFIFO status_fifo;
 
 StatusDataServer status_server(&status_fifo, 8081);
 ImagingDataServer imaging_server(&imaging_fifo, 8080);
+
+bool running = false;
 
 void run_status_server(){
   status_server.run_server();
@@ -55,114 +57,114 @@ void read_fifos(){
   }
 }
 
-// void checkSerial(){
-//   char c;
-  // while(serial_available()){
-  //   c = serial_read();
-  //   GSPacket sending_packet;
-  //   switch(c){
-  //     case '0':
-  //       std::cout << "Enabling writing" << std::endl;
-  //       enable_writing = !enable_writing;
-  //       break;
-  //     case '1':
-  //       std::cout << "Switching status file" << std::endl;
-  //       logger.switch_status_file();
-  //       break;
-  //     case '2':
-  //       std::cout << "Switching imaging data file" << std::endl;
-  //       logger.switch_imaging_file();
-  //       break;
-  //     case '3':
-  //       std::cout << "Sending status request" << std::endl;
-  //       sending_packet.operation.protocol = PROTOCOL_STATUS;
-  //       sending_packet.operation.operation = GS_STATUS_REQUEST;
-  //       sending_packet.length = 2;
-  //       // std::cout << "Sending GS packet with length " << (int)sending_packet.length << std::endl;
-  //       // std::cout << "Protocol: " << sending_packet.operation.protocol << std::endl;
-  //       // std::cout << "Operation: " << sending_packet.operation.operation << std::endl;
-  //       modem_write((uint8_t*)&sending_packet, sending_packet.length);
-  //       break;
-  //     case '4':
-  //       std::cout << "Sending status start transmission" << std::endl;
-  //       sending_packet.operation.protocol = PROTOCOL_STATUS;
-  //       sending_packet.operation.operation = GS_STATUS_START_TRANSMISSION;
-  //       sending_packet.length = 2;
-  //       // std::cout << "Sending GS packet with length " << (int)sending_packet.length << std::endl;
-  //       // std::cout << "Protocol: " << sending_packet.operation.protocol << std::endl;
-  //       // std::cout << "Operation: " << sending_packet.operation.operation << std::endl;
-  //       // std::cout << "Writing to rx buffer: ";
-  //       // for(int i = 0; i < sending_packet.length; i++){
-  //       //   std::cout << (int)((uint8_t*)&sending_packet)[i] << " ";
-  //       // }
-  //       // std::cout << std::endl;
-  //       modem_write((uint8_t*)&sending_packet, sending_packet.length);
-  //       break;
-  //     case '5':
-  //       std::cout << "Sending resend status" << std::endl;
-  //       sending_packet.operation.protocol = PROTOCOL_STATUS;
-  //       sending_packet.operation.operation = GS_STATUS_RESEND_PACKET;
-  //       for(unsigned int i = 0; i < 32; i++){
-  //         sending_packet.data.resend.packets[i] = 0;
-  //       }
-  //       sending_packet.data.resend.packets[0] |= 0x2;
-  //       // sending_packet.data.resend.packets[10] |= 0x10;
-  //       // sending_packet.data.resend.packets[23] |= 0x8;
-  //       gsPacket.data.resend.isDone = false;
-  //       sending_packet.length = 35;
-  //       modem_write((uint8_t*)&sending_packet, sending_packet.length);
-  //       break;
-  //     case '6':
-  //       std::cout << "Sending status done" << std::endl;
-  //       sending_packet.operation.protocol = PROTOCOL_STATUS;
-  //       sending_packet.operation.operation = GS_STATUS_DONE;
-  //       sending_packet.length = 2;
-  //       modem_write((uint8_t*)&sending_packet, sending_packet.length);
-  //       break;
-  //     case '7':
-  //       std::cout << "Sending imaging request" << std::endl;
-  //       sending_packet.operation.protocol = PROTOCOL_IMAGING_DATA;
-  //       sending_packet.operation.operation = GS_IMAGING_REQUEST;
-  //       sending_packet.length = 2;
-  //       modem_write((uint8_t*)&sending_packet, sending_packet.length);
-  //       break;
-  //     case '8':
-  //       std::cout << "Sending status start transmission" << std::endl;
-  //       sending_packet.operation.protocol = PROTOCOL_IMAGING_DATA;
-  //       sending_packet.operation.operation = GS_IMAGING_START_TRANSMISSION;
-  //       sending_packet.length = 2;
-  //       modem_write((uint8_t*)&sending_packet, sending_packet.length);
-  //       break;
-  //     case '9':
-  //       std::cout << "Sending resend status" << std::endl;
-  //       sending_packet.operation.protocol = PROTOCOL_IMAGING_DATA;
-  //       sending_packet.operation.operation = GS_IMAGING_RESEND_STATUS;
-  //       for(unsigned int i = 0; i < 32; i++){
-  //         gsPacket.data.resend.packets[i] = 0;
-  //       }
-  //       gsPacket.data.resend.packets[2] |= 0x2;
-  //       gsPacket.data.resend.packets[10] |= 0x10;
-  //       gsPacket.data.resend.packets[23] |= 0x8;
-  //       gsPacket.data.resend.isDone = false;
-  //       sending_packet.length = 35;
-  //       modem_write((uint8_t*)&sending_packet, sending_packet.length);
-  //       break;
-  //     case 'a':
-  //       std::cout << "Sending status done" << std::endl;
-  //       sending_packet.operation.protocol = PROTOCOL_IMAGING_DATA;
-  //       sending_packet.operation.operation = GS_IMAGING_DONE;
-  //       sending_packet.length = 2;
-  //       modem_write((uint8_t*)&sending_packet, sending_packet.length);
-  //       break;
-    // }
-    // if(c=='\n'){
-    //   received_serial = receiving_serial;
-    //   receiving_serial = "";
-    //   serial_received = true;
-    // } else{
-    //   receiving_serial += c;
-    // }
-  // }
+void checkConsole(){
+  char c;
+  while(console.available() > 0){
+    c = console.read();
+//     GSPacket sending_packet;
+//     switch(c){
+//       case '0':
+//         std::cout << "Enabling writing" << std::endl;
+//         enable_writing = !enable_writing;
+//         break;
+//       case '1':
+//         std::cout << "Switching status file" << std::endl;
+//         logger.switch_status_file();
+//         break;
+//       case '2':
+//         std::cout << "Switching imaging data file" << std::endl;
+//         logger.switch_imaging_file();
+//         break;
+//       case '3':
+//         std::cout << "Sending status request" << std::endl;
+//         sending_packet.operation.protocol = PROTOCOL_STATUS;
+//         sending_packet.operation.operation = GS_STATUS_REQUEST;
+//         sending_packet.length = 2;
+//         // std::cout << "Sending GS packet with length " << (int)sending_packet.length << std::endl;
+//         // std::cout << "Protocol: " << sending_packet.operation.protocol << std::endl;
+//         // std::cout << "Operation: " << sending_packet.operation.operation << std::endl;
+//         modem_write((uint8_t*)&sending_packet, sending_packet.length);
+//         break;
+//       case '4':
+//         std::cout << "Sending status start transmission" << std::endl;
+//         sending_packet.operation.protocol = PROTOCOL_STATUS;
+//         sending_packet.operation.operation = GS_STATUS_START_TRANSMISSION;
+//         sending_packet.length = 2;
+//         // std::cout << "Sending GS packet with length " << (int)sending_packet.length << std::endl;
+//         // std::cout << "Protocol: " << sending_packet.operation.protocol << std::endl;
+//         // std::cout << "Operation: " << sending_packet.operation.operation << std::endl;
+//         // std::cout << "Writing to rx buffer: ";
+//         // for(int i = 0; i < sending_packet.length; i++){
+//         //   std::cout << (int)((uint8_t*)&sending_packet)[i] << " ";
+//         // }
+//         // std::cout << std::endl;
+//         modem_write((uint8_t*)&sending_packet, sending_packet.length);
+//         break;
+//       case '5':
+//         std::cout << "Sending resend status" << std::endl;
+//         sending_packet.operation.protocol = PROTOCOL_STATUS;
+//         sending_packet.operation.operation = GS_STATUS_RESEND_PACKET;
+//         for(unsigned int i = 0; i < 32; i++){
+//           sending_packet.data.resend.packets[i] = 0;
+//         }
+//         sending_packet.data.resend.packets[0] |= 0x2;
+//         // sending_packet.data.resend.packets[10] |= 0x10;
+//         // sending_packet.data.resend.packets[23] |= 0x8;
+//         gsPacket.data.resend.isDone = false;
+//         sending_packet.length = 35;
+//         modem_write((uint8_t*)&sending_packet, sending_packet.length);
+//         break;
+//       case '6':
+//         std::cout << "Sending status done" << std::endl;
+//         sending_packet.operation.protocol = PROTOCOL_STATUS;
+//         sending_packet.operation.operation = GS_STATUS_DONE;
+//         sending_packet.length = 2;
+//         modem_write((uint8_t*)&sending_packet, sending_packet.length);
+//         break;
+//       case '7':
+//         std::cout << "Sending imaging request" << std::endl;
+//         sending_packet.operation.protocol = PROTOCOL_IMAGING_DATA;
+//         sending_packet.operation.operation = GS_IMAGING_REQUEST;
+//         sending_packet.length = 2;
+//         modem_write((uint8_t*)&sending_packet, sending_packet.length);
+//         break;
+//       case '8':
+//         std::cout << "Sending status start transmission" << std::endl;
+//         sending_packet.operation.protocol = PROTOCOL_IMAGING_DATA;
+//         sending_packet.operation.operation = GS_IMAGING_START_TRANSMISSION;
+//         sending_packet.length = 2;
+//         modem_write((uint8_t*)&sending_packet, sending_packet.length);
+//         break;
+//       case '9':
+//         std::cout << "Sending resend status" << std::endl;
+//         sending_packet.operation.protocol = PROTOCOL_IMAGING_DATA;
+//         sending_packet.operation.operation = GS_IMAGING_RESEND_STATUS;
+//         for(unsigned int i = 0; i < 32; i++){
+//           gsPacket.data.resend.packets[i] = 0;
+//         }
+//         gsPacket.data.resend.packets[2] |= 0x2;
+//         gsPacket.data.resend.packets[10] |= 0x10;
+//         gsPacket.data.resend.packets[23] |= 0x8;
+//         gsPacket.data.resend.isDone = false;
+//         sending_packet.length = 35;
+//         modem_write((uint8_t*)&sending_packet, sending_packet.length);
+//         break;
+//       case 'a':
+//         std::cout << "Sending status done" << std::endl;
+//         sending_packet.operation.protocol = PROTOCOL_IMAGING_DATA;
+//         sending_packet.operation.operation = GS_IMAGING_DONE;
+//         sending_packet.length = 2;
+//         modem_write((uint8_t*)&sending_packet, sending_packet.length);
+//         break;
+//     }
+//     // if(c=='\n'){
+//     //   received_serial = receiving_serial;
+//     //   receiving_serial = "";
+//     //   serial_received = true;
+//     // } else{
+//     //   receiving_serial += c;
+//     // }
+  }
 
   // if(serial_received){
   //   serial_received = false;
@@ -209,10 +211,10 @@ void read_fifos(){
   //     comm_pointer = 0;
   //   }
   // }
-// }
+}
 
 void loop(){
-  // checkSerial();
+  checkConsole();
   updateRFComm();
   read_fifos();
 }
@@ -226,7 +228,8 @@ int main( int argc, char *argv[] ){
   std::thread status_thread (run_status_server);
   std::thread imaging_thread (run_imaging_server);
 
-  std::thread async_in_thread = start_serial_thread();
+  // std::thread async_in_thread = start_serial_thread();
+  running = true;
   while(running){
     loop();
   }
@@ -234,7 +237,7 @@ int main( int argc, char *argv[] ){
   cout << "Closing servers" << endl;
   status_server.close_server();
   imaging_server.close_server();
-  async_in_thread.join();
+  // async_in_thread.join();
   status_thread.join();
   imaging_thread.join();
   

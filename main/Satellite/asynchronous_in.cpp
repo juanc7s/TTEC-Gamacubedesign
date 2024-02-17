@@ -1,8 +1,6 @@
 #include <iostream>
 #include <thread>
 
-bool running = true;
-
 uint8_t serial_buffer[256];
 unsigned int serial_buffer_writing_pointer = 0;
 unsigned int serial_buffer_reading_pointer = 0;
@@ -10,6 +8,7 @@ unsigned int serial_buffer_size = 0;
 
 void serial_receiving_thread(){
   char c;
+  bool running = true;
   while(running){
     std::cin >> c;
     if(c=='e'){

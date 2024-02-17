@@ -13,9 +13,12 @@
 #include <cstdint>
 
 #include "../CommunicationProtocol.h"
-#include "RFModemOffline.h"
+#include "RFModem.h"
 #include "Timing.h"
 #include "Logger.h"
+#include "SerialConsole.h"
+
+extern SerialConsole console;
 
 extern uint8_t rxAddh;
 extern uint8_t rxAddl;
@@ -31,14 +34,6 @@ extern GSPacket gsPacket;
 extern uint8_t number_of_packets;
 extern const uint8_t N_status;
 extern const uint8_t N_imaging;
-
-// extern unsigned long int reading_status_counter;
-// extern unsigned long int reading_imaging_counter;
-// extern unsigned long int writing_status_counter;
-// extern unsigned long int writing_imaging_counter;
-
-// extern unsigned int reading_status_file_pointer;
-// extern unsigned int reading_imaging_file_pointer;
 
 void sendSatPacket();
 
@@ -56,16 +51,7 @@ void switchCaseStatusProtocol();
 void switchCaseImagingDataProtocol();
 void switchCaseSetOperationProtocol();
 
-
 void switch_status_file();
 void switch_imaging_file();
-
-// void readSatStatusPacket(HealthData *healthData, unsigned int index);
-// void writeSatStatusPacket(unsigned long int t,
-//   float bv, float bcu, float bch, float bt, float ti, float te,
-//   unsigned long int sd, uint8_t* rasp_data);
-
-// void readSatImagingDataPacket(ImagingData *imagingData, unsigned int index);
-// void writeSatImagingDataPacket();
 
 #endif

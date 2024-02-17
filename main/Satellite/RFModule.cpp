@@ -30,6 +30,9 @@ GSPacket gsPacket;
 
 uint8_t rx_pointer = 0;
 
+// void (*console_write)(uint8_t b);
+SerialConsole console;
+
 void preStatusProtocol(){
   if(reading_status_counter==0){
     if(writing_status_counter>0){
@@ -166,8 +169,6 @@ void switchCaseStatusProtocol(){
       satPacket.operation.operation = SATELLITE_STATUS_PACKETS_AVAILABLE;
       satPacket.byte_data.number_of_packets = number_of_packets;
       satPacket.length = 3;
-      std::cout << "AAA " << (int)satPacket.byte_data.number_of_packets << std::endl;
-      print_satPacket_bytes(satPacket);
       sendSatPacket();
       break;
     case GS_STATUS_START_TRANSMISSION:
