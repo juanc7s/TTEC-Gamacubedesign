@@ -1,4 +1,21 @@
 #include <stdio.h>
+#include <iostream>
+
+using namespace std;
+
+#include "../CommunicationProtocol.h"
+
+void print_status_packet_bytes(HealthData statusPacket){
+  cout << "Packet index: " << statusPacket.index << endl;
+  cout << "Reading time: " << statusPacket.time << endl;
+  cout << "Battery charge: " << statusPacket.battery_charge << endl;
+  cout << "Battery current: " << statusPacket.battery_current << endl;
+  cout << "Battery voltage: " << statusPacket.battery_voltage << endl;
+  cout << "Battery temperature: " << statusPacket.battery_temperature << endl;
+  cout << "External temperature: " << statusPacket.external_temperature << endl;
+  cout << "Internal temperature: " << statusPacket.internal_temperature << endl;
+  cout << "Memory usage: " << statusPacket.sd_memory_usage << endl;
+}
 
 void print_status_packet_bytes(HealthData statusPacket){
   for(int i = 0; i < sizeof(HealthData); i++){

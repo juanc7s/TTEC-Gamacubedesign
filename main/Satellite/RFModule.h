@@ -12,7 +12,7 @@
 
 #include <cstdint>
 
-#include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/main/CommunicationProtocol.h"
+#include "../CommunicationProtocol.h"
 #include "RFModemOffline.h"
 #include "Timing.h"
 #include "Logger.h"

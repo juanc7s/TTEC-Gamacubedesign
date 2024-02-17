@@ -10,7 +10,7 @@
 using namespace std;
 
 #include "DataFIFO.h"
-#include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/main/CommunicationProtocol.h"
+#include "../CommunicationProtocol.h"
 
 class ImagingDataServer{
   public:

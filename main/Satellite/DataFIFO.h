@@ -2,7 +2,7 @@
 #define DATA_FIFO_H
 
 #include <iostream>
-#include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/main/CommunicationProtocol.h"
+#include "../CommunicationProtocol.h"
 
 class FIFO{
   public:

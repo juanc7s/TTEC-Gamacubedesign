@@ -6,7 +6,7 @@
 #include <iostream>
 using namespace std;
 
-#include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/main/CommunicationProtocol.h"
+#include "../CommunicationProtocol.h"
 
 extern uint8_t rx_buffer[255];
 extern unsigned int rx_buffer_writing_pointer;
