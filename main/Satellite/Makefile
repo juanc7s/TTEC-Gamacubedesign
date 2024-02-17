@@ -7,32 +7,37 @@ LibFolder := $(HomeFolder)
 
 LoraLib := $(LibFolder)/sx1278-LoRa-RaspberryPi
 
-LoRa.o: /LoRa.c
-	gcc -c $(LoraLib)/LoRa.c -o $(LoraLib)/LoRa.o -lpigpio -lrt -pthread -lm
+# OFFLINE
 
 CommunicationProtocol.o: CommunicationProtocol.h
 	g++ -c CommunicationProtocol.h -o CommunicationProtocol.o
 
+Timing.o: Timing.cpp
+	g++ -c Timing.cpp -o Timing.o
+
 Logger.o: Logger.cpp
-	g++ -c Logger.cpp -o Logger.o -lpigpio -lrt -pthread -lm
+	g++ -c Logger.cpp -o Logger.o -lrt -pthread -lm
+
+RFModemOffline.o: RFModemOffline.cpp
+	g++ -c RFModemOffline.cpp -o RFModemOffline.o -lrt -pthread -lm
 
 RFModule.o: RFModule.cpp
-	g++ -c RFModule.cpp -o RFModule.o -lpigpio -lrt -pthread -lm
+	g++ -c RFModule.cpp -o RFModule.o -lrt -pthread -lm
 
-StatusDataServer.o: StatusDataServer.cpp
-	g++ -c StatusDataServer.cpp -o StatusDataServer.o
+StatusServer.o: StatusServer.cpp
+	g++ -c StatusServer.cpp -o StatusServer.o
 
-ImagingDataServer.o: ImagingDataServer.cpp
-	g++ -c ImagingDataServer.cpp -o ImagingDataServer.o
+ImagingServer.o: ImagingServer.cpp
+	g++ -c ImagingServer.cpp -o ImagingServer.o
 
 DataFIFO.o: DataFIFO.cpp
 	g++ -c DataFIFO.cpp -o DataFIFO.o
 
 SatTTC.o: SatTTC.cpp
-	g++ -c SatTTC.cpp -o SatTTC.o -lpigpio -lrt -pthread -lm -I $(LibFolder)
+	g++ -c SatTTC.cpp -o SatTTC.o -lrt -pthread -lm
 
-SatTTC.out: $(LoraLib)/LoRa.o Logger.o SatTTC.o ImagingDataServer.o StatusDataServer.o DataFIFO.o
-	g++ -o SatTTC.out SatTTC.o $(LoraLib)/LoRa.o Logger.o ImagingDataServer.o StatusDataServer.o DataFIFO.o -lpigpio -lrt -pthread -lm
+SatTTC.out: Timing.o Logger.o RFModule.o RFModemOffline.o SatTTC.o ImagingServer.o StatusServer.o DataFIFO.o
+	g++ -o SatTTC.out SatTTC.o Timing.o Logger.o RFModule.o RFModemOffline.o ImagingServer.o StatusServer.o DataFIFO.o -lrt -pthread -lm
 
 clean:
 	rm *.o *.out
