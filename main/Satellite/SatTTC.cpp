@@ -11,6 +11,7 @@ using namespace std;
     #include "sx1278-LoRa-RaspberryPi/LoRa.h"
   }
 #endif
+#include "RFModem.h"
 
 #include "Logger.h"
 #include "RFModule.h"
@@ -19,6 +20,10 @@ using namespace std;
 #include "StatusServer.cpp"
 #include "ImagingServer.cpp"
 
+#include "asynchronous_in.cpp"
+
+#include "printing_utils.cpp"
+
 unsigned long int status_write_period = 500;
 unsigned long int imaging_write_period = 250;
 unsigned long int status_write_time = 0;
@@ -26,83 +31,33 @@ unsigned long int imaging_write_time = 0;
 
 bool enable_writing = false;
 
-bool running = true;
-
 ImagingFIFO imaging_fifo;
 StatusFIFO status_fifo;
 
-ImagingDataServer server_1(&imaging_fifo, 8080);
-StatusDataServer server_2(&status_fifo, 8081);
+StatusDataServer status_server(&status_fifo, 8081);
+ImagingDataServer imaging_server(&imaging_fifo, 8080);
 
-void run_server_1(){
-  server_1.run_server();
+void run_status_server(){
+  status_server.run_server();
 }
 
-void run_server_2(){
-  server_2.run_server();
+void run_imaging_server(){
+  imaging_server.run_server();
 }
 
 void read_fifos(){
   while(imaging_fifo.available()){
     ImagingData imagingPacket = imaging_fifo.read();
     logger.writeSatImagingDataPacket(imagingPacket);
-    // cout << "Imaging FIFO: " << endl;
-    // for(int i = 0; i < 5; i++){
-    //   cout << "Index: " << newPacket.lightnings[i].index << endl;
-    //   cout << "Duration: " << newPacket.lightnings[i].duration << endl;
-    //   cout << "Size: " << newPacket.lightnings[i].radius << endl;
-    //   cout << "x: " << newPacket.lightnings[i].x << endl;
-    //   cout << "y: " << newPacket.lightnings[i].y << endl << endl;
-    // }
-    // cout << endl;
   }
   while(status_fifo.available()){
     HealthData statusPacket = status_fifo.read();
-    // cout << "Packet bytes: " << endl;
-    // for(int i = 0; i < sizeof(HealthData); i++){
-    //   cout << (int)(((uint8_t*)&statusPacket)[i]) << " ";
-    // }
-    // cout << endl; 
     logger.writeSatStatusPacket(statusPacket);
   }
 }
 
-uint8_t serial_buffer[256];
-unsigned int serial_buffer_writing_pointer = 0;
-unsigned int serial_buffer_reading_pointer = 0;
-unsigned int serial_buffer_size = 0;
-
-void serial_receiving_thread(){
-  char c;
-  while(running){
-    std::cin >> c;
-    if(c=='e'){
-      running = false;
-    } else{
-      serial_buffer[serial_buffer_writing_pointer++] = c;
-      if(serial_buffer_writing_pointer==256){
-        serial_buffer_writing_pointer = 0;
-      }
-      serial_buffer_size++;
-    }
-  }
-}
-
-uint8_t serial_available(){
-  return serial_buffer_size;
-}
-
-uint8_t serial_read(){
-  serial_buffer_size--;
-  uint8_t b = serial_buffer[serial_buffer_reading_pointer++];
-  if(serial_buffer_reading_pointer==256){
-    serial_buffer_reading_pointer = 0;
-  }
-  return b;
-}
-
-void checkSerial(){
-  char c;
+// void checkSerial(){
+//   char c;
   // while(serial_available()){
   //   c = serial_read();
   //   GSPacket sending_packet;
@@ -208,7 +163,7 @@ void checkSerial(){
     // } else{
     //   receiving_serial += c;
     // }
-  }
+  // }
 
   // if(serial_received){
   //   serial_received = false;
@@ -255,61 +210,37 @@ void checkSerial(){
   //     comm_pointer = 0;
   //   }
   // }
-}
+// }
 
 void loop(){
-  checkSerial();
+  // checkSerial();
   updateRFComm();
   read_fifos();
-
-  // unsigned long int t = millis();
-  // if(t > status_write_time){
-  //   status_write_time += status_write_period;
-  //   if(enable_writing){
-  //     std::cout << "Writing status data" << std::endl;
-  //     write_status_data();
-  //   }
-  // }
-  // if(t > imaging_write_time){
-  //   imaging_write_time += imaging_write_period;
-  //   if(enable_writing){
-  //     std::cout << "Writing imaging data" << std::endl;
-  //     // write_imaging_data();
-  //   }
-  // }
 }
 
 int main( int argc, char *argv[] ){
-  std::cout << "Testing Raspberry Gama Satellite communication system with LoRa Ra-01 rf module\n";
+  std::cout << "Raspberry Gama Satellite communication system with LoRa Ra-01 rf module\n";
 
   initRFModule();
   std::cout << "Device initiated successfully\n";
 
-  std::thread thread_1 (run_server_1);
-  std::thread thread_2 (run_server_2);
-  
-  // setReceiveCallback(onReceive);
-  // for(int i = 0; i < 30; i++){
-  //   write_status_data();
-  // }
-  // for(int i = 0; i < 30; i++){
-  //   write_imaging_data();
-  // }
+  std::thread status_thread (run_status_server);
+  std::thread imaging_thread (run_imaging_server);
 
-  std::thread thread_object (serial_receiving_thread);
+  std::thread async_in_thread = start_serial_thread();
   while(running){
     loop();
   }
 
   cout << "Closing servers" << endl;
-  server_1.close_server();
-  server_2.close_server();
-  thread_object.join();
-  thread_1.join();
-  thread_2.join();
+  status_server.close_server();
+  imaging_server.close_server();
+  async_in_thread.join();
+  status_thread.join();
+  imaging_thread.join();
   
   exit(1);
 
-  // LoRa_end(&modem);
+  modem_finish();
   return 0;
 }
