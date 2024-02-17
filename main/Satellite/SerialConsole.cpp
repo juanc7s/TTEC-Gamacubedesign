@@ -2,7 +2,7 @@
 
 void SerialConsole::write(uint8_t b){
   buffer[writing_pointer++] = b;
-  if(writing_pointer == buffer_size){
+  if(writing_pointer >= buffer_size){
     writing_pointer = 0;
   }
   reading_size++;
@@ -10,7 +10,7 @@ void SerialConsole::write(uint8_t b){
 
 uint8_t SerialConsole::read(){
   uint8_t b = buffer[reading_pointer++];
-  if(reading_pointer == buffer_size){
+  if(reading_pointer >= buffer_size){
     reading_pointer = 0;
   }
   reading_size--;
