@@ -21,7 +21,6 @@ using namespace std;
 #include "ImagingServer.cpp"
 
 #include "asynchronous_in.cpp"
-
 #include "printing_utils.cpp"
 
 unsigned long int status_write_period = 500;
