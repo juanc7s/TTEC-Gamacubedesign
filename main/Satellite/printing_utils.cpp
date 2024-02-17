@@ -38,3 +38,11 @@ void print_imaging_packet_bytes(ImagingData imagingPacket){
     cout << (int)(((uint8_t*)&imagingPacket)[i]) << " ";
   }
 }
+
+void print_operation(GSPacket gsPacket){
+  cout << "Active thermal control: " << gsPacket.data.operation.switch_active_thermal_control ? "ON" : "OFF";
+  cout << "Attitude control: " << gsPacket.data.operation.switch_attitude_control ? "ON" : "OFF";
+  cout << "Imaging: " << gsPacket.data.operation.switch_imaging ? "ON" : "OFF";
+  cout << "Imaging mode: " << gsPacket.data.operation.switch_imaging_mode ? "Mode 2" : "Mode 1";
+  cout << "Stand by: " << gsPacket.data.operation.switch_stand_by_mode ? "ON" : "OFF";
+}

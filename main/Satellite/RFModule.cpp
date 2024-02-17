@@ -297,11 +297,6 @@ void switchCaseSetOperationProtocol(){
   switch(gsPacket.operation.operation){
     case GS_SET_OPERATION:
       DBG_Println("O:1");
-      // DBG_Print("Active thermal control: ");DBG_Println(gsPacket.data.operation.switch_active_thermal_control ? "ON" : "OFF");
-      // DBG_Print("Attitude control: ");DBG_Println(gsPacket.data.operation.switch_attitude_control ? "ON" : "OFF");
-      // DBG_Print("Imaging: ");DBG_Println(gsPacket.data.operation.switch_imaging ? "ON" : "OFF");
-      // DBG_Print("Imaging mode: ");DBG_Println(gsPacket.data.operation.switch_imaging_mode ? "Mode 2" : "Mode 1");
-      // DBG_Print("Stand by: ");DBG_Println(gsPacket.data.operation.switch_stand_by_mode ? "ON" : "OFF");
       satPacket.operation.protocol = PROTOCOL_SET_OPERATION;
       satPacket.operation.operation = SATELLITE_SET_OPERATION_ECHO;
       satPacket.data.operation_echo.switch_active_thermal_control = gsPacket.data.operation.switch_active_thermal_control;
@@ -309,7 +304,7 @@ void switchCaseSetOperationProtocol(){
       satPacket.data.operation_echo.switch_imaging = gsPacket.data.operation.switch_imaging;
       satPacket.data.operation_echo.switch_imaging_mode = gsPacket.data.operation.switch_imaging_mode;
       satPacket.data.operation_echo.switch_stand_by_mode = gsPacket.data.operation.switch_stand_by_mode;
-      satPacket.length = 3+sizeof(GSOperation);
+      satPacket.length = sizeof(SatPacket);//3+sizeof(GSOperation);
       sendSatPacket();
       break;
     case GS_SET_OPERATION_DONE:
