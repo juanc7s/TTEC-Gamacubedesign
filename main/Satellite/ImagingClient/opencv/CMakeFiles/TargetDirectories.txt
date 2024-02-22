@@ -1,0 +1,3 @@
+/home/bcr/rasp/opencv/CMakeFiles/rebuild_cache.dir
+/home/bcr/rasp/opencv/CMakeFiles/edit_cache.dir
+/home/bcr/rasp/opencv/CMakeFiles/main.dir
