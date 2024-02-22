@@ -161,7 +161,6 @@ struct SatPacket{
   uint8_t length;
   ProtocolOperation operation;
   ByteData byte_data;
-  // long long number_of_packets;
   SatData data;
 };
 

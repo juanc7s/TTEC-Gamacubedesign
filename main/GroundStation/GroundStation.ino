@@ -3,6 +3,9 @@
 
 #include "Control.h"
 #include "GSComm.h"
+// #include "C:\Users\Vitinho\Desktop\TTEC-Gamacubedesign\main\CommunicationProtocol.h"
+#include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/main/CommunicationProtocol.h"
+// #include "../CommunicationProtocol.h"
 
 const int csPin = 10;          // LoRa radio chip select
 const int resetPin = 9;       // LoRa radio reset
@@ -12,7 +15,7 @@ void setup(){
   Serial.begin(57600);                   // initialize serial
   while (!Serial);
 
-  Serial.println("Testing Gama Ground Station communication system with LoRa Ra-01 rf module");
+  Serial.println("Gama Ground Station communication system with LoRa Ra-01 rf module");
 
   // override the default CS, reset, and IRQ pins (optional)
   LoRa.setPins(csPin, resetPin, irqPin);// set CS, reset, IRQ pin

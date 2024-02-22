@@ -7,6 +7,7 @@ import SerialTransmission
 
 import Control
 import GroundStation
+import Logger
 
 class App(tk.Tk):
   def __init__(self):
@@ -14,13 +15,9 @@ class App(tk.Tk):
     self.title('GamaCubedesign Ground Station')
 
     self.serial = SerialTransmission.SerialTransmission(self)
-
-    # left_frame = ttk.Frame(master=self)
-    # left_frame.pack(side='left', fill='both')
     
     self.init_variables()
     self.init_layout()
-    # self.mcu_frame = tk.Column([[self.active_mcu]])
     self.detect_ports()
 
   def init_variables(self):
@@ -46,9 +43,12 @@ class App(tk.Tk):
     ttk.Button(master=open_frame,textvariable=self.open_close_variable,command=self.open_close_channel).pack(side='left',fill='both')
 
     self.control_frame = tk.Frame(master=self)
-    self.control = Control.ControlFrame(self.control_frame, self.serial)
     self.ground_station_frame = tk.Frame(master=self)
+    self.logger_frame = tk.Frame(master=self)
+    
+    self.control = Control.ControlFrame(self.control_frame, self.serial)
     self.ground_station = GroundStation.GroundStation(root=self.ground_station_frame, serial=self.serial)
+    self.logger = Logger.LoggerFrame(self.control_frame, self.serial, self.logger)
   
   def detect_ports(self):
     self.ports_dict = dict()
@@ -64,6 +64,7 @@ class App(tk.Tk):
       if self.serial.begin(self.ports_dict[self.port_combobox.get()], self.baudrate.get()):
         self.control_frame.pack(side='left',fill='both')
         self.ground_station_frame.pack(side='left',fill='both')
+        self.logger_frame.pack(side='bottom',fill='both')
         self.control.begin(self.serial)
         self.ground_station.begin(self.serial)
         self.open_close_variable.set("Close channel")
@@ -75,6 +76,7 @@ class App(tk.Tk):
       self.serial.close()
       self.control_frame.pack_forget()
       self.ground_station_frame.pack_forget()
+      self.logger_frame.pack_forget()
       self.open_close_variable.set("Open channel")
       # self.control_frame.pack_forget()
       # self.control_frame.pack()

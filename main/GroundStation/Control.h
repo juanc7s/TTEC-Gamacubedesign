@@ -3,8 +3,14 @@
 
 #include <SPI.h>              // include libraries
 #include <LoRa.h>
+
 #include "GSComm.h"
+// #include "C:\Users\Vitinho\Desktop\TTEC-Gamacubedesign\main\CommunicationProtocol.h"
 #include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/main/CommunicationProtocol.h"
+// #include "../CommunicationProtocol.h"
+
+extern const char CONTROL_STR[];
+extern const char PRINT_STR[];
 
 extern uint8_t txAddh;
 extern uint8_t txAddl;
@@ -58,5 +64,9 @@ void setAttitudeControl(uint8_t);
 void setImaging(uint8_t);
 void setImagingMode(uint8_t);
 void setStandByMode(uint8_t);
+
+void control_print_status_packet();
+void control_print_imaging_packet();
+void control_print_packet_info();
 
 #endif

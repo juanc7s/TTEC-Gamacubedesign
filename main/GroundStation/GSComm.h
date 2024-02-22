@@ -3,8 +3,11 @@
 
 #include <SPI.h>              // include libraries
 #include <LoRa.h>
+
+#include "Control.h"
 // #include "C:\Users\Vitinho\Desktop\TTEC-Gamacubedesign\main\CommunicationProtocol.h"
 #include "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/main/CommunicationProtocol.h"
+// #include "../CommunicationProtocol.h"
 
 extern uint8_t txAddh;
 extern uint8_t txAddl;

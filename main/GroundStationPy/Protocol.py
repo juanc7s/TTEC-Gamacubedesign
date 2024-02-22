@@ -2,7 +2,7 @@ import json
 
 import sys
 
-workspace = sys.argv[1]
+# workspace = sys.argv[1]
 
 def get_protocol():
     protocol = None

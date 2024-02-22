@@ -7,6 +7,7 @@ uint8_t txAddl = 0x06;
 // uint8_t rxChan = 10;
 uint8_t rxAddh = 0x8f;
 uint8_t rxAddl = 0xf7;
+
 uint8_t bandwidth = 7;
 unsigned long spi_frequency = 8E6;
 unsigned long frequency = 433E6;
@@ -28,21 +29,21 @@ Operation operation = {
 };
 
 uint8_t rx_pointer = 0;
-  
-// TelemetryData telemetryData;
+
 SatPacket satPacket;
 GSPacket gsPacket;
 
 void sendGSPacket(){
-  Serial.print("Sending a message of length ");
+  Serial.print(PRINT_STR);
+  Serial.print("Sending a message:Length:");
   Serial.println(gsPacket.length);
 
   LoRa.beginPacket();                                 // start packet
-  LoRa.write(txAddh);                                 // add destination high address
-  LoRa.write(txAddl);                                 // add destination low address
-  LoRa.write(rxAddh);                                 // add sender high address
-  LoRa.write(rxAddl);                                 // add sender low address
-  LoRa.write(gsPacket.length);                        // add payload length
+  // LoRa.write(txAddh);                                 // add destination high address
+  // LoRa.write(txAddl);                                 // add destination low address
+  // LoRa.write(rxAddh);                                 // add sender high address
+  // LoRa.write(rxAddl);                                 // add sender low address
+  // LoRa.write(gsPacket.length);                        // add payload length
   LoRa.write((uint8_t*)&gsPacket, gsPacket.length);   // add payload
   LoRa.endPacket();                                   // finish packet and send it
 
@@ -102,14 +103,13 @@ void updateRFComm(){
   // parse for a packet, and call onReceive with the result:
   unsigned int packetSize = LoRa.parsePacket();
   if(packetSize > 0){
-    unsigned int recipient = (LoRa.read()<<8) | LoRa.read();          // recipient address
-    unsigned int sender = (LoRa.read()<<8) | LoRa.read();            // sender address
-    unsigned int incomingLength = LoRa.read();    // incoming msg length
+    // unsigned int recipient = (LoRa.read()<<8) | LoRa.read();          // recipient address
+    // unsigned int sender = (LoRa.read()<<8) | LoRa.read();            // sender address
+    // unsigned int incomingLength = LoRa.read();    // incoming msg length
 
     uint8_t b;
     while(LoRa.available()){
       b = LoRa.read();
-      // Serial.println(b);
       ((uint8_t*)(&satPacket))[rx_pointer++] = b;
       if(rx_pointer>0 && rx_pointer==satPacket.length){
         telemetry_received = true;
@@ -173,18 +173,7 @@ void startSetOperationProtocol(){
 }
 
 void onReceive(){
-  Serial.print("\n\nReceiving telemetry of length ");
-  Serial.println(satPacket.length);
-  Serial.println(satPacket.operation.protocol);
-  Serial.println(satPacket.operation.operation);
-  Serial.print("Telemetry received!\n\n");
-  // Serial.print("Packet index: ");Serial.println(telemetry.index);
-  // Serial.print("Packet Data: ");Serial.write(telemetry.data, telemetry.length-2);
-  Serial.println("");
-  // Serial.print("Instrument 1: ");Serial.println(telemetry.instrument_1);
-  // Serial.print("Instrument 2: ");Serial.println(telemetry.instrument_2);
-  // Serial.print("Instrument 3: ");Serial.println(telemetry.instrument_3);
-  // Serial.print("Instrument 4: ");Serial.println(telemetry.instrument_4);
+  control_print_packet_info();
   switch(satPacket.operation.protocol){
     case PROTOCOL_STATUS:
       switchCaseStatusProtocol();
@@ -196,17 +185,17 @@ void onReceive(){
       switchCaseSetOperationProtocol();
       break;
   }
-  Serial.println("Next");
 }
 
 void switchCaseStatusProtocol(){
   unsigned int k = 0;
   switch(satPacket.operation.operation){
     case SATELLITE_STATUS_PACKETS_AVAILABLE:
-      Serial.print("Status: packets avilable: ");Serial.println(satPacket.data.number_of_packets);
+      Serial.print(PRINT_STR);
+      Serial.print("Status: packets available: ");Serial.println(satPacket.byte_data.number_of_packets);
       for(unsigned int i = 0; i < 32; i++){
         for(unsigned int j = 0; j < 8; j++){
-          if(k < satPacket.data.number_of_packets){
+          if(k < satPacket.byte_data.number_of_packets){
             bitSet(gsPacket.data.resend.packets[i],j);
           } else{
             bitClear(gsPacket.data.resend.packets[i],j);
@@ -219,23 +208,11 @@ void switchCaseStatusProtocol(){
       sendGSPacket();
       break;
     case SATELLITE_STATUS_PACKET:
-      Serial.print("Status: Received packet ");
-      Serial.println(satPacket.index);
-      bitClear(gsPacket.data.resend.packets[satPacket.index>>3],satPacket.index&0x07);
-      
-      Serial.print("Reading time: ");Serial.println(satPacket.data.healthData.time);
-      Serial.print("Battery voltage: ");Serial.println(satPacket.data.healthData.battery_voltage);
-      Serial.print("Battery current: ");Serial.println(satPacket.data.healthData.battery_current);
-      Serial.print("Battery charge: ");Serial.println(satPacket.data.healthData.battery_charge);
-      Serial.print("Battery temperature: ");Serial.println(satPacket.data.healthData.battery_temperature);
-      Serial.print("Internal temperature: ");Serial.println(satPacket.data.healthData.internal_temperature);
-      Serial.print("External temperature: ");Serial.println(satPacket.data.healthData.external_temperature);
-      Serial.print("SD memory usage: ");Serial.println(satPacket.data.healthData.sd_memory_usage);
-      for(uint8_t i = 0; i < 10; i++){
-        Serial.println(satPacket.data.healthData.rasp_data[i]);
-      }
+      bitClear(gsPacket.data.resend.packets[satPacket.byte_data.index>>3],satPacket.byte_data.index&0x07);
+      control_print_status_packet();
       break;
     case SATELLITE_STATUS_PACKETS_DONE:
+      Serial.print(PRINT_STR);
       Serial.println("Status: Packets done");
       gsPacket.data.resend.isDone = true;
       for(unsigned int i = 0; i < 32; i++){
@@ -251,11 +228,12 @@ void switchCaseStatusProtocol(){
       } else{
         gsPacket.operation.protocol = PROTOCOL_IMAGING_DATA;
         gsPacket.operation.operation = GS_IMAGING_RESEND_STATUS;
-        gsPacket.length = 35;
+        gsPacket.length = sizeof(SatPacket);//35;
       }
       sendGSPacket();
       break;
     case SATELLITE_STATUS_DONE:
+      Serial.print(PRINT_STR);
       Serial.println("Status: Done");
       talking = false;
       break;
@@ -266,11 +244,12 @@ void switchCaseImagingDataProtocol(){
   unsigned int k = 0;
   switch(satPacket.operation.operation){
     case SATELLITE_IMAGING_PACKETS_AVAILABLE:
+      Serial.print(PRINT_STR);
       Serial.print("Imaging: Number of packets available: ");
-      Serial.println(satPacket.data.number_of_packets);
+      Serial.println(satPacket.byte_data.number_of_packets);
       for(unsigned int i = 0; i < 32; i++){
         for(unsigned int j = 0; j < 8; j++){
-          if(k < satPacket.data.number_of_packets){
+          if(k < satPacket.byte_data.number_of_packets){
             bitSet(gsPacket.data.resend.packets[i],j);
           } else{
             bitClear(gsPacket.data.resend.packets[i],j);
@@ -283,11 +262,11 @@ void switchCaseImagingDataProtocol(){
       sendGSPacket();
       break;
     case SATELLITE_IMAGING_PACKET:
-      Serial.print("Imaging: Received packet ");
-      Serial.println(satPacket.index);
-      bitClear(gsPacket.data.resend.packets[satPacket.index>>3],satPacket.index&0x07);
+      bitClear(gsPacket.data.resend.packets[satPacket.byte_data.index>>3],satPacket.byte_data.index&0x07);
+      control_print_status_packet();
       break;
     case SATELLITE_IMAGING_PACKETS_DONE:
+      Serial.print(PRINT_STR);
       Serial.println("Imaging: Packets done");
       gsPacket.data.resend.isDone = true;
       for(unsigned int i = 0; i < 32; i++){
@@ -303,11 +282,12 @@ void switchCaseImagingDataProtocol(){
       } else{
         gsPacket.operation.protocol = PROTOCOL_IMAGING_DATA;
         gsPacket.operation.operation = GS_IMAGING_RESEND_STATUS;
-        gsPacket.length = 35;
+        gsPacket.length = sizeof(SatPacket);//35;
       }
       sendGSPacket();
       break;
     case SATELLITE_IMAGING_DONE:
+      Serial.print(PRINT_STR);
       Serial.println("Imaging: Done");
       talking = false;
       break;
@@ -317,19 +297,23 @@ void switchCaseImagingDataProtocol(){
 void switchCaseSetOperationProtocol(){
   switch(satPacket.operation.operation){
     case SATELLITE_SET_OPERATION_ECHO:
+      Serial.print(PRINT_STR);
       Serial.println("Set operation: Echo");
-      if(satPacket.data.byte == *((uint8_t*)&operation)){
-        Serial.println("Operation correct");
+      if(satPacket.byte_data.byte == *((uint8_t*)&operation)){
+        Serial.print(PRINT_STR);
+        Serial.println("Set operation: Operation correct");
         gsPacket.operation.protocol = PROTOCOL_SET_OPERATION;
         gsPacket.operation.operation = GS_SET_OPERATION_DONE;
         gsPacket.length = 2;
         sendGSPacket();
       } else{
-        Serial.println("Operation incorrect, resending");
+        Serial.print(PRINT_STR);
+        Serial.println("Set operation: Operation incorrect, resending");
         startSetOperationProtocol();
       }
       break;
     case SATELLITE_SET_OPERATION_DONE:
+      Serial.print(PRINT_STR);
       Serial.println("Set operation: Done");
       rx_pointer = 0;
       talking = false;

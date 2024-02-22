@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include "Control.h"
 
+const char PRINT_STR[] = "PRINT:";
 const char CONTROL_STR[] = "CONTROL:";
 
 bool serialFlag = false;
@@ -20,7 +21,6 @@ void checkControl(){
   uint8_t c;
   while(Serial.available()){
     c = Serial.read();
-    // Serial.println((uint8_t)c);
     if(serialFlag){
       parsing_function(c);
       serialFlag = false;
@@ -45,11 +45,7 @@ void number_parser(uint8_t c){
     number_parser_N *= 10;
     number_parser_N += c-48;
   }
-} 
-
-// void decodeSerial(){
-
-// }
+}
 
 void parseSerial(uint8_t c){
   switch(c){
@@ -76,13 +72,13 @@ void parseSerial(uint8_t c){
       break;
     case READ_FREQUENCY:
       Serial.print(CONTROL_STR);Serial.print("FREQUENCY:");
-      Serial.print(frequency);
-      Serial.println(" MHz");
+      Serial.println(frequency);
+      // Serial.println(" MHz");
       break;
     case READ_SPI_FREQUENCY:
       Serial.print(CONTROL_STR);Serial.print("SPI_FREQUENCY:");
-      Serial.print(spi_frequency);
-      Serial.println(" Hz");
+      Serial.println(spi_frequency);
+      // Serial.println(" Hz");
       break;
     case READ_SPREADING_FACTOR:
       Serial.print(CONTROL_STR);Serial.print("SPREADING_FACTOR:");
@@ -90,8 +86,8 @@ void parseSerial(uint8_t c){
       break;
     case READ_TRANSMISSION_POWER:
       Serial.print(CONTROL_STR);Serial.print("TXPW:");
-      Serial.print(tx_power);
-      Serial.println(" dBm");
+      Serial.println(tx_power);
+      // Serial.println(" dBm");
       break;
     case READ_ALL:
       // printConfiguration();
@@ -239,7 +235,8 @@ void control_setSPIFrequency(){
   spi_frequency = number_parser_N;
   LoRa.setSPIFrequency(spi_frequency);
   if (!LoRa.begin(frequency)) {             // initialize ratio at set frequency
-    Serial.println("CONTROL:LoRa init failed. Check your connections.");
+    Serial.print(PRINT_STR);
+    Serial.println("LoRa init failed. Check your connections.");
     while (true);                       // if failed, do nothing
   }
   parsing_function = parseSerial;
@@ -290,4 +287,43 @@ void setImagingMode(uint8_t c){
 
 void setStandByMode(uint8_t c){
   operation.switch_stand_by_mode = c==1;
+}
+
+void control_print_status_packet(){
+  Serial.print(PRINT_STR);
+  Serial.print("Status: Received packet");
+  Serial.println(satPacket.byte_data.index);
+  Serial.print("STATUS_PACKET:");
+  Serial.print(":Reading time:");Serial.print(satPacket.data.healthData.time);
+  Serial.print(":Battery voltage:");Serial.print(satPacket.data.healthData.battery_voltage);
+  Serial.print(":Battery current:");Serial.print(satPacket.data.healthData.battery_current);
+  Serial.print(":Battery charge:");Serial.print(satPacket.data.healthData.battery_charge);
+  Serial.print(":Battery temperature:");Serial.print(satPacket.data.healthData.battery_temperature);
+  Serial.print(":Internal temperature:");Serial.print(satPacket.data.healthData.internal_temperature);
+  Serial.print(":External temperature:");Serial.print(satPacket.data.healthData.external_temperature);
+  Serial.print(":SD memory usage:");Serial.println(satPacket.data.healthData.sd_memory_usage);
+  // for(uint8_t i = 0; i < 10; i++){
+  //   Serial.println(newPacket.data.healthData.rasp_data[i]);
+  // }
+}
+
+void control_print_imaging_packet(){
+  Serial.print(PRINT_STR);
+  Serial.print("Imaging: Received packet ");
+  Serial.println(satPacket.byte_data.index);
+  Serial.print("IMAGING_PACKET:");
+  Serial.print("Index:");Serial.print(satPacket.data.imagingData.lightnings[0].index);
+  Serial.print("Duration:");Serial.print(satPacket.data.imagingData.lightnings[0].duration);
+  Serial.print("Radius:");Serial.print(satPacket.data.imagingData.lightnings[0].radius);
+  Serial.print("X:");Serial.print(satPacket.data.imagingData.lightnings[0].x);
+  Serial.print("Y:");Serial.println(satPacket.data.imagingData.lightnings[0].y);
+}
+
+void control_print_packet_info(){
+  Serial.print(PRINT_STR);
+  Serial.print("Receiving telemetry:Length:");
+  Serial.print(satPacket.length);
+  Serial.print(":Protocol:");Serial.print(satPacket.operation.protocol);
+  Serial.print(":Operation:");Serial.print(satPacket.operation.operation);
+  Serial.println(":Telemetry received!");
 }
