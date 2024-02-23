@@ -6,6 +6,7 @@
 #include <fstream>
 #include <thread>
 #include "../ImagingDataClient.cpp" 
+#include "../../../CommunicationProtocol.h"
 
 ImagingData testingData;
 ImagingDataClient imagingSocket(8080);
@@ -42,11 +43,19 @@ int main()
    		 cout << "Goodbye" << endl;
    		 return 0;
     }
+    
+    while(true) {
 	 
     // Recebendo entrada de qual tratamento sera realizado
-    int scene;
-    std::cout << "Escolha uma cena: (1 ou 2)\n";
-    cin >> scene;
+    int scene = imagingSocket.update();
+    
+    if(scene == 0) {
+    	this_thread::sleep_for(chrono::milliseconds(100));
+    	continue;
+    }
+    
+    std::filesystem::remove_all("frames");
+    std::filesystem::create_directory("frames");
 
     // Criar VideoCapture
     VideoCapture capture(0);
@@ -65,8 +74,7 @@ int main()
         Mat frame;
         capture >> frame;
         // Grava o frame no folder designado
-        cout << "oi" << endl; 
-		imwrite("frames/frame_" + to_string(numberOfFrames++) + ".png", frame);
+        imwrite("frames/frame_" + to_string(numberOfFrames++) + ".png", frame);
         
         // Escolhe o tempo de distancia entre os frames
         // Adiciona um pequeno delay
@@ -154,6 +162,7 @@ int main()
 
     }
 
+	int contadorRaio = 0;
     if (scene == 1) {
         for (size_t k = 1; k < countOfFrames - 1; k++) {
             std::cout << "TO NO FRAME = " << k << endl;
@@ -203,10 +212,19 @@ int main()
                         centroideSum.x = xSum / areasSum;
                         centroideSum.y = ySum / areasSum;
                         // Salvamento da duracao e do valor do centroide em txt
-                        fstream newfile;
-                        newfile.open("raios.txt", ios::app);
-                        newfile << "Inicio = " << k << " e Fim = " << nextIndex-1 << " e Duracao = " << duration/3 << "seg e Centroide = " << centroideSum << endl;
-                        newfile.close();
+                        LightningData newData;
+                        newData.type = 1;
+                        newData.index = contadorRaio;
+                        newData.x = centroideSum.x;
+                        newData.y = centroideSum.y;
+                        newData.duration = duration/3;
+                        newData.radius = areasSum;
+                        imagingClient.sendPacket(newData);
+                        //fstream newfile;
+                        //newfile.open("raios.txt", ios::app);
+                        //newfile << "Inicio = " << k << " e Fim = " << nextIndex-1 << " e Duracao = " << duration/3 << "seg e Centroide = " << centroideSum << endl;
+                        //newfile.close();
+                        contadorRaio++;
                         break;
                     }
                     nextIndex++;
@@ -249,6 +267,7 @@ int main()
                 if (isInside <= ::distance) {
                     centroide = nextCentroide;
                     duration++;
+                    biggestContourFrames += biggestAreas[nextIndex][i];
 
                     //Colocar como visitado
                     matrixVisited[nextIndex][i] = 1;
@@ -259,6 +278,12 @@ int main()
                 // Salvamento da duracao
                 if (count == -1){
                     std::cout << "Duracao = " << duration/3 << endl;
+			LightningData newData;
+			newData.type = 2;
+			newData.index = contadorRaio;
+			newData.duration = duration/3;
+			newData.radius = biggestContourFrames;
+			imagingClient.sendPacket(newData);
                     break;
                 }
                 nextIndex = indexOfFrameOfBiggestContour;
@@ -270,6 +295,6 @@ int main()
     }
 
     waitKey(0);
-
+    }
     return 0;
 }
