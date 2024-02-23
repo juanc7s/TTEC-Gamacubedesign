@@ -48,7 +48,7 @@ class App(tk.Tk):
     
     self.control = Control.ControlFrame(self.control_frame, self.serial)
     self.ground_station = GroundStation.GroundStation(root=self.ground_station_frame, serial=self.serial)
-    self.logger = Logger.LoggerFrame(self.control_frame, self.serial, self.logger)
+    # self.logger = Logger.LoggerFrame(self.control_frame, self.serial, self.logger)
   
   def detect_ports(self):
     self.ports_dict = dict()
@@ -64,7 +64,7 @@ class App(tk.Tk):
       if self.serial.begin(self.ports_dict[self.port_combobox.get()], self.baudrate.get()):
         self.control_frame.pack(side='left',fill='both')
         self.ground_station_frame.pack(side='left',fill='both')
-        self.logger_frame.pack(side='bottom',fill='both')
+        # self.logger_frame.pack(side='bottom',fill='both')
         self.control.begin(self.serial)
         self.ground_station.begin(self.serial)
         self.open_close_variable.set("Close channel")
@@ -76,7 +76,7 @@ class App(tk.Tk):
       self.serial.close()
       self.control_frame.pack_forget()
       self.ground_station_frame.pack_forget()
-      self.logger_frame.pack_forget()
+      # self.logger_frame.pack_forget()
       self.open_close_variable.set("Open channel")
       # self.control_frame.pack_forget()
       # self.control_frame.pack()

@@ -90,10 +90,10 @@ class GroundStation(ttk.LabelFrame):
 
   def toggle_status(self):
     if self.toggle_status_variable.get() == 'ON':
-      self.status_flag = False
+      self.status_flag = 0
       self.toggle_status_variable.set('OFF')
     elif self.toggle_status_variable.get() == 'OFF':
-      self.status_flag = True
+      self.status_flag = 1
       self.toggle_status_variable.set('ON')
     self.ser.write([protocol['control_commands'].index("TOGGLE_QUERY_STATUS"), self.status_flag])
   
@@ -102,10 +102,10 @@ class GroundStation(ttk.LabelFrame):
 
   def toggle_imaging_data(self):
     if self.toggle_imaging_data_variable.get() == 'ON':
-      self.transmission_flag = False
+      self.imaging_data_flag = 0
       self.toggle_imaging_data_variable.set('OFF')
     elif self.toggle_imaging_data_variable.get() == 'OFF':
-      self.transmission_flag = True
+      self.imaging_data_flag = 1
       self.toggle_imaging_data_variable.set('ON')
     self.ser.write([protocol['control_commands'].index("TOGGLE_QUERY_IMAGING"), self.imaging_data_flag])
   
@@ -114,10 +114,10 @@ class GroundStation(ttk.LabelFrame):
 
   def toggle_set_operation(self):
     if self.toggle_set_operation_variable.get() == 'ON':
-      self.set_operation_flag = False
+      self.set_operation_flag = 0
       self.toggle_set_operation_variable.set('OFF')
     elif self.toggle_set_operation_variable.get() == 'OFF':
-      self.set_operation_flag = True
+      self.set_operation_flag = 1
       self.toggle_set_operation_variable.set('ON')
     self.ser.write([protocol['control_commands'].index("TOGGLE_COMMAND"), self.set_operation_flag])
   
@@ -126,12 +126,13 @@ class GroundStation(ttk.LabelFrame):
   
   def toggle_active_thermal_control(self):
     if self.toggle_active_thermal_control_variable.get() == 'OFF':
+      print("Toggling active thermal control OFF")
       self.toggle_active_thermal_control_variable.set('ON')
-      f = 1
+      self.ser.write([protocol['control_commands'].index("SET_ACTIVE_THERMAL_CONTROL"), 0])
     elif self.toggle_active_thermal_control_variable.get() == 'ON':
+      print("Toggling active thermal control ON")
       self.toggle_active_thermal_control_variable.set('OFF')
-      f = 0
-    self.ser.write([protocol['control_commands'].index("SET_ACTIVE_THERMAL_CONTROL"), f])
+      self.ser.write([protocol['control_commands'].index("SET_ACTIVE_THERMAL_CONTROL"), 1])
   
   def toggle_attitude_control(self):
     if self.toggle_attitude_control_variable.get() == 'OFF':

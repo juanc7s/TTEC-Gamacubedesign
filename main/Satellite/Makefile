@@ -39,3 +39,5 @@ SatTTC.out: Timing.o Logger.o RFModule.o RFModem.o SatTTC.o DataFIFO.o
 clean:
 	rm *.o *.out
 
+test: test_struct_formatting.cpp
+	g++ -o test.out test_struct_formatting.cpp

@@ -11,6 +11,37 @@
 
 extern const char CONTROL_STR[];
 extern const char PRINT_STR[];
+enum PRINT_ENUM{
+  PRINT_MESSAGE,
+  PRINT_STATUS_PACKET,
+  PRINT_IMAGING_PACKET,
+  PRINT_STATUS_RECEIVED,
+  PRINT_IMAGING_RECEIVED,
+  PRINT_PACKET_INFO
+};
+enum CONTROL_ENUM{
+  PRINT_DEVICE_READY,
+  CONTROL_RX_ADDH,
+  CONTROL_RX_ADDL,
+  CONTROL_TX_ADDH,
+  CONTROL_TX_ADDL,
+  CONTROL_BANDWIDTH,
+  CONTROL_FREQUENCY,
+  CONTROL_SPI_FREQUENCY,
+  CONTROL_SPREADING_FACTOR,
+  CONTROL_TXPW,
+  PRINT_LORA_INIT_FAILED
+};
+
+void printSeparator();
+void printPrint();
+void printPrint(PRINT_ENUM cmd);
+void printPrintln(PRINT_ENUM cmd);
+void printControl();
+void printControl(CONTROL_ENUM cmd);
+void printControlln(CONTROL_ENUM cmd);
+
+void printBIN(uint8_t *buf, unsigned int size);
 
 extern uint8_t txAddh;
 extern uint8_t txAddl;
@@ -23,10 +54,6 @@ extern unsigned long spi_frequency;
 extern unsigned long frequency;
 extern uint8_t spreading_factor;
 extern uint8_t tx_power;
-
-// extern String received_serial;
-// extern String receiving_serial;
-// extern bool serial_received;
 
 extern bool state_request_status;
 extern uint8_t send_request_status;

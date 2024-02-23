@@ -1,3 +1,4 @@
+import time
 import serial
 
 class SerialTransmission:
@@ -8,7 +9,11 @@ class SerialTransmission:
     self.transmission_flag = False
     self.receiving_buffer = bytes()
     self.receiving_flag = False
+    self.reading_binary = False
     self.listeners = dict()
+    
+    self.cmd = ''
+    self.args = []
     
   def begin(self, port, baudrate):
     if self.channel is not None:
@@ -45,7 +50,8 @@ class SerialTransmission:
   
   def write(self, message):
     print(self.encode(message)+[10])
-    self.channel.write(self.encode(message)+[10])
+    self.channel.write(bytearray(self.encode(message)+[10]))
+    time.sleep(0.1)
   
   def read(self):
     while self.channel.in_waiting > 0:
@@ -66,7 +72,7 @@ class SerialTransmission:
     # print(self.receiving_buffer)
     try:
       msg = str(self.receiving_buffer,encoding='utf8').rstrip()
-      # print(msg)
+      print(msg)
       if len(msg)>2:
         v = msg.split(':')
         if v[0] in self.listeners.keys():

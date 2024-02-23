@@ -120,31 +120,40 @@ class ControlFrame(ttk.LabelFrame):
   def close(self):
     self.pack_forget()
   
+  def key_from_value(self, d, v):
+    for k in d.keys():
+      if d[k] == v:
+        return k
+    
+    return None
+  
   def parse_message(self, cmd:str, args:list):
     print("Cmd: " + cmd)
     print("Args")
     print(args[0:])
-    if cmd=="Device initiated successfully":
+    if cmd=="0":#Device initiated successfully
       self.on_device_ready()
-    elif cmd == "RX_ADDH":
+    elif cmd == "1":#RX_ADDH
       self.rx_addh_variable.set(hex(int(args[0], 16))[2:].upper())
-    elif cmd == "RX_ADDL":
+    elif cmd == "2":#RX_ADDL
       self.rx_addl_variable.set(hex(int(args[0], 16))[2:].upper())
-    elif cmd == "TX_ADDH":
+    elif cmd == "3":#TX_ADDH
       self.tx_addh_variable.set(hex(int(args[0], 16))[2:].upper())
-    elif cmd == "TX_ADDL":
+    elif cmd == "4":#TX_ADDL
       self.tx_addl_variable.set(hex(int(args[0], 16))[2:].upper())
-    elif cmd == "BANDWIDTH":
+    elif cmd == "5":#BANDWIDTH
       sbw = list(protocol["bandwidth_dict"].keys())[int(args[0])]
       self.bandwidth_variable.set(sbw)
-    elif cmd == "FREQUENCY":
+    elif cmd == "6":#FREQUENCY
       self.frequency_variable.set(args[0][:-3])
-    elif cmd == "SPI_FREQUENCY":
+    elif cmd == "7":#SPI_FREQUENCY
       self.spi_frequency_variable.set(args[0][:-3])
-    elif cmd == "SPREADING_FACTOR":
+    elif cmd == "8":#SPREADING_FACTOR
       self.spreading_factor_variable.set(args[0])
-    elif cmd == "TXPW":
-      self.tx_power_variable.set(args[0])
+    elif cmd == "9":#TXPW
+      self.tx_power_variable.set(self.key_from_value(protocol["transmission_power_dict"], int(args[0])))
+    else:
+      print(cmd + " " + args[0:])
 
   def on_device_ready(self):
     self.read_rx_addh()

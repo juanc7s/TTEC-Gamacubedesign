@@ -114,20 +114,20 @@ struct GSPacket{
 struct HealthData{
 //   uint8_t length;
 //   uint8_t type;
-  unsigned long int index;
-  unsigned long int time;
+  uint32_t index;
+  uint32_t time;
   float battery_voltage;
   float battery_current;
   float battery_charge;
   float battery_temperature;
   float internal_temperature;
   float external_temperature;
-  unsigned long int sd_memory_usage; // MB
+  uint32_t sd_memory_usage; // MB
   uint8_t rasp_data[N];
 };
 
 struct LightningData{
-  unsigned long int index;
+  uint64_t index;
   float x;
   float y;
   float radius;
@@ -161,6 +161,7 @@ struct SatPacket{
   uint8_t length;
   ProtocolOperation operation;
   ByteData byte_data;
+  uint8_t padding_0[5];
   SatData data;
 };
 
@@ -174,8 +175,12 @@ struct Operation{
 
 // extern Message message;
 // extern TelemetryData telemetryData;
-extern SatPacket satPacket;
-extern GSPacket gsPacket;
-extern Operation operation;
+extern SatPacket satPacket;//int defsatPacketSize = sizeof(SatPacket);
+extern GSPacket gsPacket;//int defgsPacketSize = sizeof(GSPacket);
+extern Operation operation;//int defoperationSize = sizeof(Operation);
+
+// int temp_var0 = sizeof(SatPacket);
+// int temp_var1 = sizeof(uint8_t);
+// int temp_var2 = sizeof(ProtocolOperation);
 
 #endif

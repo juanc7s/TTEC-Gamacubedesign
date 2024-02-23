@@ -77,5 +77,6 @@
     "future": "cpp",
     "typeindex": "cpp"
   },
-  "C_Cpp.default.compilerPath": "/usr/bin/g++"
+  "C_Cpp.default.compilerPath": "/usr/bin/g++",
+  "cmake.sourceDirectory": "/mnt/DADOS/Workbench/GCD/TTC/TTEC-Gamacubedesign/main/Satellite/ImagingClient/opencv"
 }

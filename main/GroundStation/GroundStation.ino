@@ -12,10 +12,10 @@ const int resetPin = 9;       // LoRa radio reset
 const int irqPin = 8;         // change for your board; must be a hardware interrupt pin
 
 void setup(){
-  Serial.begin(57600);                   // initialize serial
+  Serial.begin(9600);                   // initialize serial
   while (!Serial);
 
-  Serial.println("Gama Ground Station communication system with LoRa Ra-01 rf module");
+  // Serial.println("Gama Ground Station communication system with LoRa Ra-01 rf module");
 
   // override the default CS, reset, and IRQ pins (optional)
   LoRa.setPins(csPin, resetPin, irqPin);// set CS, reset, IRQ pin
@@ -25,16 +25,16 @@ void setup(){
   LoRa.setTxPower(tx_power);
 
   if (!LoRa.begin(frequency)) {             // initialize ratio at 915 MHz
-    Serial.println("CONTROL:LoRa init failed. Check your connections.");
+    printControlln(PRINT_LORA_INIT_FAILED); // "CONTROL:LoRa init failed. Check your connections."
     while (true);                       // if failed, do nothing
   }
-  Serial.println("CONTROL:Device initiated successfully");
+  printControlln(PRINT_DEVICE_READY); // "CONTROL:Device initiated successfully"
 }
 
 bool state_sending = false;
 uint8_t send_tx = 0;
 
-unsigned long transmission_timer = 100;
+unsigned long transmission_timer = 2000;
 unsigned long next_transmission = 0;
 
 void loop(){

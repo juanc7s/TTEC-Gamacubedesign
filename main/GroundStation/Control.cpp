@@ -3,6 +3,55 @@
 
 const char PRINT_STR[] = "PRINT:";
 const char CONTROL_STR[] = "CONTROL:";
+const char SEPARATOR_STR = ':';
+
+void printSeparator(){
+  Serial.print(SEPARATOR_STR);
+}
+void printPrint(){
+  Serial.print(PRINT_STR);
+}
+void printPrint(PRINT_ENUM cmd){
+  Serial.print(PRINT_STR);
+  Serial.print(cmd);
+  printSeparator();
+}
+void printPrintln(PRINT_ENUM cmd){
+  Serial.print(PRINT_STR);
+  Serial.println(cmd);
+}
+void printControl(){
+  Serial.print(CONTROL_STR);
+}
+void printControl(CONTROL_ENUM cmd){
+  Serial.print(CONTROL_STR);
+  Serial.print(cmd);
+  printSeparator();
+}
+void printControlln(CONTROL_ENUM cmd){
+  Serial.print(CONTROL_STR);
+  Serial.println(cmd);
+}
+
+void printBIN(uint8_t *buf, unsigned int size){
+  uint8_t b;
+  Serial.print("BIN:");
+  for(unsigned int i = 0; i < size; i++){
+    b = buf[i];
+    if(b == 11){
+      Serial.write(11);
+      Serial.write(11);
+    } else if(b == 10){
+      Serial.write(11);
+      Serial.write(10);
+    } else if(b == 13){
+      Serial.write(11);
+      Serial.write(13);
+    } else{
+      Serial.write(b);
+    }
+  }
+}
 
 bool serialFlag = false;
 
@@ -21,6 +70,7 @@ void checkControl(){
   uint8_t c;
   while(Serial.available()){
     c = Serial.read();
+    Serial.println((int)c);
     if(serialFlag){
       parsing_function(c);
       serialFlag = false;
@@ -50,44 +100,40 @@ void number_parser(uint8_t c){
 void parseSerial(uint8_t c){
   switch(c){
     case READ_RX_ADDH:
-      Serial.print(CONTROL_STR);Serial.print("RX_ADDH:");
-      Serial.println(rxAddh, HEX);
+      printControl(CONTROL_RX_ADDH);
+      Serial.println((unsigned int)rxAddh, HEX);
       break;
     case READ_RX_ADDL:
-      Serial.print(CONTROL_STR);Serial.print("RX_ADDL:");
-      Serial.println(rxAddl, HEX);
+      printControl(CONTROL_RX_ADDL);
+      Serial.println((unsigned int)rxAddl, HEX);
       break;
     case READ_TX_ADDH:
-      Serial.print(CONTROL_STR);Serial.print("TX_ADDH:");
-      Serial.println(txAddh, HEX);
+      printControl(CONTROL_TX_ADDH);
+      Serial.println((unsigned int)txAddh, HEX);
       break;
     case READ_TX_ADDL:
-      Serial.print(CONTROL_STR);Serial.print("TX_ADDL:");
-      Serial.println(txAddl, HEX);
+      printControl(CONTROL_TX_ADDL);
+      Serial.println((unsigned int)txAddl, HEX);
       break;
     case READ_BANDWIDTH:
-      Serial.print(CONTROL_STR);Serial.print("BANDWIDTH:");
-      Serial.println(bandwidth);
-      // Serial.print(" Hz");
+      printControl(CONTROL_BANDWIDTH);
+      Serial.println((unsigned int)bandwidth);// Serial.print(" Hz");
       break;
     case READ_FREQUENCY:
-      Serial.print(CONTROL_STR);Serial.print("FREQUENCY:");
-      Serial.println(frequency);
-      // Serial.println(" MHz");
+      printControl(CONTROL_FREQUENCY);
+      Serial.println(frequency);// Serial.println(" MHz");
       break;
     case READ_SPI_FREQUENCY:
-      Serial.print(CONTROL_STR);Serial.print("SPI_FREQUENCY:");
-      Serial.println(spi_frequency);
-      // Serial.println(" Hz");
+      printControl(CONTROL_SPI_FREQUENCY);
+      Serial.println(spi_frequency);// Serial.println(" Hz");
       break;
     case READ_SPREADING_FACTOR:
-      Serial.print(CONTROL_STR);Serial.print("SPREADING_FACTOR:");
-      Serial.println(spreading_factor);
+      printControl(CONTROL_SPREADING_FACTOR);
+      Serial.println((unsigned int)spreading_factor);
       break;
     case READ_TRANSMISSION_POWER:
-      Serial.print(CONTROL_STR);Serial.print("TXPW:");
-      Serial.println(tx_power);
-      // Serial.println(" dBm");
+      printControl(CONTROL_TXPW);
+      Serial.println((unsigned int)tx_power);// Serial.println(" dBm");
       break;
     case READ_ALL:
       // printConfiguration();
@@ -163,6 +209,9 @@ void parseSerial(uint8_t c){
     case SET_STAND_BY_MODE:
       parsing_function = setStandByMode;
       break;
+    default:
+      Serial.print("Unknown command ");Serial.println((int)c);
+      break;
   }
 }
 
@@ -235,8 +284,8 @@ void control_setSPIFrequency(){
   spi_frequency = number_parser_N;
   LoRa.setSPIFrequency(spi_frequency);
   if (!LoRa.begin(frequency)) {             // initialize ratio at set frequency
-    Serial.print(PRINT_STR);
-    Serial.println("LoRa init failed. Check your connections.");
+    printControl(PRINT_LORA_INIT_FAILED);
+    Serial.println(); //"LoRa init failed. Check your connections."
     while (true);                       // if failed, do nothing
   }
   parsing_function = parseSerial;
@@ -255,6 +304,7 @@ void control_setTxPower(uint8_t c){
 }
 
 void control_toggleQueryStatus(uint8_t c){
+  Serial.print("PRINT:set status to ");Serial.println(c);
   state_request_status = c != 0;
   parsing_function = parseSerial;
 }
@@ -290,40 +340,44 @@ void setStandByMode(uint8_t c){
 }
 
 void control_print_status_packet(){
-  Serial.print(PRINT_STR);
-  Serial.print("Status: Received packet");
-  Serial.println(satPacket.byte_data.index);
-  Serial.print("STATUS_PACKET:");
-  Serial.print(":Reading time:");Serial.print(satPacket.data.healthData.time);
-  Serial.print(":Battery voltage:");Serial.print(satPacket.data.healthData.battery_voltage);
-  Serial.print(":Battery current:");Serial.print(satPacket.data.healthData.battery_current);
-  Serial.print(":Battery charge:");Serial.print(satPacket.data.healthData.battery_charge);
-  Serial.print(":Battery temperature:");Serial.print(satPacket.data.healthData.battery_temperature);
-  Serial.print(":Internal temperature:");Serial.print(satPacket.data.healthData.internal_temperature);
-  Serial.print(":External temperature:");Serial.print(satPacket.data.healthData.external_temperature);
-  Serial.print(":SD memory usage:");Serial.println(satPacket.data.healthData.sd_memory_usage);
+  printPrint(PRINT_STATUS_RECEIVED);
+  printBIN((uint8_t*)&satPacket, sizeof(satPacket));
+  // printSeparator();Serial.println(satPacket.byte_data.index);
+  // Serial.print(PRINT_STATUS_PACKET);
+  // printSeparator();Serial.print(satPacket.data.healthData.time);//Reading time:
+  // printSeparator();Serial.print(satPacket.data.healthData.battery_voltage);//Battery voltage:
+  // printSeparator();Serial.print(satPacket.data.healthData.battery_current);//Battery current:
+  // printSeparator();Serial.print(satPacket.data.healthData.battery_charge);//Battery charge:
+  // printSeparator();Serial.print(satPacket.data.healthData.battery_temperature);//Battery temperature:
+  // printSeparator();Serial.print(satPacket.data.healthData.internal_temperature);//Internal temperature:
+  // printSeparator();Serial.print(satPacket.data.healthData.external_temperature);//External temperature:
+  // printSeparator();Serial.println(satPacket.data.healthData.sd_memory_usage);//SD memory usage:
   // for(uint8_t i = 0; i < 10; i++){
   //   Serial.println(newPacket.data.healthData.rasp_data[i]);
   // }
 }
 
 void control_print_imaging_packet(){
-  Serial.print(PRINT_STR);
-  Serial.print("Imaging: Received packet ");
-  Serial.println(satPacket.byte_data.index);
-  Serial.print("IMAGING_PACKET:");
-  Serial.print("Index:");Serial.print(satPacket.data.imagingData.lightnings[0].index);
-  Serial.print("Duration:");Serial.print(satPacket.data.imagingData.lightnings[0].duration);
-  Serial.print("Radius:");Serial.print(satPacket.data.imagingData.lightnings[0].radius);
-  Serial.print("X:");Serial.print(satPacket.data.imagingData.lightnings[0].x);
-  Serial.print("Y:");Serial.println(satPacket.data.imagingData.lightnings[0].y);
+  printPrint(PRINT_IMAGING_RECEIVED);
+  printBIN((uint8_t*)&satPacket, sizeof(satPacket));
+  // printSeparator();Serial.println(satPacket.byte_data.index);
+  // Serial.print(PRINT_IMAGING_PACKET);
+  // printSeparator();Serial.print(satPacket.data.imagingData.lightnings[0].index);//"Index:"
+  // printSeparator();Serial.print(satPacket.data.imagingData.lightnings[0].duration);//"Duration:"
+  // printSeparator();Serial.print(satPacket.data.imagingData.lightnings[0].radius);//"Radius:"
+  // printSeparator();Serial.print(satPacket.data.imagingData.lightnings[0].x);//"X:"
+  // printSeparator();Serial.println(satPacket.data.imagingData.lightnings[0].y);//"Y:"
 }
 
 void control_print_packet_info(){
-  Serial.print(PRINT_STR);
-  Serial.print("Receiving telemetry:Length:");
-  Serial.print(satPacket.length);
-  Serial.print(":Protocol:");Serial.print(satPacket.operation.protocol);
-  Serial.print(":Operation:");Serial.print(satPacket.operation.operation);
-  Serial.println(":Telemetry received!");
+  printPrint(PRINT_PACKET_INFO);
+  // Serial.print("Receiving telemetry:Length:");
+  Serial.print((unsigned int)satPacket.length);
+  printSeparator();
+  // Serial.print(":Protocol:");
+  Serial.print((unsigned int)satPacket.operation.protocol);
+  printSeparator();
+  // Serial.print(":Operation:");
+  Serial.println((unsigned int)satPacket.operation.operation);
+  // Serial.println(":Telemetry received!");
 }

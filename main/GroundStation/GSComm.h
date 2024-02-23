@@ -21,6 +21,8 @@ extern unsigned long frequency;
 extern uint8_t spreading_factor;
 extern uint8_t tx_power;
 
+extern Operation operation;
+
 // extern bool switch_active_thermal_control;
 // extern bool switch_attitude_control;
 // extern bool switch_imaging;
