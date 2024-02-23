@@ -12,7 +12,7 @@ const int resetPin = 9;       // LoRa radio reset
 const int irqPin = 8;         // change for your board; must be a hardware interrupt pin
 
 void setup(){
-  Serial.begin(9600);                   // initialize serial
+  Serial.begin(57600);                   // initialize serial
   while (!Serial);
 
   // Serial.println("Gama Ground Station communication system with LoRa Ra-01 rf module");

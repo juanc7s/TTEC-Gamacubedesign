@@ -66,22 +66,29 @@ uint8_t send_command = 0;
 
 void (*parsing_function)(uint8_t c) = parseSerial;
 
+uint8_t rcv_b = 0;
 void checkControl(){
   uint8_t c;
   while(Serial.available()){
     c = Serial.read();
     Serial.println((int)c);
-    if(serialFlag){
-      parsing_function(c);
-      serialFlag = false;
-    } else if(c==13){
-      serialFlag = true;
-    } else if(c=='\n'){
-      parsing_function = parseSerial;
-    } else if (c==255){
-      parsing_function = parseSerial;
+    if(c == ',' || c == '\n' || c == 225){
+      parsing_function(rcv_b);
+      rcv_b = 0;
+      // if(serialFlag){
+      //   serialFlag = false;
+      // } else if(rcv_b==13){
+      //   serialFlag = true;
+      // } else if(rcv_b=='\n'){
+      //   parsing_function = parseSerial;
+      // } else if (rcv_b==255){
+      //   parsing_function = parseSerial;
+      // } else{
+      //   parsing_function(c);
+      // }
     } else{
-      parsing_function(c);
+      rcv_b *= 10;
+      rcv_b += c - 48;
     }
   }
 }

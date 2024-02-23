@@ -21,7 +21,7 @@ class SerialTransmission:
         self.channel.close()
     
     try:
-      self.channel = serial.Serial(port=port.device,baudrate=baudrate,timeout=0.1)
+      self.channel = serial.Serial(port=port.device,baudrate=baudrate,timeout=0.5)
     except Exception as e:
       print(e)
       return False
@@ -41,16 +41,23 @@ class SerialTransmission:
   def encode(self, message):
     out = []
     for c in message:
-      if c==10:
-        out += [13]
-      if c==13:
-        out += [13]
-      out += [c]
-    return out
+      # if c==10:
+      #   out += [13]
+      # if c==13:
+      #   out += [13]
+      out += [str(c)]
+    return ','.join(out)
   
   def write(self, message):
-    print(self.encode(message)+[10])
-    self.channel.write(bytearray(self.encode(message)+[10]))
+    print("Sending:")
+    self.channel.write(bytes('20,1\n', 'utf-8'))
+    # print(bytearray(self.encode(message)+'\n', encoding='utf8'))
+    # self.channel.write(bytearray(self.encode(message)+'\n', encoding='utf8'))
+    # self.channel.write((self.encode(message)+'\n').encode())
+    # for c in self.encode(message):#+'\n'
+    #   print(ord(c))
+    #   self.channel.write([ord(c)])
+    print("Done sending")
     time.sleep(0.1)
   
   def read(self):
