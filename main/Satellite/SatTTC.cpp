@@ -6,11 +6,11 @@
 #include <cstring>
 using namespace std;
 
-#ifdef __cplusplus
-  extern "C" {
-    #include "sx1278-LoRa-RaspberryPi/LoRa.h"
-  }
-#endif
+//#ifdef __cplusplus
+//  extern "C" {
+//    #include "../sx1278-LoRa-RaspberryPi/LoRa.h"
+//  }
+//#endif
 #include "RFModem.h"
 
 #include "Logger.h"
@@ -57,7 +57,7 @@ void read_fifos(){
   }
 }
 
-void checkConsole(){
+/*void checkConsole(){
   char c;
   while(console.available() > 0){
     c = console.read();
@@ -214,10 +214,10 @@ void checkConsole(){
   //     comm_pointer = 0;
   //   }
   // }
-}
+}*/
 
 void loop(){
-  checkConsole();
+  //checkConsole();
   updateRFComm();
   read_fifos();
 }

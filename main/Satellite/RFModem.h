@@ -3,7 +3,7 @@
 
 #ifdef __cplusplus
   extern "C" {
-    #include "sx1278-LoRa-RaspberryPi/LoRa.h"
+    #include "../sx1278-LoRa-RaspberryPi/LoRa.h"
   }
 #endif
 

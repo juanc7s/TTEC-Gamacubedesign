@@ -5,7 +5,7 @@ using namespace std;
 
 #include "../CommunicationProtocol.h"
 
-void print_status_packet_bytes(HealthData statusPacket){
+void print_status_packet(HealthData statusPacket){
   cout << "Packet index: " << statusPacket.index << endl;
   cout << "Reading time: " << statusPacket.time << endl;
   cout << "Battery charge: " << statusPacket.battery_charge << endl;
