@@ -38,6 +38,11 @@ enum PROTOCOL_SET_OPERATION{
     SATELLITE_SET_OPERATION_DONE
 };
 
+//enum PROTOCOL_PING {
+//    GS_PING_REQUEST,
+//    SATELLITE_PING_RESPONSE
+//};
+
 struct ProtocolOperation{
     unsigned protocol : 2;
     unsigned operation : 6;

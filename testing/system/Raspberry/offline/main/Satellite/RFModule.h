@@ -55,6 +55,7 @@ void postImagingDataProtocol();
 void switchCaseStatusProtocol();
 void switchCaseImagingDataProtocol();
 void switchCaseSetOperationProtocol();
+//void switchCasePingProtocol();
 
 
 void switch_status_file();

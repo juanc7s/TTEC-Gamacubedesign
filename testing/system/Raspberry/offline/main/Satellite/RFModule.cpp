@@ -324,3 +324,11 @@ void switchCaseSetOperationProtocol(){
       break;
   }
 }
+
+//void switchCasePingProtocol(){
+//  switch(gsPacket.operation.operation){
+//    case GS_PING_REQUEST:
+//      satPacket.operation.protocol = PROTOCOL_PING;
+//      satPacket.operation.operation = GS_PING_REQUEST;
+//  }
+//}
